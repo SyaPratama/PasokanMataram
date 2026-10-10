@@ -121,11 +121,11 @@ export function Footer() {
             <Link href="/register" className="hover:text-white transition-colors">
               Pendaftaran HoReKa
             </Link>
-            <span>•</span>
+            <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
             <Link href="/register" className="hover:text-white transition-colors">
               Pendaftaran Gapoktan
             </Link>
-            <span>•</span>
+            <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
             <Link href="/onboarding-kyb" className="hover:text-white transition-colors">
               Status KYB
             </Link>

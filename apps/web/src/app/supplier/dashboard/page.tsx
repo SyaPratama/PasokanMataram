@@ -37,7 +37,7 @@ export default function SupplierDashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/#alur-pengadaan">
+          <Link href="/supplier/qc-handoff">
             <Button variant="outline" size="sm" className="text-xs">
               <ClipboardCheck className="w-3.5 h-3.5 mr-1.5" />
               SOP Serah Terima QC
@@ -131,8 +131,10 @@ export default function SupplierDashboardPage() {
             </span>
             <StatusBadge status="VERIFIED" />
           </div>
-          <p className="text-xs text-gelap/70">
-            SK Pengukuhan: <strong>520/SK-DISTAN/KP/2024</strong> &bull; Diterbitkan oleh: Dinas Pertanian & Ketahanan Pangan Kab. Kulon Progo.
+          <p className="text-xs text-gelap/70 flex flex-wrap items-center gap-1.5">
+            <span>SK Pengukuhan: <strong>520/SK-DISTAN/KP/2024</strong></span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span>Diterbitkan oleh: Dinas Pertanian &amp; Ketahanan Pangan Kab. Kulon Progo.</span>
           </p>
         </div>
         <div className="text-xs text-primer font-semibold bg-primer-light px-3 py-1.5 rounded-lg border border-primer/20">

@@ -116,7 +116,7 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
             <span>
               Pusat Logistik: <strong className="text-primer">Sentra Hub Kulon Progo (Sentolo)</strong>
             </span>
-            <span>&bull;</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block mx-1.5" aria-hidden="true" />
             <span>
               Kapasitas Gudang Bersama: <strong className="text-gelap">Tersedia</strong>
             </span>

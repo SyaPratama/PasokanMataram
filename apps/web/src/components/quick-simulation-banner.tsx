@@ -245,14 +245,14 @@ export function QuickSimulationBanner() {
   return (
     <>
       {/* Banner Ringkas di Bawah Hero / Atas Navigasi */}
-      <div className="bg-primer-deep text-white border-y border-white/10 px-4 py-2 sm:px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-          <div className="flex items-center gap-2 text-center sm:text-left">
-            <span className="flex h-2 w-2 rounded-full bg-cta-green animate-pulse" />
-            <span className="font-semibold text-white/90">
+      <div id="quick-sim-banner" className="bg-primer-deep text-white border-y border-white/10 px-3 sm:px-6 py-2">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink min-w-0">
+            <span className="flex h-2 w-2 rounded-full bg-cta-green animate-pulse shrink-0" aria-hidden="true" />
+            <span className="font-semibold text-white/95 text-[11px] sm:text-xs whitespace-nowrap">
               Mode Uji Coba Cepat:
             </span>
-            <span className="text-white/75 hidden md:inline">
+            <span className="text-white/75 text-xs hidden lg:inline truncate">
               Eksplorasi langsung antarmuka 4 peran tanpa perlu registrasi manual.
             </span>
           </div>
@@ -260,10 +260,12 @@ export function QuickSimulationBanner() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sekunder hover:bg-sekunder-hover text-white font-bold transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-white min-h-[44px]"
+            className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full bg-sekunder hover:bg-sekunder-hover text-white text-[11px] sm:text-xs font-bold transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-white shrink-0 whitespace-nowrap min-h-[36px] sm:min-h-[40px]"
+            title="Klik untuk memilih 1 dari 4 profil pengujian langsung"
           >
-            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Pilih 4 Simulasi Peran (1-Klik)</span>
+            <Sparkles className="w-3.5 h-3.5 text-aksen-light shrink-0" aria-hidden="true" />
+            <span className="hidden sm:inline">Pilih 4 Simulasi Peran (1-Klik)</span>
+            <span className="sm:hidden">4 Simulasi Peran</span>
           </button>
         </div>
       </div>

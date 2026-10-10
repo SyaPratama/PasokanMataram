@@ -128,8 +128,12 @@ export function ForecastInteractiveChart({
               Ensemble v2.1
             </span>
           </div>
-          <p className="text-xs text-gelap/60 mt-0.5">
-            Garis tebal: data pasar aktual &bull; Garis putus-putus: estimasi ML &bull; Area arsiran: interval keyakinan 95%
+          <p className="text-xs text-gelap/60 mt-0.5 flex flex-wrap items-center gap-1.5">
+            <span>Garis tebal: data pasar aktual</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span>Garis putus-putus: estimasi ML</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span>Area arsiran: interval keyakinan 95%</span>
           </p>
         </div>
 
@@ -139,7 +143,7 @@ export function ForecastInteractiveChart({
               key={h}
               type="button"
               onClick={() => onHorizonChange(h)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all min-h-[36px] ${
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                 horizon === h
                   ? 'bg-white text-primer shadow-2xs font-extrabold'
                   : 'text-gelap/70 hover:text-gelap'
@@ -211,13 +215,13 @@ export function ForecastInteractiveChart({
             HARI INI (09 OKT)
           </text>
 
-          {confidenceAreaPath && (
+          {confidenceAreaPath ? (
             <path
               d={confidenceAreaPath}
               fill="url(#confidenceGradient)"
               className="transition-all duration-300"
             />
-          )}
+          ) : null}
 
           <path
             d={historicalPath}

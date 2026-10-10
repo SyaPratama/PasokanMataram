@@ -100,8 +100,10 @@ export function OutletContextSelector({
                 }`}
               >
                 <span className="truncate">{outlet.name}</span>
-                <span className="text-[10px] text-gelap/85">
-                  {outlet.isMain ? 'Pusat' : 'Cabang'} &bull; {outlet.regency.replace('_', ' ')}
+                <span className="text-[10px] text-gelap/85 flex items-center gap-1">
+                  <span>{outlet.isMain ? 'Pusat' : 'Cabang'}</span>
+                  <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+                  <span>{outlet.regency.replace('_', ' ')}</span>
                 </span>
               </button>
             );

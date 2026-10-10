@@ -152,9 +152,9 @@ export function MekanismePoolingSection() {
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-netral-border/60">
             <p className="text-xs text-gelap/85 font-body">
               Ingin menghitung simulasi kebutuhan lengkap dapur Anda? Gunakan{' '}
-              <a href="#kalkulator" className="text-primer font-semibold underline underline-offset-2">
+              <Link href="/kalkulator" className="text-primer font-semibold underline underline-offset-2">
                 Kalkulator Penghematan Dapur
-              </a>
+              </Link>
               .
             </p>
             <Link

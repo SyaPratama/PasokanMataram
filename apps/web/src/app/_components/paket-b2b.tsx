@@ -102,10 +102,55 @@ const PRICING_TIERS: PricingTier[] = [
 ];
 
 export function PaketB2b() {
+  const [activeSlide, setActiveSlide] = React.useState(0);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+
+  /**
+   * Menangani pembaruan indeks slide aktif saat pengguna menggeser kartu secara manual di mobile.
+   */
+  const handleScroll = React.useCallback(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    cardRefs.current.forEach((card, idx) => {
+      if (!card) return;
+      const cardCenter = card.offsetLeft + card.clientWidth / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = idx;
+      }
+    });
+
+    setActiveSlide(closestIndex);
+  }, []);
+
+  /**
+   * Menavigasi ke slide tertentu saat titik indikator diklik oleh pengguna.
+   * @param index Indeks slide tujuan (0 s.d. 3).
+   */
+  const handleSelectSlide = (index: number) => {
+    const container = carouselRef.current;
+    const card = cardRefs.current[index];
+    if (container && card) {
+      const targetScrollLeft = card.offsetLeft - (container.clientWidth - card.clientWidth) / 2;
+      container.scrollTo({
+        left: Math.max(0, targetScrollLeft),
+        behavior: 'smooth',
+      });
+      setActiveSlide(index);
+    }
+  };
+
   return (
-    <section id="biaya" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-canvas">
+    <section id="biaya" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-canvas overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
             Transparansi Paket Layanan Dapur
           </span>
@@ -117,15 +162,24 @@ export function PaketB2b() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch max-w-7xl mx-auto">
-          {PRICING_TIERS.map((tier) => {
+        {/* Kontainer Kartu: Carousel di Mobile, Grid di Desktop */}
+        <div
+          ref={carouselRef}
+          onScroll={handleScroll}
+          className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth items-stretch max-w-7xl mx-auto pt-6 pb-6 md:py-0 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-auto md:px-0"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {PRICING_TIERS.map((tier, idx) => {
             const IconComponent = tier.icon;
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all ${
+                ref={(el) => {
+                  cardRefs.current[idx] = el;
+                }}
+                className={`relative rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all shrink-0 w-[86vw] max-w-[340px] snap-center md:w-auto md:max-w-none md:shrink ${
                   tier.isFeatured
-                    ? 'bg-primer-deep text-white shadow-xl ring-2 ring-sekunder/80 -translate-y-1'
+                    ? 'bg-primer-deep text-white shadow-xl ring-2 ring-sekunder/80 md:-translate-y-1'
                     : 'bg-white text-gelap shadow-sm border border-netral-border hover:shadow-md'
                 }`}
               >
@@ -196,8 +250,8 @@ export function PaketB2b() {
                   </div>
 
                   <ul className="mt-5 space-y-2.5 text-xs">
-                    {tier.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
+                    {tier.features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2">
                         <Check
                           className={`w-4 h-4 shrink-0 mt-0.5 ${
                             tier.isFeatured ? 'text-aksen' : 'text-primer-deep'
@@ -232,6 +286,50 @@ export function PaketB2b() {
               </div>
             );
           })}
+        </div>
+
+        {/* Indikator Slide Aktif Khusus Mobile (Tanpa Navigasi Panah) */}
+        <div className="mt-2 flex flex-col items-center gap-2 md:hidden">
+          {/* Label Informasi Slide Aktif */}
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-netral-border/90 text-xs font-semibold text-gelap shadow-2xs">
+            <span>Paket {activeSlide + 1} dari {PRICING_TIERS.length}</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span className="font-bold text-primer">{PRICING_TIERS[activeSlide]?.name}</span>
+          </div>
+
+          {/* Dot / Pill Indicators Interaktif */}
+          <div
+            role="tablist"
+            aria-label="Indikator slide paket akun"
+            className="flex items-center gap-1.5 py-1"
+          >
+            {PRICING_TIERS.map((tier, idx) => {
+              const isActive = activeSlide === idx;
+              return (
+                <button
+                  key={tier.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={`Beralih ke slide ${idx + 1}: ${tier.name}`}
+                  onClick={() => handleSelectSlide(idx)}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-full"
+                >
+                  <span
+                    className={`block rounded-full transition-all duration-300 ${
+                      isActive
+                        ? 'w-7 h-2.5 bg-primer shadow-xs'
+                        : 'w-2.5 h-2.5 bg-netral-border hover:bg-primer/40'
+                    }`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="text-[11px] text-gelap/70 font-body">
+            Geser kartu secara horizontal untuk membandingkan paket
+          </p>
         </div>
 
         {/* Layanan Logistik Rantai Dingin Terjadwal 24 Jam */}

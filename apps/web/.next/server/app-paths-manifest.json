@@ -1,8 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/buyer/forecast/page": "app/buyer/forecast/page.js",
-  "/farmer/dashboard/page": "app/farmer/dashboard/page.js",
-  "/supplier/dashboard/page": "app/supplier/dashboard/page.js",
-  "/(auth)/onboarding-kyb/page": "app/(auth)/onboarding-kyb/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js"
-}

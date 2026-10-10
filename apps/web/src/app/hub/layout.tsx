@@ -1,69 +1,119 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   ScanQrCode,
   Scale,
-  LogOut,
-  MapPin,
-  ShieldCheck,
+  Truck,
+  ShieldAlert,
+  FileText,
+  HelpCircle,
 } from 'lucide-react';
+import {
+  DashboardShell,
+  HubContextCard,
+  type NavGroup,
+} from '../../components/dashboard-shell';
 
+/**
+ * Properti untuk shell tata letak portal operator cross-docking hub logistik.
+ */
 interface HubLayoutProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
 /**
- * Shell Tata Letak Portal Operator Cross-Dock Logistik Hub.
- * Mematuhi FR-016, FR-020, dan Konstitusi Prinsip XIII.
+ * Shell Tata Letak Portal Operator Cross-Dock Logistik Hub Modular.
+ * Mengadopsi cangkang tunggal DashboardShell dengan slot kartu konteks fasilitas hub Bantul.
  */
 export default function HubLayout({ children }: HubLayoutProps) {
+  const pathname = usePathname();
+
+  const navGroups: readonly NavGroup[] = [
+    {
+      title: 'OPERASIONAL HUB',
+      items: [
+        {
+          name: 'Inbound & QC Sortasi',
+          href: '/hub/inbound',
+          icon: ScanQrCode,
+          active: pathname === '/hub/inbound' || pathname === '/hub',
+        },
+        {
+          name: 'Stasiun Timbangan Tera',
+          href: '/hub/weighing',
+          icon: Scale,
+          active: pathname === '/hub/weighing',
+          badge: 'Metrologi',
+        },
+      ],
+    },
+    {
+      title: 'LOGISTIK DINGIN',
+      items: [
+        {
+          name: 'Jadwal Antar Subuh',
+          href: '/hub/deliveries',
+          icon: Truck,
+          active: pathname === '/hub/deliveries',
+        },
+        {
+          name: 'Karantina Deviasi Mutu',
+          href: '/hub/quarantine',
+          icon: ShieldAlert,
+          active: pathname === '/hub/quarantine',
+        },
+      ],
+    },
+    {
+      title: 'PENGATURAN',
+      items: [
+        {
+          name: 'SOP Standar Fasilitas',
+          href: '/hub/sop',
+          icon: FileText,
+          active: pathname === '/hub/sop',
+        },
+        {
+          name: 'Pusat Bantuan Stasiun',
+          href: '/hub/help',
+          icon: HelpCircle,
+          active: pathname === '/hub/help',
+        },
+      ],
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-netral-canvas flex flex-col font-body">
-      {/* Header Logistik Hub */}
-      <header className="bg-white border-b border-netral-border px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
-        <div className="flex items-center space-x-3">
-          <Link href="/" className="flex items-center space-x-2">
-            <Image
-              src="/icons/icon.svg"
-              alt="Logo PasokMataram"
-              width={28}
-              height={28}
-              className="w-7 h-7 object-contain"
-            />
-            <span className="font-heading font-extrabold text-base text-primer tracking-tight">
-              Pasok<span className="text-sekunder">Mataram</span>
+    <DashboardShell
+      portalBadge={{ label: 'Hub Transit', variant: 'primer' }}
+      contextSlot={<HubContextCard />}
+      navGroups={navGroups}
+      tenantProfile={{
+        tenantName: 'Hub Transit Sewon Bantul',
+        statusBadge: 'VERIFIED',
+        userName: 'Danang Prasetyo',
+        roleTitle: 'OPERATOR_QC',
+        logoutHref: '/login',
+      }}
+      topBarMeta={{
+        titleMeta: (
+          <>
+            <span>
+              Fasilitas Logistik: <strong className="text-primer">Hub Bantul Paseban (hub-bantul-01)</strong>
             </span>
-          </Link>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primer-light text-primer uppercase">
-            Hub Operator
-          </span>
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-netral-canvas border border-netral-border text-xs text-gelap">
-            <MapPin className="w-3.5 h-3.5 text-sekunder" />
-            <span>Fasilitas: <strong>Hub Bantul Paseban (hub-bantul-01)</strong></span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-primer font-semibold">
-            <ShieldCheck className="w-4 h-4" />
-            QC Station Aktif
-          </span>
-          <Link
-            href="/login"
-            className="inline-flex items-center text-xs text-sekunder hover:underline font-semibold"
-          >
-            <LogOut className="w-3.5 h-3.5 mr-1" />
-            Keluar
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full">
-        {children}
-      </main>
-    </div>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block mx-1.5" aria-hidden="true" />
+            <span>
+              Stasiun Kontrol Mutu: <strong className="text-gelap">Cold-Chain Siaga 24 Jam</strong>
+            </span>
+          </>
+        ),
+        badgeText: 'Operator Logistik Sah',
+        notificationAriaLabel: 'Pemberitahuan Truk Masuk Inbound',
+      }}
+    >
+      {children}
+    </DashboardShell>
   );
 }

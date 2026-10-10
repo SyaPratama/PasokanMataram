@@ -92,7 +92,7 @@ export default function BuyerDeliveriesPage() {
                   <div className="text-[11px] text-gelap/60 flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3 text-sekunder" />
                     <span>Asal: {del.departureHub}</span>
-                    <span>&bull;</span>
+                    <span className="w-1 h-1 rounded-full bg-netral-border inline-block mx-1" aria-hidden="true" />
                     <span className="font-mono text-primer font-semibold">ETA: {del.eta}</span>
                   </div>
                 </div>

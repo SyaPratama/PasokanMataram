@@ -194,8 +194,10 @@ export default function BuyerDashboardPage() {
           <div className="text-xl font-bold text-gelap font-heading">
             Besok Subuh
           </div>
-          <div className="text-[11px] text-gelap/85 font-medium">
-            Est. 04:30 WIB &bull; 85 kg muatan
+          <div className="text-[11px] text-gelap/85 font-medium flex items-center gap-1.5">
+            <span>Est. 04:30 WIB</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span>85 kg muatan</span>
           </div>
         </div>
 
@@ -216,8 +218,8 @@ export default function BuyerDashboardPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-netral-border/80 shadow-2xs overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-netral-border/70 flex items-center justify-between">
-          <div>
+        <div className="p-4 sm:p-5 border-b border-netral-border/70 flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <h2 className="text-sm font-bold text-gelap font-heading">
               {hasFinancialAccess ? 'Purchase Orders Berjalan' : 'Daftar Penerimaan Bahan Baku Subuh'}
             </h2>
@@ -225,7 +227,7 @@ export default function BuyerDashboardPage() {
               Jadwal Pengiriman Bahan Baku Rutin dari sentra Gapoktan via Cross-Dock Hub DIY.
             </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primer-light text-primer">
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primer-light text-primer whitespace-nowrap shrink-0">
             {orders.length} Batch Aktif
           </span>
         </div>

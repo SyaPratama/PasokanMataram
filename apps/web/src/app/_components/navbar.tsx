@@ -26,7 +26,14 @@ import {
   TrendingUp,
   HelpCircle,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+  useTransform,
+  useSpring,
+} from 'framer-motion';
 
 interface NavItem {
   href: string;
@@ -197,12 +204,47 @@ export function Navbar() {
     }
   };
 
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [hasBanner, setHasBanner] = useState(false);
+
+  useEffect(() => {
+    const banner = document.getElementById('quick-sim-banner');
+    setHasBanner(!!banner);
+  }, []);
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    setIsScrolled(latest > 20);
+  });
+
+  const rawY = useTransform(scrollY, [0, 40], [hasBanner ? 36 : 0, 0]);
+  const smoothY = useSpring(rawY, { stiffness: 350, damping: 32, mass: 0.8 });
+
   return (
-    <header className="sticky top-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 transition-all">
-      <div
-        ref={dropdownRef}
-        className="max-w-7xl mx-auto bg-white/95 backdrop-blur-md border border-netral-border/70 rounded-full px-5 py-2.5 shadow-sm flex items-center justify-between"
+    <>
+      {/* Spacer pengatur aliran dokumen fisik agar konten berikutnya tidak meloncat */}
+      <div className="h-[68px] sm:h-[72px]" aria-hidden="true" />
+
+      {/* Header Mengambang Interaktif Framer Motion JavaScript (Bukan CSS Sticky) */}
+      <motion.header
+        style={{ y: smoothY }}
+        initial={{ y: -30, opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 pointer-events-none"
       >
+        <motion.div
+          ref={dropdownRef}
+          animate={{
+            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.92)',
+            boxShadow: isScrolled
+              ? '0 12px 30px -10px rgba(46, 83, 57, 0.18), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+              : '0 2px 6px 0 rgba(0, 0, 0, 0.04)',
+            borderColor: isScrolled ? 'rgba(216, 198, 174, 0.95)' : 'rgba(216, 198, 174, 0.7)',
+          }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-7xl mx-auto backdrop-blur-md rounded-full px-5 py-2.5 flex items-center justify-between border pointer-events-auto"
+        >
         <Link
           href="/"
           onClick={handleScrollToTop}
@@ -323,7 +365,7 @@ export function Navbar() {
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </div>
+      </motion.div>
 
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -332,7 +374,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="lg:hidden max-w-7xl mx-auto mt-2 bg-white border border-netral-border/80 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col space-y-3"
+            className="lg:hidden max-w-7xl mx-auto mt-2 bg-white border border-netral-border/80 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col space-y-3 pointer-events-auto"
           >
             <Link
               href="/"
@@ -401,6 +443,7 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
+  </>
   );
 }

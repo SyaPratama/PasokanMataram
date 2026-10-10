@@ -63,7 +63,7 @@ export function KybActionModal({
             {decision === 'APPROVED' ? (
               <CheckCircle2 className="w-5 h-5 text-primer" />
             ) : (
-              <XCircle className="w-5 h-5 text-red-600" />
+              <XCircle className="w-5 h-5 text-status-danger" />
             )}
             <h3 id="modal-title" className="font-heading font-bold text-sm text-gelap">
               {decision === 'APPROVED' ? 'Persetujuan Kemitraan KYB' : 'Penolakan Berkas KYB'}
@@ -73,25 +73,25 @@ export function KybActionModal({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="p-1 rounded-md text-gelap/50 hover:text-gelap hover:bg-netral-border/40 focus:outline-none focus:ring-2 focus:ring-primer"
+            className="w-8 h-8 rounded-lg text-gelap/70 hover:text-gelap hover:bg-netral-border/40 focus:outline-none focus:ring-2 focus:ring-primer flex items-center justify-center transition-colors"
             aria-label="Tutup dialog"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <p className="text-xs text-gelap/70">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
+          <p className="text-xs text-gelap/85 leading-relaxed font-body">
             {decision === 'APPROVED' ? (
               <>
                 Konfirmasi persetujuan legalitas untuk{' '}
-                <strong className="text-gelap font-semibold">{businessName}</strong>. Status entitas akan
+                <strong className="text-gelap font-bold">{businessName}</strong>. Status entitas akan
                 beralih menjadi <span className="text-primer font-bold">VERIFIED</span>.
               </>
             ) : (
               <>
                 Tolak berkas kepatuhan untuk{' '}
-                <strong className="text-gelap font-semibold">{businessName}</strong>. Berikan catatan
+                <strong className="text-gelap font-bold">{businessName}</strong>. Berikan catatan
                 penolakan resmi agar mitra dapat mengunggah perbaikan.
               </>
             )}
@@ -99,7 +99,7 @@ export function KybActionModal({
 
           {decision === 'REJECTED' && (
             <div>
-              <label htmlFor="rejection-reason" className="block text-xs font-semibold text-gelap mb-1">
+              <label htmlFor="rejection-reason" className="block text-xs font-bold text-gelap mb-1.5">
                 Alasan Penolakan Resmi (Wajib)
               </label>
               <textarea
@@ -111,10 +111,10 @@ export function KybActionModal({
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="misal: Halaman NIB buram, tanggal masa berlaku terpotong..."
-                className="w-full px-3 py-2 text-xs bg-white border border-netral-border rounded-md text-gelap focus:outline-none focus:ring-2 focus:ring-primer"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap focus:outline-none focus:ring-2 focus:ring-primer font-body placeholder:text-gelap/50"
               />
               {error && (
-                <div className="mt-1 flex items-center space-x-1 text-[11px] text-red-600">
+                <div className="mt-1 flex items-center space-x-1 text-[11px] text-status-danger font-semibold">
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -122,13 +122,14 @@ export function KybActionModal({
             </div>
           )}
 
-          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-netral-border/60">
+          <div className="flex items-center justify-end space-x-2 pt-3 border-t border-netral-border/60">
             <Button
               type="button"
               variant="outline"
               size="sm"
               disabled={isLoading}
               onClick={onClose}
+              className="text-xs font-semibold border-netral-border text-gelap min-h-[38px]"
             >
               Batal
             </Button>
@@ -138,8 +139,8 @@ export function KybActionModal({
               isLoading={isLoading}
               className={
                 decision === 'APPROVED'
-                  ? 'bg-primer hover:bg-primer-deep text-white'
-                  : 'bg-red-600 hover:bg-red-700 text-white'
+                  ? 'bg-primer hover:bg-primer-deep text-white text-xs font-bold min-h-[38px] px-4 shadow-xs'
+                  : 'bg-status-danger hover:opacity-90 text-white text-xs font-bold min-h-[38px] px-4 shadow-xs'
               }
             >
               {decision === 'APPROVED' ? 'Setujui Kemitraan' : 'Kirim Penolakan'}

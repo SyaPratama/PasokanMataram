@@ -160,7 +160,7 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
             <span>
               Wilayah Pengadaan: <strong className="text-gelap">D.I. Yogyakarta</strong>
             </span>
-            <span>&bull;</span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block mx-1.5" aria-hidden="true" />
             <span>
               Gerai Terpilih: <strong className="text-primer">{activeOutlet?.name}</strong>
             </span>

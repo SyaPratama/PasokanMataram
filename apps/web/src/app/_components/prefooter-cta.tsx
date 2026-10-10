@@ -42,7 +42,7 @@ export function PreFooterCtaSection() {
               Ekosistem Pertanian & Kuliner D.I. Yogyakarta
             </span>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white font-heading tracking-tight leading-tight">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white font-heading tracking-tight leading-tight">
               Siap Memulai Efisiensi Pengadaan Dapur Anda?
             </h2>
 

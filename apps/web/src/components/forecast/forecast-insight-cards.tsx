@@ -123,35 +123,35 @@ export function ForecastInsightCards({
             Tingkat keyakinan model: <strong className="text-primer font-mono">{commodity.confidenceScore}%</strong>
           </span>
 
-          {userType === 'BUYER' && (
+          {userType === 'BUYER' ? (
             <Link
               href="/buyer/orders"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
             >
               <span>Jadwalkan Standing Order Sekarang</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
-          )}
+          ) : null}
 
-          {userType === 'SUPPLIER' && (
+          {userType === 'SUPPLIER' ? (
             <Link
               href="/supplier/allocations"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
             >
               <span>Buka Alokasi Kuota Pasok Hub</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
-          )}
+          ) : null}
 
-          {userType === 'PUBLIC' && (
+          {userType === 'PUBLIC' ? (
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
             >
               <span>Daftar Kemitraan PasokMataram</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
 

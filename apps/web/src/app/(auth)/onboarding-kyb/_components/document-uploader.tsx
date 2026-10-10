@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { UploadCloud, CheckCircle2, AlertCircle, FileText } from 'lucide-react';
 import type { DocumentType } from '@pasok/domain';
@@ -115,33 +114,36 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
   };
 
   return (
-    <form onSubmit={handleUpload} className="space-y-4">
-      {statusMessage && (
+    <form onSubmit={handleUpload} className="space-y-5">
+      {statusMessage ? (
         <div
-          className={`p-3 rounded-md flex items-start space-x-2 text-xs ${
+          role="alert"
+          aria-live="polite"
+          className={`p-3.5 rounded-xl flex items-start space-x-2.5 text-xs font-semibold ${
             statusMessage.type === 'error'
-              ? 'bg-red-50 border border-red-200 text-red-700'
+              ? 'bg-status-danger-light border border-status-danger/30 text-status-danger'
               : 'bg-pendukung-light border border-pendukung/30 text-primer'
           }`}
         >
           {statusMessage.type === 'error' ? (
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           ) : (
-            <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           )}
           <span>{statusMessage.text}</span>
         </div>
-      )}
+      ) : null}
 
       <div>
-        <label htmlFor="docType" className="block text-xs font-semibold text-gelap mb-1">
+        <label htmlFor="docType" className="block text-xs font-bold text-gelap mb-1.5 font-heading">
           Jenis Dokumen Legalitas Resmi
         </label>
         <select
           id="docType"
+          name="docType"
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value as DocumentType)}
-          className="w-full px-3 py-2 text-sm bg-white border border-netral-border rounded-md text-gelap focus:outline-none focus:ring-2 focus:ring-primer"
+          className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium min-h-[44px] transition-colors"
         >
           <option value="NIB">Nomor Induk Berusaha (NIB OSS - HoReKa)</option>
           <option value="KTP">KTP Penanggung Jawab / Ketua</option>
@@ -150,60 +152,75 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
         </select>
       </div>
 
-      <Input
-        label="Nomor Dokumen Resmi (13 Digit NIB / 16 Digit NIK)"
-        placeholder="misal: 0123456789012"
-        value={documentNumber}
-        onChange={(e) => setDocumentNumber(e.target.value)}
-        required
-      />
+      <div>
+        <label htmlFor="docNumber" className="block text-xs font-bold text-gelap mb-1.5 font-heading">
+          Nomor Dokumen Resmi (13 Digit NIB / 16 Digit NIK)
+        </label>
+        <input
+          id="docNumber"
+          name="docNumber"
+          type="text"
+          inputMode="numeric"
+          spellCheck={false}
+          placeholder="misal: 0123456789012…"
+          value={documentNumber}
+          onChange={(e) => setDocumentNumber(e.target.value)}
+          required
+          className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap placeholder:text-gelap/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium min-h-[44px] transition-colors"
+        />
+      </div>
 
       <div>
-        <label className="block text-xs font-semibold text-gelap mb-1">
+        <label className="block text-xs font-bold text-gelap mb-1.5">
           Berkas Dokumen Digital (PDF atau WebP/JPEG, Maks. 5 MB)
         </label>
-        <div className="border-2 border-dashed border-netral-border rounded-lg p-6 text-center hover:border-primer transition-colors bg-netral-canvas/40">
+        <div className="border-2 border-dashed border-netral-border rounded-2xl p-6 sm:p-7 text-center hover:border-primer transition-colors bg-netral-canvas/60">
           <input
             type="file"
             id="fileUpload"
+            name="fileUpload"
+            aria-label="Unggah Berkas Dokumen Digital"
             accept=".pdf,image/webp,image/jpeg,image/png"
             onChange={handleFileChange}
             className="hidden"
           />
           <label htmlFor="fileUpload" className="cursor-pointer block">
-            <UploadCloud className="w-8 h-8 mx-auto text-primer/70 mb-2" />
-            <span className="text-xs font-medium text-primer hover:underline">
+            <div className="w-12 h-12 rounded-2xl bg-primer-light text-primer border border-primer/20 flex items-center justify-center mx-auto mb-2.5">
+              <UploadCloud className="w-6 h-6 text-primer" aria-hidden="true" />
+            </div>
+            <span className="text-xs sm:text-sm font-bold text-primer hover:underline block">
               Pilih berkas dari perangkat
             </span>
-            <span className="text-[11px] text-gelap/60 block mt-1">
+            <span className="text-xs text-gelap/80 block mt-1 font-body">
               {file ? (
-                <span className="inline-flex items-center text-primer font-semibold">
-                  <FileText className="w-3.5 h-3.5 mr-1" />
+                <span className="inline-flex items-center text-primer font-bold">
+                  <FileText className="w-4 h-4 mr-1 shrink-0" aria-hidden="true" />
                   {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
                 </span>
               ) : (
-                'Format yang didukung: PDF, WebP, JPEG (Maksimal 5 MB)'
+                'Format berkas yang didukung: PDF, WebP, JPEG (Maksimal 5 MB)'
               )}
             </span>
           </label>
         </div>
       </div>
 
-      {uploadProgress !== null && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-[11px] text-gelap/70">
-            <span>Mengunggah dokumen ke penyimpanan privat...</span>
-            <span className="font-mono font-medium">{uploadProgress}%</span>
+      {uploadProgress !== null ? (
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs text-gelap/80 font-medium">
+            <span>Mengunggah dokumen ke penyimpanan privat…</span>
+            <span className="font-mono font-bold text-primer">{uploadProgress}%</span>
           </div>
           <Progress value={uploadProgress} />
         </div>
-      )}
+      ) : null}
 
       <Button
         type="submit"
-        className="w-full"
+        size="lg"
+        className="w-full min-h-[48px] rounded-xl font-bold text-sm bg-primer hover:bg-primer-hover text-white shadow-sm"
         isLoading={isSubmitting}
-        loadingText="Mengamankan & Mengunggah Dokumen..."
+        loadingText="Mengamankan & Mengunggah Dokumen…"
         disabled={!file || !documentNumber}
       >
         Unggah Dokumen Legalitas

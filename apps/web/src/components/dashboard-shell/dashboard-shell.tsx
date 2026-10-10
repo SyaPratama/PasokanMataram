@@ -29,6 +29,17 @@ export function DashboardShell({
 }: DashboardShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
+  React.useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const portalBadgeStyles =
     portalBadge.variant === 'sekunder'
       ? 'bg-sekunder-light text-sekunder'
@@ -40,7 +51,7 @@ export function DashboardShell({
       <aside className="hidden md:flex flex-col w-72 bg-white border-r border-netral-border/80 shadow-2xs flex-shrink-0 md:h-screen md:max-h-screen md:sticky md:top-0 md:self-start overflow-hidden">
         {/* Brand Header */}
         <div className="p-5 border-b border-netral-border/70 flex items-center justify-between flex-shrink-0">
-          <Link href="/" className="flex items-center space-x-2.5">
+          <Link href="/" className="flex items-center space-x-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-lg">
             <Image
               src="/icons/icon.svg"
               alt="Logo PasokMataram"
@@ -60,11 +71,11 @@ export function DashboardShell({
         </div>
 
         {/* Slot Konteks Dinamis (Gerai Cabang / Info Gapoktan) */}
-        {contextSlot && (
+        {contextSlot ? (
           <div className="p-3.5 border-b border-netral-border/60 bg-netral-canvas/40 flex-shrink-0">
             {contextSlot}
           </div>
-        )}
+        ) : null}
 
         {/* Navigasi Sidebar Terkelompok (Spasi Lapang & Scroll Y Mandiri) */}
         <nav className="p-3.5 space-y-6 flex-1 overflow-y-auto min-h-0 custom-scrollbar">
@@ -80,7 +91,7 @@ export function DashboardShell({
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors min-h-[44px] gap-3 ${
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors min-h-[44px] gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                         item.active
                           ? 'bg-primer text-white shadow-xs font-semibold'
                           : 'text-gelap hover:bg-netral-canvas hover:text-primer'
@@ -95,7 +106,7 @@ export function DashboardShell({
                         />
                         <span className="truncate">{item.name}</span>
                       </div>
-                      {item.badge && (
+                      {item.badge ? (
                         <span
                           className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full font-bold ml-1.5 flex-shrink-0 ${
                             item.active
@@ -105,7 +116,7 @@ export function DashboardShell({
                         >
                           {item.badge}
                         </span>
-                      )}
+                      ) : null}
                     </Link>
                   );
                 })}
@@ -123,11 +134,11 @@ export function DashboardShell({
             >
               {tenantProfile.tenantName}
             </span>
-            {tenantProfile.statusBadge && (
+            {tenantProfile.statusBadge ? (
               <div className="flex-shrink-0">
                 <StatusBadge status={tenantProfile.statusBadge} />
               </div>
-            )}
+            ) : null}
           </div>
           <div className="flex items-center justify-between pt-2 border-t border-netral-border/50 gap-2">
             <div className="min-w-0 pr-1">
@@ -178,36 +189,35 @@ export function DashboardShell({
         </header>
 
         {/* Mobile Header Bar */}
-        <div className="md:hidden bg-white border-b border-netral-border px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/icons/icon.svg"
-              alt="Logo PasokMataram"
-              width={24}
-              height={24}
-              className="w-6 h-6 object-contain"
-            />
+        <div className="md:hidden bg-white border-b border-netral-border px-3 py-2.5 flex items-center justify-between sticky top-0 z-40 min-h-[56px]">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="p-2 -ml-1 rounded-lg text-gelap hover:text-primer hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
+              aria-label="Buka Menu Navigasi"
+            >
+              <Menu className="w-5 h-5" aria-hidden="true" />
+            </button>
             <span className="font-heading font-bold text-sm text-primer">
               Portal {portalBadge.label}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="p-2.5 rounded-lg text-gelap hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-            aria-label="Buka Menu Navigasi"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5" aria-hidden="true" />
-            ) : (
-              <Menu className="w-5 h-5" aria-hidden="true" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-primer bg-primer-light/80 px-2.5 py-1 rounded-full border border-primer/20">
+              {portalBadge.label}
+            </span>
+          </div>
         </div>
 
         {/* Off-Canvas Slide-Over Drawer Mobile */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 md:hidden flex">
+        {mobileMenuOpen ? (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu Navigasi Mobile"
+            className="fixed inset-0 z-50 md:hidden flex"
+          >
             {/* Backdrop Overlay */}
             <div
               className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
@@ -232,7 +242,7 @@ export function DashboardShell({
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-lg text-gelap hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-2 rounded-lg text-gelap hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
                   aria-label="Tutup Menu Navigasi"
                 >
                   <X className="w-5 h-5" aria-hidden="true" />
@@ -240,11 +250,11 @@ export function DashboardShell({
               </div>
 
               {/* Slot Konteks Mobile */}
-              {contextSlot && (
+              {contextSlot ? (
                 <div className="p-3.5 border-b border-netral-border bg-netral-canvas/40 flex-shrink-0">
                   {contextSlot}
                 </div>
-              )}
+              ) : null}
 
               {/* Navigasi Drawer Mobile */}
               <nav className="p-3.5 space-y-6 flex-1 overflow-y-auto min-h-0 custom-scrollbar">
@@ -261,7 +271,7 @@ export function DashboardShell({
                             key={item.name}
                             href={item.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs min-h-[44px] gap-3 ${
+                            className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs min-h-[44px] gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                               item.active
                                 ? 'bg-primer text-white font-bold'
                                 : 'text-gelap hover:bg-netral-canvas'
@@ -271,7 +281,7 @@ export function DashboardShell({
                               <Icon className="w-4 h-4 mr-2.5 flex-shrink-0" aria-hidden="true" />
                               <span className="truncate">{item.name}</span>
                             </div>
-                            {item.badge && (
+                            {item.badge ? (
                               <span
                                 className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full font-bold ml-1.5 flex-shrink-0 ${
                                   item.active
@@ -281,7 +291,7 @@ export function DashboardShell({
                               >
                                 {item.badge}
                               </span>
-                            )}
+                            ) : null}
                           </Link>
                         );
                       })}
@@ -299,8 +309,10 @@ export function DashboardShell({
                   >
                     {tenantProfile.tenantName}
                   </div>
-                  <div className="text-[10px] text-gelap/85 font-mono font-medium truncate">
-                    {tenantProfile.userName} &bull; {tenantProfile.roleTitle}
+                  <div className="text-[10px] text-gelap/85 font-mono font-medium truncate flex items-center gap-1">
+                    <span>{tenantProfile.userName}</span>
+                    <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+                    <span>{tenantProfile.roleTitle}</span>
                   </div>
                 </div>
                 <Link
@@ -314,7 +326,7 @@ export function DashboardShell({
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Area Konten Utama Mandiri (Independent Y Scroll) */}
         <main className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 lg:p-8 custom-scrollbar">

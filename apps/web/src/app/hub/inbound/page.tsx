@@ -71,8 +71,10 @@ export default function HubInboundPage() {
           <div className="p-6 rounded-2xl bg-netral-canvas/60 border-2 border-dashed border-netral-border text-center space-y-2">
             <Truck className="w-8 h-8 text-primer mx-auto" />
             <div className="text-xs font-bold text-gelap">Truk AB-8120-QZ Tiba</div>
-            <p className="text-[10px] text-gelap/60">
-              Supir: Pak Tejo &bull; Tiba: 03:45 WIB
+            <p className="text-[10px] text-gelap/60 flex items-center justify-center gap-1.5">
+              <span>Supir: Pak Tejo</span>
+              <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+              <span>Tiba: 03:45 WIB</span>
             </p>
           </div>
 
@@ -149,7 +151,11 @@ export default function HubInboundPage() {
             <div className="p-4 rounded-2xl bg-green-50 border border-green-200 text-green-900 space-y-2">
               <div className="flex items-center gap-2 text-xs font-bold">
                 <CheckCircle2 className="w-4 h-4 text-green-700" />
-                <span>Muatan Lolos Uji QC &bull; Siap Cross-Docking Subuh</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span>Muatan Lolos Uji QC</span>
+                  <span className="w-1 h-1 rounded-full bg-green-600 inline-block" aria-hidden="true" />
+                  <span>Siap Cross-Docking Subuh</span>
+                </span>
               </div>
               <p className="text-[11px] text-green-800">
                 Label sortir berhasil diterbitkan. Batch diarahkan ke Jalur Pengantaran Dapur HoReKa Malioboro & Kaliurang.

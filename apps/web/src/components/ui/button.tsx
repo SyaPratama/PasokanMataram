@@ -18,14 +18,14 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, loadingText, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl';
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl whitespace-nowrap';
 
     const variants = {
-      primary: 'bg-primer text-white hover:bg-primer-hover focus:ring-primer shadow-sm',
-      secondary: 'bg-sekunder text-white hover:bg-sekunder-hover focus:ring-sekunder shadow-sm',
-      outline: 'border border-netral-border bg-transparent hover:bg-netral-canvas text-gelap focus:ring-primer',
-      ghost: 'bg-transparent hover:bg-netral-canvas text-gelap focus:ring-primer',
-      danger: 'bg-status-danger text-white hover:opacity-90 focus:ring-status-danger shadow-sm',
+      primary: 'bg-primer text-white hover:bg-primer-hover focus-visible:ring-primer shadow-sm',
+      secondary: 'bg-sekunder text-white hover:bg-sekunder-hover focus-visible:ring-sekunder shadow-sm',
+      outline: 'border border-netral-border bg-transparent hover:bg-netral-canvas text-gelap focus-visible:ring-primer',
+      ghost: 'bg-transparent hover:bg-netral-canvas text-gelap focus-visible:ring-primer',
+      danger: 'bg-status-danger text-white hover:opacity-90 focus-visible:ring-status-danger shadow-sm',
     };
 
     const sizes = {

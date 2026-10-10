@@ -134,7 +134,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden p-6 sm:p-8">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden p-6 sm:p-8">
       {/* Header Kartu Pendaftaran */}
       <div className="bg-primer rounded-2xl p-5 sm:p-6 text-white text-center mb-6 shadow-xs relative">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white/10 mb-3 border border-white/20 shadow-inner">
@@ -146,7 +146,7 @@ export default function RegisterPage() {
             className="w-8 h-8 object-contain"
           />
         </div>
-        <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-balance">
           Pendaftaran Entitas Usaha PasokMataram
         </h1>
         <p className="text-xs sm:text-sm text-white/90 mt-1.5 max-w-md mx-auto leading-relaxed">
@@ -213,12 +213,16 @@ export default function RegisterPage() {
       </div>
 
       {/* Alert Error jika Ada */}
-      {errorMessage && (
-        <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-start gap-2.5">
+      {errorMessage ? (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-start gap-2.5"
+        >
           <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
-      )}
+      ) : null}
 
       {/* Formulir Pendaftaran PIC Utama */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,10 +242,11 @@ export default function RegisterPage() {
           <Input
             id="reg-businessName"
             name="businessName"
+            autoComplete="organization"
             required
             value={formData.businessName}
             onChange={handleChange}
-            placeholder={intent === 'HOREKA' ? 'Contoh: Bale Raos Resto & Cafe' : 'Contoh: Gapoktan Srikayangan Sentolo'}
+            placeholder={intent === 'HOREKA' ? 'Contoh: Bale Raos Resto & Cafe…' : 'Contoh: Gapoktan Srikayangan Sentolo…'}
             className="w-full text-sm min-h-[48px] rounded-xl"
           />
         </div>
@@ -256,7 +261,7 @@ export default function RegisterPage() {
               name="regency"
               value={formData.regency}
               onChange={handleChange}
-              className="w-full text-sm min-h-[48px] px-3.5 bg-white border border-netral-border rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium text-gelap"
+              className="w-full text-sm min-h-[48px] px-3.5 bg-white border border-netral-border rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium text-gelap"
             >
               <option value="KULON_PROGO">Kabupaten Kulon Progo</option>
               <option value="BANTUL">Kabupaten Bantul</option>
@@ -273,10 +278,11 @@ export default function RegisterPage() {
             <Input
               id="reg-ownerName"
               name="ownerName"
+              autoComplete="name"
               required
               value={formData.ownerName}
               onChange={handleChange}
-              placeholder="Contoh: Budi Santoso"
+              placeholder="Contoh: Budi Santoso…"
               className="w-full text-sm min-h-[48px] rounded-xl"
             />
           </div>
@@ -290,10 +296,13 @@ export default function RegisterPage() {
             <Input
               id="reg-phoneNumber"
               name="phoneNumber"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               required
               value={formData.phoneNumber}
               onChange={handleChange}
-              placeholder="081234567890"
+              placeholder="081234567890…"
               className="w-full text-sm min-h-[48px] rounded-xl"
             />
             <p className="text-[11px] text-gelap/85 mt-1 font-body">
@@ -309,10 +318,12 @@ export default function RegisterPage() {
               id="reg-email"
               name="email"
               type="email"
+              autoComplete="email"
+              spellCheck={false}
               required
               value={formData.email}
               onChange={handleChange}
-              placeholder="nama@usaha.id"
+              placeholder="nama@usaha.id…"
               className="w-full text-sm min-h-[48px] rounded-xl"
             />
           </div>
@@ -326,10 +337,11 @@ export default function RegisterPage() {
             id="reg-password"
             name="password"
             type="password"
+            autoComplete="new-password"
             required
             value={formData.password}
             onChange={handleChange}
-            placeholder="Minimal 8 karakter kombinasi"
+            placeholder="Minimal 8 karakter kombinasi…"
             className="w-full text-sm min-h-[48px] rounded-xl"
           />
         </div>
@@ -339,7 +351,7 @@ export default function RegisterPage() {
           disabled={isLoading}
           className="w-full min-h-[48px] text-sm font-bold rounded-xl bg-primer text-white hover:bg-primer-hover transition-all mt-4 shadow-sm"
         >
-          {isLoading ? 'Mendaftarkan Usaha...' : 'Daftar Sekarang'}
+          {isLoading ? 'Mendaftarkan Usaha…' : 'Daftar Sekarang'}
           <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
         </Button>
       </form>

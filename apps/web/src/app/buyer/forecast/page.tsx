@@ -174,8 +174,10 @@ export default function BuyerForecastPage() {
       <div className="p-4 rounded-2xl bg-netral-canvas/60 border border-netral-border/70 text-xs text-gelap/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-primer flex-shrink-0" />
-          <span>
-            Arsitektur Model: <strong className="text-gelap">{selectedCommodity.modelMetadata.algorithm}</strong> &bull; Terakhir Diperbarui: <span className="font-mono">{selectedCommodity.modelMetadata.lastTrained}</span>
+          <span className="inline-flex flex-wrap items-center gap-1.5">
+            <span>Arsitektur Model: <strong className="text-gelap">{selectedCommodity.modelMetadata.algorithm}</strong></span>
+            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+            <span>Terakhir Diperbarui: <span className="font-mono">{selectedCommodity.modelMetadata.lastTrained}</span></span>
           </span>
         </div>
         <div className="text-[11px] text-gelap/60">

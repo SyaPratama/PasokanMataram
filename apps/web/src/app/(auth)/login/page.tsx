@@ -236,7 +236,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden">
+    <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden">
       <div className="bg-primer p-6 sm:p-7 text-white text-center relative">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white/10 mb-3 border border-white/20 shadow-inner">
             <Image
@@ -247,7 +247,7 @@ function LoginForm() {
               className="w-8 h-8 object-contain"
             />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-balance">
             Masuk Portal PasokMataram
           </h1>
           <p className="text-xs text-white/85 mt-1.5 max-w-sm mx-auto leading-relaxed">
@@ -256,12 +256,16 @@ function LoginForm() {
         </div>
 
         <div className="p-6 sm:p-8">
-          {errorMessage && (
-            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5">
+          {errorMessage ? (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5"
+            >
               <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <span>{errorMessage}</span>
             </div>
-          )}
+          ) : null}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -272,10 +276,11 @@ function LoginForm() {
                 id="login-email"
                 type="email"
                 autoComplete="email"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@bisnis-kuliner.id"
+                placeholder="nama@bisnis-kuliner.id…"
                 className="w-full text-xs h-11"
               />
             </div>
@@ -300,13 +305,13 @@ function LoginForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan kata sandi aman"
-                  className="w-full text-xs h-11 pr-10"
+                  placeholder="Masukkan kata sandi aman…"
+                  className="w-full text-xs h-11 pr-12"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gelap/50 hover:text-gelap p-1"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-gelap/60 hover:text-gelap min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
                   aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -319,7 +324,7 @@ function LoginForm() {
               disabled={isLoading}
               className="w-full h-11 text-xs font-bold rounded-xl bg-primer text-white hover:bg-primer-dark transition-all mt-2 shadow-sm"
             >
-              {isLoading ? 'Memvalidasi...' : 'Masuk ke Portal'}
+              {isLoading ? 'Memvalidasi…' : 'Masuk ke Portal'}
               <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
             </Button>
           </form>
@@ -397,7 +402,7 @@ export default function LoginPage() {
     <React.Suspense
       fallback={
         <div className="min-h-screen bg-netral-canvas flex items-center justify-center text-xs text-gelap/60">
-          Memuat formulir masuk...
+          Memuat formulir masuk…
         </div>
       }
     >

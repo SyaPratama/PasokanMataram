@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight, ArrowRight, X, ShieldCheck, Scale, CheckCircle2, Building2, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, X, ShieldCheck, Scale, CheckCircle2, Building2, Sparkles, PackageCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FacilityDetail {
@@ -22,16 +23,16 @@ const FACILITIES: FacilityDetail[] = [
     title: 'Hub Transit & Sortir Fisik Terpadu',
     image: '/images/solutions/transit-hub.webp',
     summary:
-      'Fasilitas sentral seluas 1.200 m² di Sewon Bantul yang dilengkapi ruang pendingin pra-distribusi, meja sortir grade A, dan stasiun uji petik kadar air instan.',
+      'Fasilitas sentral seluas 1.200 m\u00B2 di Sewon Bantul yang dilengkapi ruang pendingin pra-distribusi, meja sortir grade A, dan stasiun uji petik kadar air instan.',
     sopSteps: [
       'Pemeriksaan visual kebersihan, keutuhan, dan kesegaran komoditas panen petani binaan.',
       'Uji petik kadar air menggunakan moisture meter digital untuk komoditas bawang merah dan cabai rawit.',
       'Sortir 3-tahap memisahkan Grade A (standar restoran/hotel) dan Grade B (industri olahan).',
-      'Pra-pendinginan di cold-room suhu 8-12°C sebelum dimuat ke armada cold-chain pengiriman.',
+      'Pra-pendinginan di cold-room suhu 8-12\u00B0C sebelum dimuat ke armada cold-chain pengiriman.',
     ],
     specs: [
       { label: 'Kapasitas Harian', value: '15 Ton Komoditas' },
-      { label: 'Suhu Cold-Room', value: '8°C – 12°C Terkontrol' },
+      { label: 'Suhu Cold-Room', value: '8\u00B0C \u2013 12\u00B0C Terkontrol' },
       { label: 'Radius Distribusi', value: 'Seluruh Wilayah DIY (< 45 Menit)' },
     ],
   },
@@ -71,6 +72,25 @@ const FACILITIES: FacilityDetail[] = [
       { label: 'Mitra Gapoktan', value: 'Sentolo, Imogiri, Ngemplak, Playen' },
       { label: 'Jaminan Kontrak', value: 'Forward Supply Contract' },
       { label: 'Kepastian Dana', value: 'Rekening Bersama Escrow T+0' },
+    ],
+  },
+  {
+    id: 'garansi-mutu',
+    badge: 'Garansi Mutu',
+    title: 'Jaminan Penggantian Barang Busuk & Kendala Pengiriman',
+    image: '/images/solutions/transit-hub.webp',
+    summary:
+      'Garansi penuh untuk setiap pengiriman komoditas. Jika barang tiba dalam kondisi busuk, rusak, atau terjadi kendala selama perjalanan, kami ganti sepenuhnya tanpa biaya tambahan.',
+    sopSteps: [
+      'Dokumentasi foto dan video kondisi barang saat diterima koki melalui PWA tablet.',
+      'Laporan deviasi otomatis masuk ke sistem klaim dalam waktu kurang dari 5 menit.',
+      'Tim QC Hub Transit memverifikasi klaim dan menyiapkan penggantian komoditas dari stok cadangan.',
+      'Penggantian dikirim ulang pada slot pengiriman berikutnya atau dana dikembalikan via escrow.',
+    ],
+    specs: [
+      { label: 'Waktu Klaim', value: '< 5 Menit via PWA' },
+      { label: 'Penggantian', value: 'Slot Kirim Berikutnya' },
+      { label: 'Perlindungan Dana', value: 'Refund Escrow Penuh' },
     ],
   },
 ];
@@ -202,70 +222,70 @@ export function SolutionsGridSection() {
             </p>
 
             <div className="mt-6">
-              <a
-                href="/#komoditas"
-                onClick={(e) => handleSmoothScroll(e, 'komoditas')}
+              <Link
+                href="/komoditas"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold font-heading rounded-full bg-primer text-white hover:bg-primer-hover shadow-sm transition-all hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primer min-h-[44px]"
               >
                 Lihat Semua Komoditas
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
+              </Link>
             </div>
           </div>
 
-          <div className="lg:col-span-8 flex flex-col gap-5">
-            {/* Kartu Utama: Hub Transit Bantul */}
-            <motion.div
-              role="button"
-              tabIndex={0}
-              onClick={() => setSelectedFacility(FACILITIES[0] || null)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setSelectedFacility(FACILITIES[0] || null);
-                }
-              }}
-              whileHover={{ y: -6, scale: 1.015 }}
-              whileTap={{ scale: 0.985 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-3xl overflow-hidden bg-primer-deep p-6 sm:p-8 text-white min-h-[220px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen"
-            >
-              <div className="absolute inset-0 z-0 opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out">
-                <Image
-                  src={FACILITIES[0]?.image || '/images/solutions/transit-hub.webp'}
-                  alt="Fasilitas transit dan sortir komoditas pangan"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 600px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute inset-0 z-0 bg-gradient-to-r from-primer-darkest/95 via-primer-darkest/80 to-transparent" />
-
-              <div className="relative z-10 flex items-center justify-between">
-                <span className="text-xs font-bold text-aksen-light uppercase tracking-wider">
-                  {FACILITIES[0]?.badge}
-                </span>
-                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors">
-                  <ArrowUpRight className="w-4 h-4" />
+          <div className="lg:col-span-8">
+            {/* Bento Grid: 2:2 di Mobile untuk hemat ruang, 1 kartu besar kiri + 3 kartu kanan di Desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
+              {/* Kartu Utama: Hub Transit Bantul */}
+              <motion.div
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedFacility(FACILITIES[0] || null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedFacility(FACILITIES[0] || null);
+                  }
+                }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-primer-deep p-3.5 sm:p-6 lg:p-8 text-white min-h-[170px] sm:min-h-[220px] lg:min-h-[280px] row-span-1 lg:row-span-3 flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen"
+              >
+                <div className="absolute inset-0 z-0 opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out">
+                  <Image
+                    src={FACILITIES[0]?.image || '/images/solutions/transit-hub.webp'}
+                    alt="Fasilitas transit dan sortir komoditas pangan"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 400px"
+                    className="object-cover"
+                  />
                 </div>
-              </div>
+                <div className="absolute inset-0 z-0 bg-gradient-to-t from-primer-darkest/95 via-primer-darkest/75 to-primer-darkest/40" />
 
-              <div className="relative z-10 max-w-md mt-6">
-                <h3 className="font-heading font-extrabold text-xl text-white">
-                  {FACILITIES[0]?.title}
-                </h3>
-                <p className="mt-1.5 text-xs text-white/90 leading-relaxed font-body">
-                  Uji petik kadar air pada komoditas bawang dan cabai, sortir grade A fisik, dan pendinginan pra-distribusi ke dapur kafe.
-                </p>
-                <span className="inline-flex items-center gap-1 mt-3 text-[11px] font-bold text-aksen-light group-hover:underline">
-                  Buka Detail Inspeksi SOP Mutu
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </motion.div>
+                <div className="relative z-10 flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
+                    {FACILITIES[0]?.badge}
+                  </span>
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors shrink-0">
+                    <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Kartu 2: Presisi Digital */}
+                <div className="relative z-10 max-w-md mt-auto">
+                  <h3 className="font-heading font-extrabold text-xs sm:text-lg lg:text-xl text-white line-clamp-2">
+                    {FACILITIES[0]?.title}
+                  </h3>
+                  <p className="mt-1 sm:mt-1.5 text-[10px] sm:text-xs text-white/90 leading-tight sm:leading-relaxed font-body line-clamp-2 sm:line-clamp-3">
+                    Uji petik kadar air pada komoditas bawang dan cabai, sortir grade A fisik, dan pendinginan pra-distribusi ke dapur kafe.
+                  </p>
+                  <span className="hidden sm:inline-flex items-center gap-1 mt-2 lg:mt-3 text-[10px] sm:text-[11px] font-bold text-aksen-light group-hover:underline">
+                    Buka Detail Inspeksi SOP Mutu
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Kartu Kecil 1: Presisi Digital */}
               <motion.div
                 role="button"
                 tabIndex={0}
@@ -276,10 +296,10 @@ export function SolutionsGridSection() {
                     setSelectedFacility(FACILITIES[1] || null);
                   }
                 }}
-                whileHover={{ y: -6, scale: 1.015 }}
+                whileHover={{ y: -4, scale: 1.01 }}
                 whileTap={{ scale: 0.985 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-3xl overflow-hidden bg-primer-deep p-6 text-white min-h-[220px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen-light"
+                className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-primer-deep p-3.5 sm:p-5 text-white min-h-[170px] sm:min-h-[160px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen-light"
               >
                 <div className="absolute inset-0 z-0 opacity-30 group-hover:scale-105 transition-transform duration-700 ease-out">
                   <Image
@@ -293,29 +313,29 @@ export function SolutionsGridSection() {
                 <div className="absolute inset-0 z-0 bg-gradient-to-t from-primer-darkest/95 to-primer-darkest/70" />
 
                 <div className="relative z-10 flex items-center justify-between">
-                  <span className="text-xs font-bold text-aksen-light uppercase tracking-wider">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
                     {FACILITIES[1]?.badge}
                   </span>
-                  <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
 
-                <div className="relative z-10 mt-6">
-                  <h3 className="font-heading font-extrabold text-base text-white">
+                <div className="relative z-10 mt-auto">
+                  <h3 className="font-heading font-bold text-xs sm:text-sm text-white line-clamp-2">
                     {FACILITIES[1]?.title}
                   </h3>
-                  <p className="mt-1 text-xs text-white/90 leading-relaxed font-body">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-white/85 leading-tight sm:leading-relaxed font-body line-clamp-2">
                     Pencatatan berat digital terintegrasi otomatis ke sistem order untuk menghilangkan selisih timbangan di dapur.
                   </p>
-                  <span className="inline-flex items-center gap-1 mt-2.5 text-[11px] font-bold text-aksen-light group-hover:underline">
+                  <span className="hidden sm:inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] font-bold text-aksen-light group-hover:underline">
                     Lihat Sertifikasi Tera
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
               </motion.div>
 
-              {/* Kartu 3: Kemitraan Petani */}
+              {/* Kartu Kecil 2: Kemitraan Petani */}
               <motion.div
                 role="button"
                 tabIndex={0}
@@ -326,10 +346,10 @@ export function SolutionsGridSection() {
                     setSelectedFacility(FACILITIES[2] || null);
                   }
                 }}
-                whileHover={{ y: -6, scale: 1.015 }}
+                whileHover={{ y: -4, scale: 1.01 }}
                 whileTap={{ scale: 0.985 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-3xl overflow-hidden bg-primer-deep p-6 text-white min-h-[220px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen-light"
+                className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-primer-deep p-3.5 sm:p-5 text-white min-h-[170px] sm:min-h-[160px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen-light"
               >
                 <div className="absolute inset-0 z-0 opacity-30 group-hover:scale-105 transition-transform duration-700 ease-out">
                   <Image
@@ -343,24 +363,65 @@ export function SolutionsGridSection() {
                 <div className="absolute inset-0 z-0 bg-gradient-to-t from-primer-darkest/95 to-primer-darkest/70" />
 
                 <div className="relative z-10 flex items-center justify-between">
-                  <span className="text-xs font-bold text-aksen-light uppercase tracking-wider">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
                     {FACILITIES[2]?.badge}
                   </span>
-                  <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
 
-                <div className="relative z-10 mt-6">
-                  <h3 className="font-heading font-extrabold text-base text-white">
+                <div className="relative z-10 mt-auto">
+                  <h3 className="font-heading font-bold text-xs sm:text-sm text-white line-clamp-2">
                     {FACILITIES[2]?.title}
                   </h3>
-                  <p className="mt-1 text-xs text-white/90 leading-relaxed font-body">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-white/85 leading-tight sm:leading-relaxed font-body line-clamp-2">
                     Pendampingan panen terjadwal bersama gabungan kelompok tani dan dinas pertanian kabupaten D.I. Yogyakarta.
                   </p>
-                  <span className="inline-flex items-center gap-1 mt-2.5 text-[11px] font-bold text-aksen-light group-hover:underline">
+                  <span className="hidden sm:inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] font-bold text-aksen-light group-hover:underline">
                     Periksa Alur Kemitraan
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Kartu Kecil 3: Garansi Mutu */}
+              <motion.div
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedFacility(FACILITIES[3] || null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedFacility(FACILITIES[3] || null);
+                  }
+                }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-sekunder p-3.5 sm:p-5 text-white min-h-[170px] sm:min-h-[160px] flex flex-col justify-between group shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-aksen-light"
+              >
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-sekunder via-sekunder to-sekunder-hover" />
+
+                <div className="relative z-10 flex items-center justify-between">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-white/90 uppercase tracking-wider line-clamp-1">
+                    {FACILITIES[3]?.badge}
+                  </span>
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-sekunder transition-colors shrink-0">
+                    <PackageCheck className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+
+                <div className="relative z-10 mt-auto">
+                  <h3 className="font-heading font-bold text-xs sm:text-sm text-white line-clamp-2">
+                    {FACILITIES[3]?.title}
+                  </h3>
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-white/90 leading-tight sm:leading-relaxed font-body line-clamp-2">
+                    Barang busuk atau ada kendala di jalan? Kami ganti sepenuhnya tanpa biaya tambahan.
+                  </p>
+                  <span className="hidden sm:inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] font-bold text-white group-hover:underline">
+                    Lihat Ketentuan Garansi
+                    <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
               </motion.div>

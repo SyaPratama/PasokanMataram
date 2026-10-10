@@ -8,8 +8,8 @@
 /scratch
 
 # Next.js build output
-/.next/
-/out/
+.next/
+out/
 
 # Production build
 /build

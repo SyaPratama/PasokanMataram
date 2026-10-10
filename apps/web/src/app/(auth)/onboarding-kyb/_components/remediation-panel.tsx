@@ -71,18 +71,18 @@ export function RemediationPanel({
 
   if (isSuccess) {
     return (
-      <div className="bg-primer-light/40 border border-primer/30 rounded-xl p-6 text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primer text-white mx-auto shadow-sm">
-          <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+      <div className="bg-primer-light/50 border border-primer/30 rounded-2xl p-6 sm:p-8 text-center space-y-3.5 shadow-xs">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primer text-white mx-auto shadow-sm">
+          <CheckCircle2 className="w-7 h-7 text-white" aria-hidden="true" />
         </div>
-        <h3 className="text-base font-bold text-gelap font-heading">
+        <h3 className="text-base sm:text-lg font-bold text-gelap font-heading">
           Berkas Perbaikan Berhasil Dikirimkan
         </h3>
-        <p className="text-xs text-gelap/80 max-w-md mx-auto">
-          Status kepatuhan entitas usaha Anda telah beralih kembali ke <strong>PENDING_VERIFICATION</strong>. Dokumen telah masuk kembali ke antrean teratas meja kerja audit tim PasokMataram.
+        <p className="text-xs sm:text-sm text-gelap/90 max-w-md mx-auto leading-relaxed font-body">
+          Status kepatuhan entitas usaha Anda telah beralih kembali ke <strong className="text-gelap font-bold">PENDING_VERIFICATION</strong>. Dokumen telah masuk kembali ke antrean teratas meja kerja audit tim PasokMataram.
         </p>
         <div className="pt-2">
-          <span className="inline-flex items-center text-xs font-semibold text-primer bg-white px-3 py-1.5 rounded-md border border-primer/20 shadow-xs">
+          <span className="inline-flex items-center text-xs font-bold text-primer bg-white px-3.5 py-2 rounded-xl border border-primer/20 shadow-2xs">
             Estimasi Tinjauan Ulang: Maksimal 1x24 Jam Kerja
           </span>
         </div>
@@ -91,61 +91,75 @@ export function RemediationPanel({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-sekunder/40 shadow-sm overflow-hidden">
-      {/* Banner Peringatan Penolakan */}
-      <div className="bg-sekunder-light/50 border-b border-sekunder/30 p-4 sm:p-5 flex items-start gap-3">
-        <div className="p-2 bg-sekunder text-white rounded-lg flex-shrink-0 mt-0.5">
-          <AlertTriangle className="w-5 h-5" aria-hidden="true" />
+    <div className="bg-white rounded-2xl border border-sekunder/40 shadow-xs overflow-hidden">
+      {/* Banner Peringatan Penolakan Berkas */}
+      <div className="bg-sekunder-light/80 border-b border-sekunder/30 p-4 sm:p-5 flex items-start gap-3.5">
+        <div className="p-2.5 bg-sekunder text-white rounded-xl shrink-0 mt-0.5 shadow-2xs">
+          <AlertTriangle className="w-5 h-5 text-white" aria-hidden="true" />
         </div>
-        <div className="text-xs space-y-1">
-          <div className="font-bold text-sm text-sekunder font-heading">
+        <div className="text-xs space-y-1.5 flex-1">
+          <h3 className="font-bold text-sm sm:text-base text-sekunder-dark font-heading">
             Permohonan Verifikasi Membutuhkan Perbaikan
-          </div>
-          <p className="text-gelap/80">
-            Tim kepatuhan PasokMataram menandai dokumen <strong>{rejectedDocumentType}</strong> memerlukan perbaikan dengan catatan resmi sebagai berikut:
+          </h3>
+          <p className="text-gelap/90 leading-relaxed font-body">
+            Tim kepatuhan PasokMataram menandai dokumen <strong className="text-gelap font-bold">{rejectedDocumentType}</strong> memerlukan perbaikan dengan catatan resmi sebagai berikut:
           </p>
-          <div className="bg-white/80 p-3 rounded-md border border-sekunder/20 text-gelap font-medium mt-2 italic">
+          <div className="bg-white p-3.5 rounded-xl border border-sekunder/30 text-gelap font-medium mt-2 italic text-xs leading-relaxed shadow-2xs">
             &ldquo;{rejectionReason}&rdquo;
           </div>
         </div>
       </div>
 
       {/* Formulir Unggah Pengganti */}
-      <form onSubmit={handleResubmit} className="p-5 space-y-4">
+      <form onSubmit={handleResubmit} className="p-5 sm:p-6 space-y-5">
         <div>
-          <label className="block text-xs font-bold text-gelap mb-1">
-            Unggah Berkas Perbaikan Dokumen Resmi (PDF/WebP maks 5 MB)
+          <label htmlFor="remediation-file" className="block text-xs font-bold text-gelap mb-1.5">
+            Unggah Berkas Perbaikan Dokumen Resmi (PDF/WebP maks. 5 MB)
           </label>
           <div
+            tabIndex={0}
+            role="button"
+            aria-label="Pilih Berkas Perbaikan Dokumen"
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-netral-border hover:border-primer rounded-lg p-6 text-center cursor-pointer bg-netral-canvas transition-colors"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            className="border-2 border-dashed border-netral-border hover:border-primer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-2xl p-6 sm:p-7 text-center cursor-pointer bg-netral-canvas/60 transition-colors"
           >
             <input
               ref={fileInputRef}
               type="file"
+              id="remediation-file"
+              name="remediation-file"
+              aria-label="Pilih Berkas Perbaikan Dokumen"
               accept=".pdf,.webp,.jpg,.jpeg,.png"
               onChange={handleFileChange}
               className="hidden"
             />
             <div className="flex flex-col items-center justify-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-primer-light flex items-center justify-center text-primer">
-                <UploadCloud className="w-5 h-5" aria-hidden="true" />
+              <div className="w-12 h-12 rounded-2xl bg-primer-light text-primer border border-primer/20 flex items-center justify-center">
+                <UploadCloud className="w-6 h-6 text-primer" aria-hidden="true" />
               </div>
               {selectedFile ? (
                 <div className="text-xs">
-                  <span className="font-semibold text-gelap flex items-center justify-center gap-1">
-                    <FileText className="w-4 h-4 text-primer" />
+                  <span className="font-bold text-gelap flex items-center justify-center gap-1.5">
+                    <FileText className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
                     {selectedFile.name}
                   </span>
-                  <span className="text-[11px] text-gelap/60 block mt-0.5">
-                    ({(selectedFile.size / 1024).toFixed(1)} KB) - Klik untuk ganti berkas
+                  <span className="text-xs text-gelap/75 flex items-center justify-center gap-1.5 mt-1 font-body">
+                    <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                    <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+                    <span>Klik untuk mengganti berkas</span>
                   </span>
                 </div>
               ) : (
-                <div className="text-xs text-gelap/70">
-                  <span className="font-semibold text-primer">Klik untuk memilih berkas pengganti</span> atau seret dokumen ke sini
-                  <p className="text-[11px] text-gelap/50 mt-1">
-                    Pastikan lembar tanda tangan dan stempel instansi terlihat utuh serta tidak buram.
+                <div className="text-xs text-gelap/80 space-y-1 font-body">
+                  <span className="font-bold text-primer text-sm block">Klik untuk memilih berkas pengganti</span>
+                  <p className="text-xs text-gelap/75">
+                    Pastikan lembar tanda tangan dan stempel instansi terlihat utuh serta tidak buram (Format: PDF/WebP maks. 5 MB)
                   </p>
                 </div>
               )}
@@ -153,23 +167,28 @@ export function RemediationPanel({
           </div>
         </div>
 
-        {errorMessage && (
-          <div className="p-2.5 bg-red-50 text-red-700 text-xs rounded-md border border-red-200">
+        {errorMessage ? (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="p-3 bg-status-danger-light text-status-danger text-xs font-semibold rounded-xl border border-status-danger/30"
+          >
             {errorMessage}
           </div>
-        )}
+        ) : null}
 
         <div>
-          <label htmlFor="remediation-notes" className="block text-xs font-bold text-gelap mb-1">
+          <label htmlFor="remediation-notes" className="block text-xs font-bold text-gelap mb-1.5">
             Catatan Perbaikan Tambahan (Opsional)
           </label>
           <textarea
             id="remediation-notes"
-            rows={2}
+            name="remediation-notes"
+            rows={3}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Tuliskan keterangan jika ada halaman tambahan atau konfirmasi nomor surat pengesahan..."
-            className="w-full text-xs p-2.5 rounded-md border border-netral-border focus:ring-2 focus:ring-primer focus:outline-none"
+            placeholder="Tuliskan keterangan jika ada halaman tambahan atau konfirmasi nomor surat pengesahan…"
+            className="w-full text-xs sm:text-sm p-3 rounded-xl border border-netral-border focus-visible:ring-2 focus-visible:ring-primer focus-visible:outline-none bg-white text-gelap placeholder:text-gelap/50"
           />
         </div>
 
@@ -177,12 +196,13 @@ export function RemediationPanel({
           <Button
             type="submit"
             variant="primary"
+            size="lg"
             isLoading={isSubmitting}
-            loadingText="Mengirimkan Berkas Perbaikan..."
-            className="text-xs font-semibold px-5 shadow-sm"
+            loadingText="Mengirimkan Berkas Perbaikan…"
+            className="w-full sm:w-auto min-h-[48px] text-xs sm:text-sm font-bold px-6 shadow-sm"
           >
             <span>Kirim Ulang Dokumen Perbaikan</span>
-            <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
+            <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
           </Button>
         </div>
       </form>
