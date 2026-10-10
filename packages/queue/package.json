@@ -1,0 +1,25 @@
+{
+  "name": "@pasok/queue",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest run ../../tests/unit/architecture/eager-lazy.test.ts --passWithNoTests"
+  },
+  "dependencies": {
+    "@pasok/config": "*",
+    "@pasok/domain": "*",
+    "ioredis": "^5.4.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0"
+  }
+}

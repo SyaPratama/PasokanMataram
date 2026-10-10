@@ -1,0 +1,39 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing & Coverage
+/coverage
+/scratch
+
+# Next.js build output
+/.next/
+/out/
+
+# Production build
+/build
+/dist
+*.tsbuildinfo
+.turbo/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files (except .env.example)
+.env
+.env*.local
+.env.development
+.env.production
+!.env.example
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Test Screenshots Artifacts
+/tests/screenshots/*
+!/tests/screenshots/.gitignore

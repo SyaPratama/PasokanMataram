@@ -1,0 +1,26 @@
+{
+  "name": "@pasok/auth-kyb-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest run ../../tests/unit/lib/auth.test.ts --passWithNoTests"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.670.0",
+    "@aws-sdk/s3-request-presigner": "^3.670.0",
+    "@pasok/config": "*",
+    "@pasok/database": "*",
+    "@pasok/domain": "*",
+    "@pasok/queue": "*",
+    "argon2": "^0.41.1",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

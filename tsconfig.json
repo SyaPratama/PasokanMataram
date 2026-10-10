@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@pasok/config": ["./packages/config/src/index.ts"],
+      "@pasok/domain": ["./packages/domain/src/index.ts"],
+      "@pasok/repository-contracts": ["./packages/repository-contracts/src/index.ts"],
+      "@pasok/security": ["./packages/security/src/index.ts"],
+      "@pasok/security/edge": ["./packages/security/src/edge.ts"],
+      "@pasok/security/tokens": ["./packages/security/src/tokens.ts"],
+      "@pasok/security/passwords": ["./packages/security/src/passwords.ts"],
+      "@pasok/database": ["./packages/database/src/index.ts"],
+      "@pasok/queue": ["./packages/queue/src/index.ts"],
+      "@pasok/auth-kyb-service": ["./services/auth-kyb-service/src/index.ts"],
+      "@/*": ["./apps/web/src/*"]
+    }
+  },
+  "include": ["packages/**/*.ts", "services/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", ".next", "apps/*/.next"]
+}

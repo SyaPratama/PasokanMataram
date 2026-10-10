@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pasok/config": ["../../packages/config/src/index.ts"],
+      "@pasok/domain": ["../../packages/domain/src/index.ts"],
+      "@pasok/repository-contracts": ["../../packages/repository-contracts/src/index.ts"],
+      "@pasok/security": ["../../packages/security/src/index.ts"],
+      "@pasok/security/edge": ["../../packages/security/src/edge.ts"],
+      "@pasok/security/tokens": ["../../packages/security/src/tokens.ts"],
+      "@pasok/security/passwords": ["../../packages/security/src/passwords.ts"],
+      "@pasok/database": ["../../packages/database/src/index.ts"],
+      "@pasok/queue": ["../../packages/queue/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
