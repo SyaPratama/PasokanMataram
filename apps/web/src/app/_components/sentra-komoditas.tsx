@@ -306,22 +306,28 @@ export function SentraKomoditasSection() {
                     }}
                     className="flex flex-col bg-netral-canvas/40 border border-netral-border/80 rounded-2xl p-5 sm:p-6 hover:shadow-md hover:border-primer/50 transition-all group shrink-0 w-[86vw] max-w-[340px] snap-center md:w-auto md:max-w-none md:shrink"
                   >
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div>
-                        <h3 className="font-heading font-bold text-lg text-gelap group-hover:text-primer transition-colors">
+                    <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3">
+                      <div className="flex-1 min-w-0 pr-1">
+                        <h3 className="font-heading font-bold text-base sm:text-lg text-gelap group-hover:text-primer transition-colors leading-snug">
                           {item.nama}
                         </h3>
                         <div className="flex items-center text-xs text-gelap/85 mt-1 font-body">
-                          <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder flex-shrink-0" aria-hidden="true" />
-                          <span>{item.sentra}</span>
+                          <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder shrink-0" aria-hidden="true" />
+                          <span className="truncate">{item.sentra}</span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs text-gelap/80 block font-medium">Estimasi Grosir</span>
-                        <span className="font-heading font-extrabold text-base text-primer">
-                          {item.hargaEstimasi}
+                      <div className="text-right shrink-0">
+                        <span className="text-[11px] sm:text-xs text-gelap/80 block font-medium whitespace-nowrap">
+                          Estimasi Grosir
                         </span>
-                        <span className="text-[10px] text-gelap/80 block font-medium">/{item.satuan}</span>
+                        <div className="flex items-baseline justify-end gap-1 mt-0.5">
+                          <span className="font-heading font-extrabold text-base text-primer whitespace-nowrap">
+                            {item.hargaEstimasi}
+                          </span>
+                          <span className="text-xs text-gelap/80 font-medium whitespace-nowrap">
+                            /{item.satuan}
+                          </span>
+                        </div>
                       </div>
                     </div>
 

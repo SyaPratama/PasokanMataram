@@ -72,11 +72,12 @@ export function HeroSection() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
             >
               {/* Badge Kategori Pengadaan */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/15 text-white backdrop-blur-sm border border-white/20 mb-3.5 sm:mb-4 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-aksen" aria-hidden="true" />
-                <span>Pengadaan Bahan Baku Dapur Restoran & Petani</span>
-                <span className="w-1 h-1 rounded-full bg-white/60 inline-block" aria-hidden="true" />
-                <span>D.I. Yogyakarta</span>
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white/15 text-white backdrop-blur-sm border border-white/20 mb-3.5 sm:mb-4 shadow-sm whitespace-nowrap max-w-full">
+                <Sparkles className="w-3.5 h-3.5 text-aksen shrink-0" aria-hidden="true" />
+                <span className="hidden sm:inline">Pengadaan Bahan Baku Dapur Restoran & Petani</span>
+                <span className="sm:hidden">Sourcing Bahan Baku Dapur</span>
+                <span className="w-1 h-1 rounded-full bg-white/60 inline-block shrink-0" aria-hidden="true" />
+                <span className="font-bold text-white whitespace-nowrap shrink-0">D.I. Yogyakarta</span>
               </div>
 
               {/* Judul Utama: Proporsional & Kontras Tinggi */}

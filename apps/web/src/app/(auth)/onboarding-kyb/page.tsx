@@ -18,12 +18,13 @@ export default function OnboardingKybPage() {
     <div className="w-full max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden p-6 sm:p-8 space-y-6">
       {/* Header Kartu Verifikasi KYB Resmi */}
       <div className="bg-primer rounded-2xl p-5 sm:p-6 text-white text-center shadow-xs relative">
-        <div className="flex items-center justify-center gap-2 mb-3.5">
-          <div className="inline-flex items-center justify-center h-8 w-8 rounded-xl bg-white/15 border border-white/25 text-white shrink-0 shadow-2xs">
-            <ShieldCheck className="w-4 h-4 text-white" aria-hidden="true" />
-          </div>
-          <div className="inline-flex items-center h-8 px-3.5 rounded-xl bg-white/15 border border-white/25 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-2xs whitespace-nowrap">
-            <span>Tahap 2 dari 2: Verifikasi Resmi</span>
+        {/* Single Unified Badge: Logo & Teks Rapi Sejajar */}
+        <div className="flex items-center justify-center mb-3 sm:mb-3.5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/15 border border-white/25 text-white shadow-2xs">
+            <ShieldCheck className="w-4 h-4 text-white shrink-0" aria-hidden="true" />
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap">
+              Tahap 2 dari 2: Verifikasi Resmi
+            </span>
           </div>
         </div>
         <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-white">

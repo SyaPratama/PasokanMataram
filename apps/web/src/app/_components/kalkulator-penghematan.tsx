@@ -23,7 +23,7 @@ export function KalkulatorPenghematan() {
   const yearlySavings = monthlySavings * 12;
 
   const formatRupiah = (val: number) => {
-    return 'Rp ' + Math.round(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return 'Rp\u00A0' + Math.round(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
   return (
@@ -44,26 +44,35 @@ export function KalkulatorPenghematan() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto">
           {/* Panel Input Interaktif */}
-          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-netral-border flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-white p-4 sm:p-8 rounded-2xl shadow-sm border border-netral-border flex flex-col justify-between">
             <div className="space-y-6">
               {/* Tipe Bisnis */}
               <div>
                 <label className="block text-xs font-bold text-gelap uppercase tracking-wider mb-2">
                   Kategori Usaha Kuliner
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                   {(['KAFE', 'RESTO', 'HOTEL'] as const).map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => setBusinessType(type)}
-                      className={`px-3 py-2.5 text-xs font-semibold rounded-lg border transition-all text-center ${
+                      className={`px-1 sm:px-3 py-2.5 text-[10.5px] sm:text-xs font-semibold rounded-lg border transition-all text-center whitespace-nowrap min-h-[44px] flex items-center justify-center ${
                         businessType === type
                           ? 'bg-primer-deep text-white border-primer-deep shadow-sm'
                           : 'bg-netral-canvas text-gelap border-netral-border hover:bg-netral-surface'
                       }`}
                     >
-                      {type === 'KAFE' ? 'Kafe / Kedai' : type === 'RESTO' ? 'Restoran / Rumah Makan' : 'Hotel / Katering'}
+                      {type === 'KAFE' ? (
+                        <span>Kafe / Kedai</span>
+                      ) : type === 'RESTO' ? (
+                        <>
+                          <span className="hidden md:inline">Restoran / Rumah Makan</span>
+                          <span className="md:hidden">Restoran</span>
+                        </>
+                      ) : (
+                        <span>Hotel / Katering</span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -74,19 +83,26 @@ export function KalkulatorPenghematan() {
                 <label className="block text-xs font-bold text-gelap uppercase tracking-wider mb-2">
                   Jumlah Gerai Fisik (Outlet)
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
                   {[1, 2, 3, 5].map((count) => (
                     <button
                       key={count}
                       type="button"
                       onClick={() => setOutletCount(count)}
-                      className={`px-3 py-2 text-xs font-semibold rounded-lg border transition-all text-center ${
+                      className={`px-1 sm:px-2.5 py-2 text-[10.5px] sm:text-xs font-semibold rounded-lg border transition-all text-center whitespace-nowrap min-h-[44px] flex items-center justify-center ${
                         outletCount === count
                           ? 'bg-primer-deep text-white border-primer-deep shadow-sm'
                           : 'bg-netral-canvas text-gelap border-netral-border hover:bg-netral-surface'
                       }`}
                     >
-                      {count === 5 ? '5+ Cabang' : `${count} Gerai`}
+                      {count === 5 ? (
+                        <>
+                          <span className="hidden sm:inline">5+ Cabang</span>
+                          <span className="sm:hidden">5+ Gerai</span>
+                        </>
+                      ) : (
+                        `${count} Gerai`
+                      )}
                     </button>
                   ))}
                 </div>
@@ -94,11 +110,12 @@ export function KalkulatorPenghematan() {
 
               {/* Slider Belanja Harian */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label htmlFor={sliderId} className="text-xs font-bold text-gelap uppercase tracking-wider">
-                    Estimasi Belanja Dapur per Gerai / Hari
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <label htmlFor={sliderId} className="text-xs font-bold text-gelap uppercase tracking-wider truncate">
+                    <span className="hidden sm:inline">Estimasi Belanja Dapur per Gerai / Hari</span>
+                    <span className="sm:hidden">Belanja Dapur / Hari</span>
                   </label>
-                  <span className="text-sm font-extrabold text-primer-deep font-mono">
+                  <span className="text-sm sm:text-base font-extrabold text-primer-deep font-mono whitespace-nowrap shrink-0">
                     {formatRupiah(dailyExpense)}
                   </span>
                 </div>
@@ -138,11 +155,11 @@ export function KalkulatorPenghematan() {
               <p className="text-xs text-netral-light/90 uppercase tracking-wider font-semibold">
                 Potensi Penghematan per Bulan
               </p>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white font-heading mt-1">
+              <div className="text-2xl sm:text-4xl font-extrabold text-white font-heading mt-1 whitespace-nowrap">
                 {formatRupiah(monthlySavings)}
               </div>
               <p className="text-xs text-netral-light/90 mt-1 font-body">
-                Atau setara dengan <strong className="text-white font-bold">{formatRupiah(yearlySavings)}</strong> per tahun.
+                Atau setara dengan <strong className="text-white font-bold whitespace-nowrap">{formatRupiah(yearlySavings)}</strong> per tahun.
               </p>
 
               <div className="mt-6 space-y-2.5 pt-6 border-t border-white/15 text-xs font-body">
