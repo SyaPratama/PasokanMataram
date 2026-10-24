@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "lint": "tsc --noEmit",
+    "start": "tsx src/index.ts",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {

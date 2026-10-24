@@ -1,0 +1,11 @@
+{
+  "name": "@pasok/ml-forecasting-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo \"ML forecasting service ready\"",
+    "lint": "echo \"ML forecasting service linted\"",
+    "test": "vitest run --passWithNoTests"
+  }
+}

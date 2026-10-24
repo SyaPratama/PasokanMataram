@@ -27,11 +27,31 @@ export const WelcomeEmailPayloadSchema = z.object({
   recipientEmail: z.string().email(),
   recipientName: z.string().min(1),
 });
+export const MlDataIngestPayloadSchema = z.object({
+  forceRefresh: z.boolean().optional(),
+  source: z.enum(['ALL', 'BAPANAS', 'PIHPS', 'PASAR_LELANG', 'BMKG']).optional().default('ALL'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
+
+export const MlModelTrainPayloadSchema = z.object({
+  commodityIds: z.array(z.string().uuid()).optional(),
+  horizonDays: z.number().int().positive().optional().default(90),
+  algorithm: z.string().optional().default('PasokML-Ensemble-v1'),
+});
+
+export const MlForecastPublishPayloadSchema = z.object({
+  generatedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  invalidateCache: z.boolean().optional().default(true),
+});
+
 
 export const QueueJobRegistry = {
   'kyb.document.uploaded': KybUploadedPayloadSchema,
   'kyb.status.changed': KybStatusChangedPayloadSchema,
   'notification.welcome.email': WelcomeEmailPayloadSchema,
+  'ml.data.ingest.daily': MlDataIngestPayloadSchema,
+  'ml.model.train.periodic': MlModelTrainPayloadSchema,
+  'ml.forecast.publish.daily': MlForecastPublishPayloadSchema,
 } as const;
 
 export type QueueName = keyof typeof QueueJobRegistry;

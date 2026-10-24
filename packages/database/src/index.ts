@@ -4,3 +4,5 @@
 
 export * from './client';
 export * from './migrator';
+export * from './adapters/ecosystem';
+export * from './locks/quota-lock';

@@ -80,7 +80,6 @@ export async function runMigrations(): Promise<MigrationResult[]> {
     try {
       await client.query(`SELECT pg_advisory_unlock($1)`, [migrationsConfig.lockId]);
     } catch {
-      // Ignored during teardown
     }
     client.release();
     await pool.end();

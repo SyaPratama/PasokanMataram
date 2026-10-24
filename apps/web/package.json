@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit && next lint",
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
@@ -18,6 +18,9 @@
     "@pasok/database": "*",
     "@pasok/domain": "*",
     "@pasok/queue": "*",
+    "@pasok/logistics-hub-service": "*",
+    "@pasok/pooling-service": "*",
+    "@pasok/settlement-service": "*",
     "argon2": "^0.41.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",

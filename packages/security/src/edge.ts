@@ -100,9 +100,9 @@ export function canAuthorizeVariance(microRole: MicroRole): boolean {
 export function resolveUserHomeRoute(macroRole: MacroRole): string {
   switch (macroRole) {
     case 'HOREKA':
-      return '/horeka/dashboard';
+      return '/buyer/dashboard';
     case 'GAPOKTAN':
-      return '/farmer/dashboard';
+      return '/supplier/dashboard';
     case 'HUB_OPERATOR':
       return '/hub/inbound';
     case 'SUPER_ADMIN':
@@ -131,11 +131,11 @@ export function isRouteAllowedForRole(pathname: string, macroRole: MacroRole, mi
     return false;
   }
 
-  if (pathname.startsWith('/farmer') && macroRole !== 'GAPOKTAN') {
+  if ((pathname.startsWith('/farmer') || pathname.startsWith('/supplier')) && macroRole !== 'GAPOKTAN') {
     return false;
   }
 
-  if (pathname.startsWith('/horeka') && macroRole !== 'HOREKA') {
+  if ((pathname.startsWith('/horeka') || pathname.startsWith('/buyer')) && macroRole !== 'HOREKA') {
     return false;
   }
 
