@@ -78,6 +78,7 @@ services:
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-Tama123}
       DB_NAME: ${DB_NAME:-pasokmataram_db}
+      DB_SSL: "false"
       REDIS_URL: redis://redis:6379
       ML_SERVICE_URL: http://ml-service:8000
       SOLOSMARTPAY_API_TOKEN: ${SOLOSMARTPAY_API_TOKEN:-ssp_test_pasokmataram_demo}
@@ -115,6 +116,7 @@ services:
     restart: unless-stopped
     environment:
       DB_HOST: postgres
+      DB_SSL: "false"
       REDIS_URL: redis://redis:6379
     depends_on:
       - postgres
