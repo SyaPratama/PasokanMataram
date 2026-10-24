@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { themeColors } from '@pasok/config';
 import type { CommodityForecast, ForecastHorizon, PriceDataPoint } from '../../types/forecast';
 import { Calendar, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 
@@ -58,21 +59,27 @@ export function ForecastInteractiveChart({
   const chartW = svgWidth - padLeft - padRight;
   const chartH = svgHeight - padTop - padBottom;
 
-  const getX = (index: number) => {
-    return padLeft + (index / (filteredData.length - 1)) * chartW;
-  };
+  const getX = React.useCallback(
+    (index: number) => {
+      return padLeft + (index / (filteredData.length - 1)) * chartW;
+    },
+    [filteredData.length, chartW]
+  );
 
-  const getY = (price: number) => {
-    const norm = (price - minPrice) / (priceRange || 1);
-    return padTop + chartH - norm * chartH;
-  };
+  const getY = React.useCallback(
+    (price: number) => {
+      const norm = (price - minPrice) / (priceRange || 1);
+      return padTop + chartH - norm * chartH;
+    },
+    [minPrice, priceRange, chartH]
+  );
 
   const historicalPoints = filteredData.filter((p) => !p.isProjected);
   const historicalPath = React.useMemo(() => {
     return historicalPoints
       .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(idx).toFixed(1)} ${getY(p.price).toFixed(1)}`)
       .join(' ');
-  }, [historicalPoints, minPrice, priceRange]);
+  }, [historicalPoints, getX, getY]);
 
   const lastHistIdx = historicalPoints.length - 1;
   const projectedPath = React.useMemo(() => {
@@ -83,7 +90,7 @@ export function ForecastInteractiveChart({
         return `${i === 0 ? 'M' : 'L'} ${getX(actualIdx).toFixed(1)} ${getY(p.price).toFixed(1)}`;
       })
       .join(' ');
-  }, [filteredData, lastHistIdx, minPrice, priceRange]);
+  }, [filteredData, lastHistIdx, getX, getY]);
 
   const confidenceAreaPath = React.useMemo(() => {
     const projPoints = filteredData.slice(lastHistIdx);
@@ -107,7 +114,7 @@ export function ForecastInteractiveChart({
       .join(' ');
 
     return `${topPath} ${bottomPath} Z`;
-  }, [filteredData, lastHistIdx, minPrice, priceRange]);
+  }, [filteredData, lastHistIdx, getX, getY]);
 
   const yTicks = [
     minPrice,
@@ -120,11 +127,11 @@ export function ForecastInteractiveChart({
     <div className="bg-white border border-netral-border/80 rounded-2xl p-5 shadow-xs flex flex-col space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-netral-border/70">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="font-heading font-extrabold text-base text-gelap">
-              Kurva Tren & Proyeksi AI Multi-Horizon
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <h2 className="font-heading font-extrabold text-xs sm:text-base text-gelap truncate">
+              Kurva Tren &amp; Proyeksi Multi-Horizon
             </h2>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primer-light text-primer font-bold">
+            <span className="inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded-full bg-primer-light text-primer font-bold whitespace-nowrap shrink-0 shadow-2xs">
               Ensemble v2.1
             </span>
           </div>
@@ -163,12 +170,12 @@ export function ForecastInteractiveChart({
         >
           <defs>
             <linearGradient id="confidenceGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#D48028" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#D48028" stopOpacity="0.04" />
+              <stop offset="0%" stopColor={themeColors.aksen.DEFAULT} stopOpacity="0.18" />
+              <stop offset="100%" stopColor={themeColors.aksen.DEFAULT} stopOpacity="0.04" />
             </linearGradient>
             <linearGradient id="todayLineGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2E5339" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#2E5339" stopOpacity="0.1" />
+              <stop offset="0%" stopColor={themeColors.primer.DEFAULT} stopOpacity="0.6" />
+              <stop offset="100%" stopColor={themeColors.primer.DEFAULT} stopOpacity="0.1" />
             </linearGradient>
           </defs>
 
@@ -181,7 +188,7 @@ export function ForecastInteractiveChart({
                   y1={y}
                   x2={svgWidth - padRight}
                   y2={y}
-                  stroke="#E8E2D9"
+                  stroke={themeColors.netral.border}
                   strokeDasharray="4 4"
                   strokeWidth="1"
                 />
@@ -189,7 +196,7 @@ export function ForecastInteractiveChart({
                   x={padLeft - 10}
                   y={y + 3}
                   textAnchor="end"
-                  className="text-[10px] font-mono fill-gelap/50 tabular-nums"
+                  className="text-xs font-mono fill-gelap-muted tabular-nums"
                 >
                   Rp {(val / 1000).toFixed(0)}k
                 </text>
@@ -210,7 +217,7 @@ export function ForecastInteractiveChart({
             x={getX(lastHistIdx)}
             y={padTop - 8}
             textAnchor="middle"
-            className="text-[9px] font-bold fill-primer font-heading"
+            className="text-xs font-bold fill-primer font-heading"
           >
             HARI INI (09 OKT)
           </text>
@@ -226,7 +233,7 @@ export function ForecastInteractiveChart({
           <path
             d={historicalPath}
             fill="none"
-            stroke="#2E5339"
+            stroke={themeColors.primer.DEFAULT}
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -235,7 +242,7 @@ export function ForecastInteractiveChart({
           <path
             d={projectedPath}
             fill="none"
-            stroke="#B85324"
+            stroke={themeColors.sekunder.DEFAULT}
             strokeWidth="2.5"
             strokeDasharray="6 4"
             strokeLinecap="round"
@@ -254,7 +261,7 @@ export function ForecastInteractiveChart({
                   cx={x}
                   cy={y}
                   r={isHovered ? 6 : isToday ? 5 : p.isProjected ? 3 : 3.5}
-                  fill={isToday ? '#2E5339' : p.isProjected ? '#B85324' : '#2E5339'}
+                  fill={isToday ? themeColors.primer.DEFAULT : p.isProjected ? themeColors.sekunder.DEFAULT : themeColors.primer.DEFAULT}
                   stroke="#FFFFFF"
                   strokeWidth={isHovered ? 2.5 : 1.5}
                   className="cursor-pointer transition-all hover:scale-125"
@@ -270,7 +277,7 @@ export function ForecastInteractiveChart({
               x={padLeft}
               y={svgHeight - 14}
               textAnchor="start"
-              className="text-[10px] font-mono fill-gelap/50"
+              className="text-xs font-mono fill-gelap-muted"
             >
               {filteredData[0]?.date}
             </text>
@@ -278,7 +285,7 @@ export function ForecastInteractiveChart({
               x={getX(lastHistIdx)}
               y={svgHeight - 14}
               textAnchor="middle"
-              className="text-[10px] font-mono fill-primer font-bold"
+              className="text-xs font-mono fill-primer font-bold"
             >
               09 Okt (Sekarang)
             </text>
@@ -286,7 +293,7 @@ export function ForecastInteractiveChart({
               x={svgWidth - padRight}
               y={svgHeight - 14}
               textAnchor="end"
-              className="text-[10px] font-mono fill-gelap/50"
+              className="text-xs font-mono fill-gelap-muted"
             >
               +{horizonDays} Hari
             </text>
@@ -295,9 +302,9 @@ export function ForecastInteractiveChart({
 
         {hoveredPoint && (
           <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm border border-netral-border rounded-xl p-3 shadow-lg text-xs space-y-1 pointer-events-none transition-all">
-            <div className="text-[10px] font-bold text-gelap/60 uppercase flex items-center justify-between gap-3">
+            <div className="text-xs font-bold text-gelap-muted uppercase flex items-center justify-between gap-3">
               <span>{hoveredPoint.date}</span>
-              <span className={`px-1.5 py-0.2 rounded text-[9px] font-semibold ${
+              <span className={`px-1.5 py-0.2 rounded text-xs font-semibold ${
                 hoveredPoint.isProjected ? 'bg-aksen-light text-aksen-dark' : 'bg-primer-light text-primer'
               }`}>
                 {hoveredPoint.isProjected ? 'Proyeksi AI' : 'Data Pasar Riil'}

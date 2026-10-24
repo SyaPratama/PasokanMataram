@@ -17,8 +17,8 @@ export function PwaFloatingButton() {
   const { isInstalled, isIos, canPromptDirectly, promptInstall } = usePwaInstall();
   const [modalOpen, setModalOpen] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);
+  const [showManualGuide, setShowManualGuide] = useState(false);
 
-  // Jika sudah terpasang di mode standalone, sembunyikan tombol
   if (isInstalled) {
     return null;
   }
@@ -30,9 +30,10 @@ export function PwaFloatingButton() {
         setInstallSuccess(true);
         setTimeout(() => setModalOpen(false), 2000);
       }
+    } else {
+      setShowManualGuide(true);
     }
   };
-
   return (
     <>
       <div className="fixed bottom-6 right-6 z-40 group">
@@ -155,6 +156,15 @@ export function PwaFloatingButton() {
                   </div>
                 ) : null}
 
+                {showManualGuide && !isIos && (
+                  <div className="bg-primer-light/70 border border-primer/20 rounded-2xl p-4 text-xs space-y-1.5 text-gelap">
+                    <span className="font-bold text-primer block">Panduan Pemasangan Cepat Browser:</span>
+                    <p className="text-gelap/85 leading-relaxed">
+                      Klik ikon <strong>Instal Aplikasi</strong> di bilah alamat browser atau buka menu browser (tiga titik) lalu pilih <strong>&quot;Pasang PasokMataram&quot;</strong> atau <strong>&quot;Install App&quot;</strong>.
+                    </p>
+                  </div>
+                )}
+
                 {installSuccess ? (
                   <div className="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -164,7 +174,7 @@ export function PwaFloatingButton() {
               </div>
 
               <div className="pt-3 border-t border-netral-border/50 flex flex-col sm:flex-row gap-2.5">
-                {canPromptDirectly && !installSuccess && (
+                {!installSuccess && (
                   <button
                     type="button"
                     onClick={handleInstallClick}
@@ -175,7 +185,6 @@ export function PwaFloatingButton() {
                   </button>
                 )}
                 <button
-                  type="button"
                   onClick={() => setModalOpen(false)}
                   className="px-5 py-3 rounded-full text-xs font-semibold text-gelap/70 hover:text-gelap hover:bg-netral-canvas transition-colors min-h-[44px]"
                 >

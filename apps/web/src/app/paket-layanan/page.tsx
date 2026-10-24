@@ -2,24 +2,23 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight, CreditCard } from 'lucide-react';
 import { Navbar } from '../_components/navbar';
-import { PaketB2b } from '../_components/paket-b2b';
+import { PaketLayanan } from '../_components/paket-layanan';
 import { Footer } from '../_components/footer';
 import { PwaFloatingButton } from '../../components/pwa-floating-button';
 
 export const metadata: Metadata = {
   title: 'Paket Layanan Pengadaan Dapur HoReKa | PasokMataram',
   description:
-    'Pilihan paket berlangganan fleksibel untuk dapur mandiri, kafe multi-cabang, dan jaringan hotel berbintang di Yogyakarta.',
+    'Pilihan paket layanan transparan untuk dapur mandiri, kafe multi-cabang, dan jaringan hotel di D.I. Yogyakarta.',
   alternates: {
-    canonical: '/paket-b2b',
+    canonical: '/paket-layanan',
   },
 };
 
 /**
  * Halaman rute semantik Paket Layanan Pengadaan Dapur HoReKa.
- * Menggantikan anchor #biaya.
  */
-export default function PaketB2bPage() {
+export default function PaketLayananPage() {
   return (
     <div className="flex flex-col min-h-screen bg-netral-canvas font-body">
       <Navbar />
@@ -37,7 +36,7 @@ export default function PaketB2bPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-gelap tracking-tight">
-                  Paket Langganan & Biaya Operasional
+                  Paket Layanan & Biaya Operasional
                 </h1>
                 <p className="text-xs sm:text-sm text-gelap/70 mt-1 max-w-2xl">
                   Transparansi biaya platform tanpa komisi tersembunyi. Dilengkapi fitur multi-cabang dan integrasi timbangan digital.
@@ -51,7 +50,7 @@ export default function PaketB2bPage() {
           </div>
         </div>
 
-        <PaketB2b />
+        <PaketLayanan />
       </main>
 
       <Footer />

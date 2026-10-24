@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import {
   DashboardShell,
-  GapoktanContextCard,
+  SupplierContextCard,
   type NavGroup,
 } from '../../components/dashboard-shell';
 
@@ -94,20 +94,20 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
 
   return (
     <DashboardShell
-      portalBadge={{ label: 'Gapoktan', variant: 'sekunder' }}
+      portalBadge={{ label: 'Pemasok', variant: 'sekunder' }}
       contextSlot={
-        <GapoktanContextCard
-          gapoktanName="Gapoktan Srikayangan Makmur"
-          location="Panjatan, Kulon Progo"
+        <SupplierContextCard
+          supplierName="Sentra Supplier Sleman"
+          location="Turi &amp; Pakem, Sleman"
           status="VERIFIED"
         />
       }
       navGroups={navGroups}
       tenantProfile={{
-        tenantName: 'Gapoktan Srikayangan Makmur',
+        tenantName: 'Sentra Supplier Sleman (Gapoktan Srikayangan Makmur)',
         statusBadge: 'VERIFIED',
         userName: 'Pak Subardi',
-        roleTitle: 'Ketua Gapoktan',
+        roleTitle: 'Manajer Operasional Supplier',
         logoutHref: '/login',
       }}
       topBarMeta={{

@@ -100,20 +100,20 @@ export default function BuyerDashboardPage() {
               : 'Pantau ketersediaan stok bahan segar, jadwal subuh 04:30 WIB, dan alokasi pool kuota.'}
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <Button
             variant="primary"
             size="sm"
             onClick={() => setKybModalOpen(true)}
-            className="text-xs font-bold bg-sekunder text-white hover:bg-sekunder-hover shadow-sm"
+            className="text-xs font-bold bg-sekunder text-white hover:bg-sekunder-hover shadow-sm whitespace-nowrap shrink-0"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Ajukan Kuota Pool
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            <span>+ Kuota Pool</span>
           </Button>
           <Link href="/buyer/outlets">
-            <Button variant="outline" size="sm" className="text-xs">
-              <Store className="w-3.5 h-3.5 mr-1.5" />
-              Kelola Gerai
+            <Button variant="outline" size="sm" className="text-xs whitespace-nowrap shrink-0">
+              <Store className="w-3.5 h-3.5 mr-1" />
+              <span>Gerai</span>
             </Button>
           </Link>
         </div>
@@ -224,7 +224,7 @@ export default function BuyerDashboardPage() {
               {hasFinancialAccess ? 'Purchase Orders Berjalan' : 'Daftar Penerimaan Bahan Baku Subuh'}
             </h2>
             <p className="text-[11px] text-gelap/85 mt-0.5">
-              Jadwal Pengiriman Bahan Baku Rutin dari sentra Gapoktan via Cross-Dock Hub DIY.
+              Jadwal Pengiriman Bahan Baku Rutin dari ekosistem supplier pangan DIY via Direct Dispatch &amp; Cross-Dock Hub.
             </p>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primer-light text-primer whitespace-nowrap shrink-0">
@@ -252,7 +252,7 @@ export default function BuyerDashboardPage() {
                   </td>
                   <td className="p-3.5">
                     <div className="font-semibold">{order.commodityName}</div>
-                    <div className="text-[10px] text-gelap/85">Sentra Tani DIY</div>
+                    <div className="text-[10px] text-gelap/85">Sentra Produsen DIY</div>
                   </td>
                   <td className="p-3.5">
                     <div>{order.outletName}</div>

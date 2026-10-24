@@ -13,11 +13,9 @@ export function PwaRegistrar() {
         navigator.serviceWorker
           .register('/sw.js')
           .then((registration) => {
-            // Service worker registered successfully
             registration.update();
           })
           .catch(() => {
-            // Silently fall back to standard web navigation
           });
       });
     }

@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ChefHat,
   Building2,
-  Tractor,
+  Store,
   ScanQrCode,
   ArrowRight,
   Eye,
@@ -33,7 +33,7 @@ const DEMO_PERSONAS = [
     microRole: 'HEAD_CHEF',
     email: 'chef.bambang@baleraos.id',
     icon: ChefHat,
-    redirectUrl: '/horeka/dashboard',
+    redirectUrl: '/buyer/dashboard',
     description: 'Akses stok dapur & COGS resep (Metrik finansial disembunyikan total)',
   },
   {
@@ -45,20 +45,20 @@ const DEMO_PERSONAS = [
     microRole: 'OWNER',
     email: 'owner@kopiklotok.id',
     icon: Building2,
-    redirectUrl: '/horeka/dashboard',
+    redirectUrl: '/buyer/dashboard',
     description: 'Akses penuh saldo escrow, mutasi bank, dan manajemen multi-outlet',
   },
   {
     id: 'gapoktan-srikayangan',
-    label: 'Masuk sbg Ketua Gapoktan (Srikayangan)',
-    shortRole: 'Ketua Gapoktan',
-    businessName: 'Gapoktan Srikayangan',
+    label: 'Masuk sbg Mitra Supplier (Srikayangan)',
+    shortRole: 'Supplier Pangan',
+    businessName: 'Sentra Supplier Srikayangan',
     macroRole: 'GAPOKTAN',
     microRole: 'CHAIRPERSON',
     email: 'ketua.subardi@srikayangan.id',
-    icon: Tractor,
-    redirectUrl: '/farmer/dashboard',
-    description: 'Floor price panen, jadwal kirim truk, dan penarikan dana escrow',
+    icon: Store,
+    redirectUrl: '/supplier/dashboard',
+    description: 'Harga grosir pasokan, etalase produk, dan pencairan dana escrow',
   },
   {
     id: 'qc-hub-bantul',
@@ -236,26 +236,26 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden">
-      <div className="bg-primer p-6 sm:p-7 text-white text-center relative">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white/10 mb-3 border border-white/20 shadow-inner">
-            <Image
-              src="/icons/icon.svg"
-              alt="Logo PasokMataram"
-              width={32}
-              height={32}
-              className="w-8 h-8 object-contain"
-            />
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-balance">
-            Masuk Portal PasokMataram
-          </h1>
-          <p className="text-xs text-white/85 mt-1.5 max-w-sm mx-auto leading-relaxed">
-            Pengadaan Bahan Baku Dapur Restoran & Rantai Pasok Petani D.I. Yogyakarta
-          </p>
+    <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-md border border-netral-border/80 overflow-hidden p-6 sm:p-8">
+      <div className="bg-gradient-to-b from-primer-deep to-primer rounded-2xl p-6 sm:p-7 text-white text-center mb-6 shadow-xs relative">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white mb-3 shadow-xs p-2">
+          <Image
+            src="/icons/icon.svg"
+            alt="Logo PasokMataram"
+            width={32}
+            height={32}
+            className="w-8 h-8 object-contain"
+          />
         </div>
+        <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-balance">
+          Masuk Portal PasokMataram
+        </h1>
+        <p className="text-xs text-white/90 mt-1.5 max-w-sm mx-auto leading-relaxed">
+          Pengadaan Bahan Baku Dapur Restoran &amp; Rantai Pasok Pangan D.I. Yogyakarta
+        </p>
+      </div>
 
-        <div className="p-6 sm:p-8">
+      <div>
           {errorMessage ? (
             <div
               role="alert"

@@ -101,7 +101,6 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-netral-border overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Header Modal */}
         <div className="bg-primer-deep p-4 px-6 text-white flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="w-5 h-5 text-netral" />
@@ -110,18 +109,17 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Tutup Dialog"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form Isi Data Gerai */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
           {errorMessage && (
-            <div className="flex items-start p-3 text-xs rounded-lg bg-red-50 text-red-800 border border-red-200">
-              <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 text-red-600 mt-0.5" aria-hidden="true" />
+            <div className="flex items-start p-3 text-xs rounded-xl bg-status-danger/10 text-status-danger border border-status-danger/30">
+              <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 text-status-danger mt-0.5" aria-hidden="true" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -210,7 +208,6 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
             />
           </div>
 
-          {/* Koordinat Pengantaran */}
           <div className="bg-netral/20 p-3 rounded-lg border border-netral-border/60 text-xs space-y-2">
             <div className="font-semibold text-primer flex items-center">
               <MapPin className="w-3.5 h-3.5 mr-1" />
@@ -247,7 +244,6 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
             </p>
           </div>
 
-          {/* Tombol Aksi */}
           <div className="pt-2 flex justify-end gap-2.5">
             <Button
               type="button"

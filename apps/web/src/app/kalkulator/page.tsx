@@ -9,7 +9,7 @@ import { PwaFloatingButton } from '../../components/pwa-floating-button';
 export const metadata: Metadata = {
   title: 'Kalkulator Efisiensi Belanja Dapur HoReKa | PasokMataram',
   description:
-    'Simulasi perbandingan biaya belanja bahan baku dapur HoReKa antara pasar tradisional harian vs pengadaan agregasi langsung petani PasokMataram.',
+    'Simulasi perbandingan biaya belanja bahan baku dapur HoReKa antara pasar tradisional harian vs pengadaan agregasi langsung supplier PasokMataram.',
   alternates: {
     canonical: '/kalkulator',
   },

@@ -1,14 +1,7 @@
 'use client';
 
-/**
- * @file src/app/_components/mekanisme-pooling.tsx
- * @description Komponen mekanisme pooling kuota panen dan garansi escrow tanpa kalkulator duplikat.
- * Kalkulator interaktif dipusatkan secara eksklusif pada KalkulatorPenghematan (Ponytail YAGNI).
- * Mematuhi prinsip antislop-ui (R-05 variasi ritme, C-3 berbasis konten riil) dan antislop-human (WCAG AA).
- */
-
 import React from 'react';
-import { ShieldCheck, Truck, ArrowRight, Sparkles, Scale, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Truck, ArrowRight, CalendarClock, Scale, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function MekanismePoolingSection() {
@@ -27,32 +20,31 @@ export function MekanismePoolingSection() {
           </p>
         </div>
 
-        {/* 4 Tahapan Eksekusi Nyata */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-sm relative flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-xs relative flex flex-col justify-between">
             <div>
-              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-xs">
                 1
               </div>
-              <h3 className="font-heading font-bold text-base text-gelap">Buka Kuota Panen</h3>
+              <h3 className="font-heading font-bold text-base text-gelap">Buka Kuota Pasokan</h3>
               <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
-                Gapoktan mitra mengumumkan jadwal panen komoditas dengan batas minimum tonase muatan truk (500 kg - 2 ton).
+                Supplier pangan dan Gapoktan mitra mengumumkan ketersediaan pasokan dengan batas minimum tonase muatan truk (25 kg hingga 2 ton).
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-primer flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" />
+              <CalendarClock className="w-3.5 h-3.5" />
               <span>Jadwal Terbuka Transparan</span>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-sm relative flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-xs relative flex flex-col justify-between">
             <div>
-              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-xs">
                 2
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Kunci Alokasi & Escrow</h3>
               <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
-                Dapur memesan porsi (25–100 kg). Saldo pesanan dikunci dengan aman di rekening penampung escrow terproteksi.
+                Dapur memesan porsi (25 sampai 100 kg). Saldo pesanan dikunci dengan aman di rekening penampung escrow terproteksi.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-sekunder-dark flex items-center gap-1">
@@ -61,9 +53,9 @@ export function MekanismePoolingSection() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-sm relative flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-xs relative flex flex-col justify-between">
             <div>
-              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-xs">
                 3
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">QC Hub Transit Bantul</h3>
@@ -77,29 +69,28 @@ export function MekanismePoolingSection() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-sm relative flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-2xl border border-netral-border/70 shadow-xs relative flex flex-col justify-between">
             <div>
-              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-primer text-white flex items-center justify-center font-heading font-extrabold text-sm mb-4 shadow-xs">
                 4
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Drop Subuh & Rilis Dana</h3>
               <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
-                Armada mengantar komoditas pukul 04:30 WIB. Koki memvalidasi kualitas via QC digital sebelum dana escrow dilepas ke petani.
+                Armada mengantar komoditas pukul 04:30 WIB. Koki memvalidasi kualitas via QC digital sebelum dana escrow dilepas ke supplier.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-primer flex items-center gap-1">
               <Truck className="w-3.5 h-3.5" />
-              <span>Pengiriman Tepat Waktu</span>
+              <span>Drop Pukul 04:30 Subuh</span>
             </div>
           </div>
         </div>
 
-        {/* Live Pooling Pool Status & Garansi Proteksi */}
-        <div className="bg-white rounded-2xl border border-netral-border p-6 sm:p-8 shadow-sm max-w-4xl mx-auto">
+        <div className="bg-white rounded-3xl border border-netral-border p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-netral-border/60">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primer-light/40 text-primer mb-1.5">
-                <span className="w-2 h-2 rounded-full bg-primer animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-primer" />
                 <span>Batch Aktif Pekan Ini</span>
               </div>
               <h3 className="text-lg md:text-xl font-heading font-bold text-gelap">
@@ -108,11 +99,10 @@ export function MekanismePoolingSection() {
             </div>
             <div className="text-left sm:text-right">
               <span className="text-xs text-gelap/85 font-medium block">Target Tonase Batch</span>
-              <span className="text-base font-extrabold text-primer">850 kg / 1.000 kg (85%)</span>
+              <span className="text-base font-extrabold text-primer font-mono tabular-nums">850 kg / 1.000 kg (85%)</span>
             </div>
           </div>
 
-          {/* Progress Bar Kuota Pooling */}
           <div className="my-5">
             <div className="w-full bg-netral-canvas rounded-full h-3.5 p-0.5 overflow-hidden border border-netral-border">
               <div
@@ -127,7 +117,7 @@ export function MekanismePoolingSection() {
             </div>
             <div className="flex justify-between items-center text-xs text-gelap/85 mt-2 font-body">
               <span>Sisa kuota: 150 kg (Tutup pemesanan hari ini 16:00 WIB)</span>
-              <span className="font-bold text-sekunder-dark">Harga Langsung Petani: Rp 24.500/kg</span>
+              <span className="font-bold text-sekunder-dark">Harga Langsung Produsen: Rp 24.500/kg</span>
             </div>
           </div>
 
@@ -150,18 +140,11 @@ export function MekanismePoolingSection() {
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-netral-border/60">
-            <p className="text-xs text-gelap/85 font-body">
-              Ingin menghitung simulasi kebutuhan lengkap dapur Anda? Gunakan{' '}
-              <Link href="/kalkulator" className="text-primer font-semibold underline underline-offset-2">
-                Kalkulator Penghematan Dapur
-              </Link>
-              .
-            </p>
             <Link
               href="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-xs font-bold rounded-full bg-primer text-white hover:bg-primer-hover shadow-sm transition-all hover:scale-[1.02]"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-xs font-bold rounded-full bg-primer text-white hover:bg-primer-hover shadow-xs transition-all hover:scale-[1.02] min-h-[44px]"
             >
-              Kunci Kuota Batch Terbuka
+              Ikuti Batch
               <ArrowRight className="w-4 h-4 ml-1.5" />
             </Link>
           </div>

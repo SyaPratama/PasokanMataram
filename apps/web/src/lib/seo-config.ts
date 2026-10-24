@@ -65,9 +65,9 @@ export const defaultSeoConfig: SeoConfig = {
   },
   keywords: [
     'pengadaan bahan baku restoran jogja',
-    'b2b kitchen supply yogyakarta',
+    'suplai dapur restoran yogyakarta',
     'supplier sayur hotel horeka sleman',
-    'distributor bawang merah srikayangan b2b',
+    'distributor bawang merah srikayangan grosir',
     'grosir cabai rawit panjatan kulon progo',
     'supplier beras premium sleman',
   ],

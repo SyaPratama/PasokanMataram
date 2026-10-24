@@ -1,13 +1,6 @@
 'use client';
 
-/**
- * @file src/app/_components/sentra-komoditas.tsx
- * @description Komponen interaktif katalog komoditas unggulan Gapoktan D.I. Yogyakarta
- * dilengkapi real-time search, dropdown pemilihan daerah 5 kabupaten/kota, dan empty state ramah.
- * Mematuhi prinsip antislop-ui & WCAG 2.1 AA.
- */
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
   MapPin,
   Calendar,
@@ -18,134 +11,25 @@ import {
   SlidersHorizontal,
   RotateCcw,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
-
-export type RegencyCode = 'KULON_PROGO' | 'BANTUL' | 'SLEMAN' | 'GUNUNGKIDUL' | 'YOGYAKARTA';
-
-export interface KomoditasItem {
-  id: string;
-  nama: string;
-  sentra: string;
-  kabupaten: RegencyCode;
-  kabupatenNama: string;
-  hargaEstimasi: string;
-  satuan: string;
-  kuotaTerkumpul: number;
-  kuotaTarget: number;
-  jadwalPanen: string;
-  standarMutu: string;
-}
-
-const DATA_KOMODITAS: KomoditasItem[] = [
-  {
-    id: 'k-1',
-    nama: 'Bawang Merah Srikayangan',
-    sentra: 'Kapanewon Sentolo & Panjatan',
-    kabupaten: 'KULON_PROGO',
-    kabupatenNama: 'Kulon Progo',
-    hargaEstimasi: 'Rp 24.500',
-    satuan: 'kg',
-    kuotaTerkumpul: 850,
-    kuotaTarget: 1000,
-    jadwalPanen: 'Panen Tiap Selasa & Jumat',
-    standarMutu: 'Grade A, diameter >2.5 cm, kadar air <80%',
-  },
-  {
-    id: 'k-2',
-    nama: 'Cabai Rawit Merah Panjatan',
-    sentra: 'Pesisir Pantai Selatan',
-    kabupaten: 'KULON_PROGO',
-    kabupatenNama: 'Kulon Progo',
-    hargaEstimasi: 'Rp 36.000',
-    satuan: 'kg',
-    kuotaTerkumpul: 420,
-    kuotaTarget: 500,
-    jadwalPanen: 'Petik Harian Pukul 06:00',
-    standarMutu: 'Segar petik pagi, tangkai utuh, bebas busuk',
-  },
-  {
-    id: 'k-3',
-    nama: 'Beras Premium Sleman (Rojolele / Mentik)',
-    sentra: 'Seyegan & Minggir',
-    kabupaten: 'SLEMAN',
-    kabupatenNama: 'Sleman',
-    hargaEstimasi: 'Rp 14.800',
-    satuan: 'kg',
-    kuotaTerkumpul: 2400,
-    kuotaTarget: 3000,
-    jadwalPanen: 'Giling Segar Mingguan',
-    standarMutu: 'Beras kepala min 95%, derajat sosoh 100%',
-  },
-  {
-    id: 'k-4',
-    nama: 'Bawang Merah Organik Nawungan',
-    sentra: 'Lembah Nawungan, Selopamioro',
-    kabupaten: 'BANTUL',
-    kabupatenNama: 'Bantul',
-    hargaEstimasi: 'Rp 28.000',
-    satuan: 'kg',
-    kuotaTerkumpul: 600,
-    kuotaTarget: 800,
-    jadwalPanen: 'Siklus Panen Semi-Organik',
-    standarMutu: 'Bebas pestisida sintetis, aroma tajam',
-  },
-  {
-    id: 'k-5',
-    nama: 'Kopi Arabika Lereng Merapi',
-    sentra: 'Pakem & Cangkringan',
-    kabupaten: 'SLEMAN',
-    kabupatenNama: 'Sleman',
-    hargaEstimasi: 'Rp 115.000',
-    satuan: 'kg green bean',
-    kuotaTerkumpul: 180,
-    kuotaTarget: 250,
-    jadwalPanen: 'Full Wash / Natural Process',
-    standarMutu: 'Defect <5%, moisture 11-12%',
-  },
-  {
-    id: 'k-6',
-    nama: 'Kedelai Hitam Lokal Mallika',
-    sentra: 'Kapanewon Semin & Karangmojo',
-    kabupaten: 'GUNUNGKIDUL',
-    kabupatenNama: 'Gunungkidul',
-    hargaEstimasi: 'Rp 16.500',
-    satuan: 'kg',
-    kuotaTerkumpul: 1200,
-    kuotaTarget: 1500,
-    jadwalPanen: 'Kering Jemur Matahari',
-    standarMutu: 'Kadar air max 13%, butir utuh pilihan',
-  },
-  {
-    id: 'k-7',
-    nama: 'Sayur Hidroponik Kota Gede (Selada & Pakcoy)',
-    sentra: 'Kemantren Kotagede & Mergangsan',
-    kabupaten: 'YOGYAKARTA',
-    kabupatenNama: 'Kota Yogyakarta',
-    hargaEstimasi: 'Rp 18.000',
-    satuan: 'kg',
-    kuotaTerkumpul: 310,
-    kuotaTarget: 400,
-    jadwalPanen: 'Panen Harian 05:00 WIB',
-    standarMutu: 'Bebas pestisida, daun renyah tanpa layu',
-  },
-];
-
-type RegencyFilter = 'SEMUA' | RegencyCode;
-
-const DAFTAR_WILAYAH: { value: RegencyFilter; label: string }[] = [
-  { value: 'SEMUA', label: 'Semua Wilayah (D.I. Yogyakarta)' },
-  { value: 'KULON_PROGO', label: 'Kabupaten Kulon Progo' },
-  { value: 'BANTUL', label: 'Kabupaten Bantul' },
-  { value: 'SLEMAN', label: 'Kabupaten Sleman' },
-  { value: 'GUNUNGKIDUL', label: 'Kabupaten Gunungkidul' },
-  { value: 'YOGYAKARTA', label: 'Kota Yogyakarta' },
-];
+import {
+  DATA_KOMODITAS,
+  DAFTAR_WILAYAH,
+  RegencyFilter,
+  KomoditasItem,
+} from './commodities/types';
+const ITEMS_PER_PAGE = 4;
 
 export function SentraKomoditasSection() {
   const [filter, setFilter] = useState<RegencyFilter>('SEMUA');
   const [searchQuery, setSearchQuery] = useState<string>('');
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const filteredItems = useMemo(() => {
     return DATA_KOMODITAS.filter((item) => {
       const matchRegency = filter === 'SEMUA' || item.kabupaten === filter;
@@ -163,11 +47,14 @@ export function SentraKomoditasSection() {
     });
   }, [filter, searchQuery]);
 
-  const [activeSlide, setActiveSlide] = React.useState(0);
-  const carouselRef = React.useRef<HTMLDivElement>(null);
-  const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
 
-  const handleScroll = React.useCallback(() => {
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredItems, currentPage]);
+
+  const handleScroll = useCallback(() => {
     const container = carouselRef.current;
     if (!container) return;
 
@@ -204,36 +91,33 @@ export function SentraKomoditasSection() {
   const handleReset = () => {
     setFilter('SEMUA');
     setSearchQuery('');
+    setCurrentPage(1);
   };
 
   return (
     <section id="komoditas" className="py-16 md:py-24 bg-white border-y border-netral-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Seksi */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold tracking-wider uppercase text-sekunder">
-              Katalog Langsung dari Gapoktan
+              Katalog Ekosistem Supplier Pangan Lokal
             </span>
             <h2 className="mt-2 text-2xl md:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight">
-              Komoditas Sentra Pertanian D.I. Yogyakarta
+              Bahan Pangan Sentra Produsen D.I. Yogyakarta
             </h2>
             <p className="mt-3 text-sm md:text-base text-gelap/70 font-body leading-relaxed">
-              Dipanen terjadwal oleh kelompok tani binaan dan disortir di Hub Transit Bantul untuk kepastian
-              timbangan serta standar mutu dapur restoran profesional.
+              Dipasok langsung oleh peternakan ayam, RPH daging, koperasi susu, dan produsen pangan binaan dengan kontrol mutu higienis untuk standar dapur profesional.
             </p>
           </div>
 
           <div className="text-sm text-gelap/70 font-medium">
             Menampilkan <span className="font-bold text-primer">{filteredItems.length}</span> dari{' '}
-            <span className="font-bold text-gelap">{DATA_KOMODITAS.length}</span> komoditas siap panen
+            <span className="font-bold text-gelap">{DATA_KOMODITAS.length}</span> bahan pangan siap kirim
           </div>
         </div>
 
-        {/* Toolbar Interaktif: Pencarian Real-Time & Pemilihan Wilayah Dropdown */}
         <div className="bg-netral-canvas p-4 sm:p-5 rounded-2xl border border-netral-border/80 mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
-            {/* Input Pencarian Real-Time (Touch Target Ergonomis 48px) */}
             <div className="md:col-span-7 relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap/50">
                 <Search className="w-5 h-5 text-primer" aria-hidden="true" />
@@ -243,7 +127,10 @@ export function SentraKomoditasSection() {
                 name="komoditas-search"
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Cari komoditas (misal: Bawang, Cabai, Sleman, Grade A)..."
                 aria-label="Cari nama komoditas, sentra panen, atau mutu"
                 className="w-full pl-11 pr-10 py-3 text-sm text-gelap bg-white border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] placeholder:text-gelap/45 transition-colors"
@@ -260,7 +147,6 @@ export function SentraKomoditasSection() {
               )}
             </div>
 
-            {/* Dropdown Pemilihan Wilayah (5 Kabupaten / Kota DIY) */}
             <div className="md:col-span-5 relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap/50">
                 <SlidersHorizontal className="w-4 h-4 text-sekunder" aria-hidden="true" />
@@ -269,7 +155,10 @@ export function SentraKomoditasSection() {
                 id="komoditas-regency-select"
                 name="komoditas-regency-select"
                 value={filter}
-                onChange={(e) => setFilter(e.target.value as RegencyFilter)}
+                onChange={(e) => {
+                  setFilter(e.target.value as RegencyFilter);
+                  setCurrentPage(1);
+                }}
                 aria-label="Pilih daerah kabupaten atau kota di D.I. Yogyakarta"
                 className="w-full pl-10 pr-8 py-3 text-sm font-semibold text-gelap bg-white border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] appearance-none cursor-pointer"
               >
@@ -286,16 +175,15 @@ export function SentraKomoditasSection() {
           </div>
         </div>
 
-        {/* Grid Kartu Komoditas atau Empty State: Carousel di Mobile, Grid di Desktop */}
         {filteredItems.length > 0 ? (
           <>
             <div
               ref={carouselRef}
               onScroll={handleScroll}
-              className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth items-stretch max-w-7xl mx-auto pt-2 pb-4 md:py-0 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0"
+              className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth items-stretch max-w-7xl mx-auto pt-2 pb-4 md:py-0 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {filteredItems.map((item, idx) => {
+              {paginatedItems.map((item, idx) => {
                 const percentage = Math.round((item.kuotaTerkumpul / item.kuotaTarget) * 100);
 
                 return (
@@ -304,7 +192,7 @@ export function SentraKomoditasSection() {
                     ref={(el) => {
                       cardRefs.current[idx] = el;
                     }}
-                    className="flex flex-col bg-netral-canvas/40 border border-netral-border/80 rounded-2xl p-5 sm:p-6 hover:shadow-md hover:border-primer/50 transition-all group shrink-0 w-[86vw] max-w-[340px] snap-center md:w-auto md:max-w-none md:shrink"
+                    className="flex flex-col bg-netral-canvas/40 border border-netral-border/80 hover:border-primer/50 rounded-2xl p-5 sm:p-6 shadow-xs hover:shadow-md transition-all group shrink-0 w-[86vw] max-w-[340px] snap-center md:w-auto md:max-w-none md:shrink"
                   >
                     <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3">
                       <div className="flex-1 min-w-0 pr-1">
@@ -321,7 +209,7 @@ export function SentraKomoditasSection() {
                           Estimasi Grosir
                         </span>
                         <div className="flex items-baseline justify-end gap-1 mt-0.5">
-                          <span className="font-heading font-extrabold text-base text-primer whitespace-nowrap">
+                          <span className="font-heading font-extrabold text-base text-primer whitespace-nowrap font-mono tabular-nums">
                             {item.hargaEstimasi}
                           </span>
                           <span className="text-xs text-gelap/80 font-medium whitespace-nowrap">
@@ -342,11 +230,10 @@ export function SentraKomoditasSection() {
                       </div>
                     </div>
 
-                    {/* Progress Bar Kuota Pooling Terkumpul */}
                     <div className="mt-auto pt-2">
                       <div className="flex justify-between text-xs mb-1.5">
                         <span className="text-gelap/85 font-medium">Kuota Pooling Terkunci</span>
-                        <span className="font-semibold text-gelap">
+                        <span className="font-semibold text-gelap font-mono tabular-nums">
                           {item.kuotaTerkumpul} / {item.kuotaTarget} kg ({percentage}%)
                         </span>
                       </div>
@@ -358,14 +245,14 @@ export function SentraKomoditasSection() {
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-netral-border/60 flex items-center justify-between">
-                      <span className="text-[11px] text-gelap/85 font-semibold">Minimum alokasi 25 kg</span>
+                    <div className="mt-4 pt-3.5 border-t border-netral-border/60 flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-gelap/85 font-semibold whitespace-nowrap shrink-0">Min. 25 kg</span>
                       <Link
                         href="/register"
-                        className="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-primer-surface/10 hover:bg-primer hover:text-white text-xs font-bold text-primer-deep group-hover:shadow-xs transition-all min-h-[44px]"
+                        className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-xl bg-primer-surface/10 hover:bg-primer hover:text-white text-xs font-bold text-primer-deep group-hover:shadow-xs transition-all min-h-[38px] whitespace-nowrap shrink-0"
                       >
-                        <span>Ikut Kuota Ini</span>
-                        <ArrowRight className="w-3.5 h-3.5 ml-1.5" aria-hidden="true" />
+                        <span>Ikut Kuota</span>
+                        <ArrowRight className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
                       </Link>
                     </div>
                   </div>
@@ -373,67 +260,118 @@ export function SentraKomoditasSection() {
               })}
             </div>
 
-            {/* Dot / Pill Indicators Interaktif Mobile */}
-            {filteredItems.length > 1 && (
+            {paginatedItems.length > 1 && (
               <div className="flex md:hidden flex-col items-center gap-2 mt-4">
                 <div
                   role="tablist"
                   aria-label="Indikator slide katalog komoditas"
-                  className="flex items-center gap-1.5 py-1"
+                  className="inline-flex items-center gap-1.5 p-1 rounded-full bg-white border border-netral-border/80 shadow-2xs"
                 >
-                  {filteredItems.map((item, idx) => {
-                    const isActive = activeSlide === idx;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={isActive}
-                        aria-label={`Beralih ke komoditas ${idx + 1}: ${item.nama}`}
-                        onClick={() => handleSelectSlide(idx)}
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-full"
-                      >
-                        <span
-                          className={`block rounded-full transition-all duration-300 ${
-                            isActive
-                              ? 'w-7 h-2.5 bg-primer shadow-xs'
-                              : 'w-2.5 h-2.5 bg-netral-border hover:bg-primer/40'
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
+                  {paginatedItems.map((item, idx) => (
+                    <button
+                      key={item.id}
+                      role="tab"
+                      aria-selected={activeSlide === idx}
+                      aria-label={`Lihat komoditas ${item.nama}`}
+                      onClick={() => handleSelectSlide(idx)}
+                      className="p-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primer transition-all"
+                    >
+                      <span
+                        className={`block rounded-full transition-all duration-300 ${
+                          activeSlide === idx
+                            ? 'w-6 h-2 bg-primer shadow-xs'
+                            : 'w-2 h-2 bg-netral-border hover:bg-primer/40'
+                        }`}
+                      />
+                      <span className="sr-only">{item.nama}</span>
+                    </button>
+                  ))}
                 </div>
-                <p className="text-[11px] text-gelap/70 font-body">
-                  Geser kartu secara horizontal untuk melihat komoditas lainnya
-                </p>
+                <span className="text-[11px] font-semibold text-gelap/60">
+                  Geser horizontal untuk menelusuri ({activeSlide + 1} dari {paginatedItems.length})
+                </span>
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-netral-border/70">
+                <span className="text-xs text-gelap/70 font-body">
+                  Menampilkan <span className="font-bold text-primer font-mono tabular-nums">{Math.min(filteredItems.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}–{Math.min(filteredItems.length, currentPage * ITEMS_PER_PAGE)}</span> dari <span className="font-bold text-gelap font-mono tabular-nums">{filteredItems.length}</span> komoditas
+                </span>
+
+                <div
+                  role="navigation"
+                  aria-label="Paginasi katalog komoditas"
+                  className="inline-flex items-center gap-1.5 p-1 rounded-full bg-white border border-netral-border/80 shadow-2xs"
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentPage((p) => Math.max(1, p - 1));
+                      setActiveSlide(0);
+                    }}
+                    disabled={currentPage === 1}
+                    aria-label="Halaman sebelumnya"
+                    className="w-9 h-9 rounded-full text-gelap hover:text-primer hover:bg-netral-canvas disabled:opacity-30 disabled:hover:text-gelap disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primer flex items-center justify-center min-h-[44px] min-w-[44px]"
+                  >
+                    <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        setActiveSlide(0);
+                      }}
+                      aria-label={`Beralih ke halaman ${pageNum}`}
+                      aria-current={currentPage === pageNum ? 'page' : undefined}
+                      className={`w-9 h-9 rounded-full text-xs font-bold font-mono transition-all flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[44px] min-w-[44px] ${
+                        currentPage === pageNum
+                          ? 'bg-primer text-white shadow-xs'
+                          : 'text-gelap hover:text-primer hover:bg-netral-canvas'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentPage((p) => Math.min(totalPages, p + 1));
+                      setActiveSlide(0);
+                    }}
+                    disabled={currentPage === totalPages}
+                    aria-label="Halaman berikutnya"
+                    className="w-9 h-9 rounded-full text-gelap hover:text-primer hover:bg-netral-canvas disabled:opacity-30 disabled:hover:text-gelap disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primer flex items-center justify-center min-h-[44px] min-w-[44px]"
+                  >
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                </div>
               </div>
             )}
           </>
         ) : (
-          /* Empty State Ramah saat Pencarian Tidak Ditemukan */
-          <div className="bg-netral-canvas/60 border border-netral-border rounded-2xl p-10 text-center max-w-lg mx-auto">
-            <div className="w-12 h-12 rounded-full bg-white border border-netral-border flex items-center justify-center mx-auto text-sekunder shadow-2xs">
+          <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-netral-border/80 bg-netral-canvas/40">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-netral-border flex items-center justify-center mx-auto mb-3 text-gelap/40">
               <Search className="w-6 h-6" aria-hidden="true" />
             </div>
-            <h3 className="font-heading font-bold text-lg text-gelap mt-4">
+            <h3 className="font-heading font-bold text-base text-gelap">
               Komoditas Tidak Ditemukan
             </h3>
-            <p className="text-sm text-gelap/70 mt-1.5 leading-relaxed">
-              Tidak ada komoditas panen yang cocok dengan kata kunci{' '}
-              {searchQuery && <span className="font-bold text-gelap">&quot;{searchQuery}&quot;</span>}{' '}
-              pada wilayah terpilih.
+            <p className="text-xs text-gelap/70 mt-1 max-w-sm mx-auto">
+              Tidak ada hasil yang sesuai dengan filter wilayah atau kata kunci pencarian Anda saat ini.
             </p>
-            <div className="mt-6">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-primer text-white hover:bg-primer-hover shadow-sm transition-all min-h-[44px]"
-              >
-                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                Atur Ulang Pencarian &amp; Filter
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover transition-colors shadow-xs min-h-[44px]"
+            >
+              <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Reset Pencarian & Filter</span>
+            </button>
           </div>
         )}
       </div>
