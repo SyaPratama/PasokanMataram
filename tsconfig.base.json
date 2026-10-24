@@ -13,6 +13,8 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": ".",
@@ -28,6 +30,9 @@
       "@pasok/queue": ["packages/queue/src/index.ts"],
       "@pasok/auth-kyb-service": ["services/auth-kyb-service/src/index.ts"],
       "@pasok/queue-worker": ["services/queue-worker/src/index.ts"],
+      "@pasok/pooling-service": ["services/pooling-service/src/index.ts"],
+      "@pasok/logistics-hub-service": ["services/logistics-hub-service/src/index.ts"],
+      "@pasok/settlement-service": ["services/settlement-service/src/index.ts"],
       "@/*": ["apps/web/src/*"]
     }
   }

@@ -34,7 +34,6 @@ export const getQueueRedisClient = lazyAsync<Redis | null>(async () => {
       retryStrategy: () => null,
     });
     client.on('error', () => {
-      // Ignored when running offline with in-memory fallback
     });
     await client.connect();
     return client;
@@ -50,7 +49,6 @@ export async function enqueueJob<Q extends QueueName>(
   queue: Q,
   rawPayload: unknown
 ): Promise<QueueJob<Q>> {
-  // 1. Eager contract validation (fail-fast)
   const validatedPayload = validateJobPayload(queue, rawPayload);
 
   const job: QueueJob<Q> = {
@@ -61,12 +59,10 @@ export async function enqueueJob<Q extends QueueName>(
     createdAt: Date.now(),
   };
 
-  // 2. Lazy broker connection
   const redis = await getQueueRedisClient();
   if (redis && redis.status === 'ready') {
     await redis.lpush(`queue:${queue}`, JSON.stringify(job));
   } else {
-    // In-memory fallback
     const list = inMemoryQueues.get(queue) || [];
     list.push(job as QueueJob);
     inMemoryQueues.set(queue, list);
