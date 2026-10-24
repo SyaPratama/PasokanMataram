@@ -45,7 +45,6 @@ export default function SupplierForecastPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -71,7 +70,6 @@ export default function SupplierForecastPage() {
         </button>
       </div>
 
-      {/* Selector Komoditas */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {MOCK_COMMODITY_FORECASTS.map((item) => {
           const isSelected = item.id === selectedCommodityId;
@@ -97,10 +95,9 @@ export default function SupplierForecastPage() {
         })}
       </div>
 
-      {/* Grid Metrik Petani */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider">
+          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
             Harga Beli Hub Hari Ini
           </div>
           <div className="text-xl font-heading font-black text-gelap mt-1 font-mono tabular-nums">
@@ -113,7 +110,7 @@ export default function SupplierForecastPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider">
+          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
             Proyeksi Nilai Tampung 7 Hari
           </div>
           <div className="text-xl font-heading font-black text-primer mt-1 font-mono tabular-nums">
@@ -128,7 +125,7 @@ export default function SupplierForecastPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider">
+          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
             Proyeksi Nilai Tampung 30 Hari
           </div>
           <div className="text-xl font-heading font-black text-primer mt-1 font-mono tabular-nums">
@@ -143,7 +140,7 @@ export default function SupplierForecastPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider">
+          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
             Saran Waktu Setor Panen
           </div>
           <div className="text-sm font-heading font-bold text-sekunder mt-1 truncate">
@@ -155,20 +152,17 @@ export default function SupplierForecastPage() {
         </div>
       </div>
 
-      {/* Grafik Interaktif */}
       <ForecastInteractiveChart
         commodity={selectedCommodity}
         horizon={horizon}
         onHorizonChange={setHorizon}
       />
 
-      {/* Kartu Wawasan untuk Pemasok */}
       <ForecastInsightCards
         commodity={selectedCommodity}
         userType="SUPPLIER"
       />
 
-      {/* Transparansi Model */}
       <div className="p-4 rounded-2xl bg-netral-canvas/60 border border-netral-border/70 text-xs text-gelap/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-sekunder flex-shrink-0" />
@@ -179,7 +173,7 @@ export default function SupplierForecastPage() {
           </span>
         </div>
         <div className="text-[11px] text-gelap/60">
-          Dana penjualan panen diproteksi sistem escrow B2B terbit otomatis saat QR Pass tervalidasi.
+          Dana penjualan panen diproteksi sistem rekening escrow terbit otomatis saat QR Pass tervalidasi.
         </div>
       </div>
     </div>

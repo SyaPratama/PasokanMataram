@@ -16,12 +16,34 @@ export const redis = new Redis(cacheConfig.url, {
   enableOfflineQueue: false,
 });
 
-redis.on('error', () => {
-  // Peringatan koneksi ditekan agar unit test lokal berjalan lancar
-});
-
-redis.connect().catch(() => {});
-
+redis.on('error', () => {});
+async function getRedisClient(): Promise<Redis | null> {
+  if (redis.status === 'ready') return redis;
+  if (redis.status === 'connecting') {
+    const { promise, resolve } = Promise.withResolvers<boolean>();
+    const onReady = () => { cleanup(); resolve(true); };
+    const onClose = () => { cleanup(); resolve(false); };
+    const timer = setTimeout(() => { cleanup(); resolve(false); }, 300);
+    function cleanup() {
+      clearTimeout(timer);
+      redis.removeListener('ready', onReady);
+      redis.removeListener('close', onClose);
+    }
+    redis.once('ready', onReady);
+    redis.once('close', onClose);
+    await promise;
+    return (redis.status as string) === 'ready' ? redis : null;
+  }
+  if (redis.status === 'wait') {
+    try {
+      await redis.connect();
+      return (redis.status as string) === 'ready' ? redis : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 interface InMemoryLock {
   token: string;
   expiresAt: number;
@@ -51,14 +73,17 @@ export async function acquireLock(
   const lockToken = crypto.randomUUID();
   const startTime = Date.now();
 
+  const client = await getRedisClient();
+
   while (Date.now() - startTime < waitTimeoutMs) {
-    try {
-      const result = await redis.set(lockKey, lockToken, 'EX', ttlSeconds, 'NX');
-      if (result === 'OK') {
-        return lockToken;
-      }
-    } catch {
-      // In-memory fallback yang menegakkan mutual exclusion saat Redis offline
+    if (client) {
+      try {
+        const result = await client.set(lockKey, lockToken, 'EX', ttlSeconds, 'NX');
+        if (result === 'OK') {
+          return lockToken;
+        }
+      } catch {}
+    } else {
       purgeExpiredInMemoryLocks();
       const current = inMemoryStore.get(lockKey);
       if (!current) {
@@ -70,7 +95,9 @@ export async function acquireLock(
       }
     }
 
-    await new Promise((resolve) => setTimeout(resolve, cacheConfig.retryIntervalMs));
+    const { promise: delayPromise, resolve: delayResolve } = Promise.withResolvers<void>();
+    setTimeout(delayResolve, cacheConfig.retryIntervalMs);
+    await delayPromise;
   }
 
   return null;
@@ -90,18 +117,21 @@ export async function releaseLock(resourceKey: string, lockToken: string): Promi
     end
   `;
 
-  try {
-    const result = await redis.eval(luaScript, 1, lockKey, lockToken);
-    return result === 1;
-  } catch {
-    purgeExpiredInMemoryLocks();
-    const current = inMemoryStore.get(lockKey);
-    if (current && current.token === lockToken) {
-      inMemoryStore.delete(lockKey);
-      return true;
-    }
-    return false;
+  const client = await getRedisClient();
+  if (client) {
+    try {
+      const result = await client.eval(luaScript, 1, lockKey, lockToken);
+      return result === 1;
+    } catch {}
   }
+
+  purgeExpiredInMemoryLocks();
+  const current = inMemoryStore.get(lockKey);
+  if (current && current.token === lockToken) {
+    inMemoryStore.delete(lockKey);
+    return true;
+  }
+  return false;
 }
 
 /**

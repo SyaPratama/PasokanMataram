@@ -74,14 +74,14 @@ export default function AdminQuotasPage() {
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Badge variant="success">Batas Kuota Panen Musim Gadu 2026</Badge>
+            <Badge variant="success">Alokasi Pasokan Bahan Pangan 2026</Badge>
             <span className="text-xs text-gelap/60">5 Kabupaten/Kota DIY</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Katalog Komoditas &amp; Alokasi Kuota Konsorsium
           </h1>
           <p className="text-xs text-gelap/65 mt-1">
-            Pengaturan batas serap panen agregat, penetapan harga dasar (floor price) petani, dan pencegahan tengkulak.
+            Pengaturan batas serap pasokan agregat, penetapan harga dasar (floor price) produsen, dan jaminan transparansi.
           </p>
         </div>
       </div>

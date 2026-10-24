@@ -14,7 +14,6 @@ interface JsonLdProps {
 }
 
 export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonLdProps) {
-  // 1. Skema Organization (Entitas Perusahaan & Area Layanan HoReKa)
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -48,7 +47,6 @@ export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonL
     sameAs: ['https://pasokmataram.com'],
   };
 
-  // 2. Skema BreadcrumbList (Struktur SERP Navigasi)
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -74,18 +72,17 @@ export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonL
       {
         '@type': 'ListItem',
         position: 4,
-        name: 'Pendaftaran KYB B2B',
+        name: 'Pendaftaran Verifikasi Usaha',
         item: `${baseUrl}/register`,
       },
     ],
   };
 
-  // 3. Skema Product & AggregateOffer (Pooling Kuota Komoditas Pangan)
   const commodityProductsSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     '@id': `${baseUrl}/#product-bawang-srikayangan`,
-    name: 'Bawang Merah Srikayangan Grade A (Pooling Panen B2B)',
+    name: 'Bawang Merah Srikayangan Grade A (Pasokan Kolektif Dapur)',
     image: `${baseUrl}/images/commodities/bawang-merah-srikayangan.webp`,
     description:
       'Komoditas bawang merah unggulan sentra panen Srikayangan Kulon Progo dengan kalibrasi timbangan digital presisi di Hub Transit Bantul untuk dapur restoran & hotel D.I. Yogyakarta.',
@@ -116,14 +113,13 @@ export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonL
     },
   };
 
-  // 4. Skema WebSite & Sitelinks Search Box
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${baseUrl}/#website`,
     url: baseUrl,
     name: 'PasokMataram',
-    description: 'Sistem Pengadaan Bahan Baku Dapur Restoran Langsung ke Petani D.I. Yogyakarta',
+    description: 'Sistem Pengadaan Bahan Baku Dapur Restoran Langsung dari Supplier Pangan Lokal D.I. Yogyakarta',
     inLanguage: 'id-ID',
     publisher: {
       '@id': `${baseUrl}/#organization`,

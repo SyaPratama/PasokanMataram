@@ -83,7 +83,6 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-netral-border">
-        {/* Panel Kiri: Profil Bisnis & Legalitas */}
         <div className="lg:col-span-5 p-6 space-y-6">
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-gelap/80 mb-3 flex items-center">
@@ -145,7 +144,6 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
           </div>
         </div>
 
-        {/* Panel Kanan: Berkas Legalitas KYB */}
         <div className="lg:col-span-7 p-6 space-y-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-gelap/80 flex items-center">

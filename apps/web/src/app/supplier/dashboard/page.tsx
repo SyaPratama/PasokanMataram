@@ -3,7 +3,8 @@
 import * as React from 'react';
 import Link from 'next/link';
 import {
-  Tractor,
+  PackageCheck,
+  Store,
   Calendar,
   Lock,
   Wallet,
@@ -26,54 +27,49 @@ export default function SupplierDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-netral-border/60 pb-4">
         <div>
           <h1 className="text-xl font-bold font-heading text-gelap">
-            Meja Kerja Jadwal Panen & Pasok Sentra Tani
+            Meja Kerja Suplai Bahan Pangan &amp; Etalase
           </h1>
           <p className="text-xs text-gelap/60 mt-1">
-            Pantau kepastian serap komoditas, alokasi kuota dapur HoReKa, dan jaminan dana escrow panen.
+            Pantau pasokan harian, alokasi kuota dapur HoReKa, dan jaminan dana escrow supplier.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/supplier/qc-handoff">
-            <Button variant="outline" size="sm" className="text-xs">
-              <ClipboardCheck className="w-3.5 h-3.5 mr-1.5" />
-              SOP Serah Terima QC
+            <Button variant="outline" size="sm" className="text-xs whitespace-nowrap shrink-0">
+              <ClipboardCheck className="w-3.5 h-3.5 mr-1" />
+              Serah QC
             </Button>
           </Link>
           <Button
             variant="primary"
             size="sm"
-            onClick={() => alert('Formulir Pendaftaran Jadwal Panen Baru (Musim Tanam DIY)')}
-            className="text-xs font-semibold shadow-sm"
+            onClick={() => alert('Formulir Pendaftaran Pasokan Baru (Sentra Produsen DIY)')}
+            className="text-xs font-semibold shadow-sm whitespace-nowrap shrink-0"
           >
-            <Tractor className="w-3.5 h-3.5 mr-1.5" />
-            Daftarkan Jadwal Panen
+            <Store className="w-3.5 h-3.5 mr-1" />
+            Pasok Bahan
           </Button>
         </div>
       </div>
-
-      {/* Grid 4 Kartu KPI Metrik */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1 */}
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-gelap/60">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Hasil Panen</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Total Pasokan Siap Kirim</span>
             <div className="p-2 bg-primer-light rounded-lg text-primer">
-              <Tractor className="w-4 h-4" />
+              <PackageCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-gelap font-heading">
             4.15 <span className="text-xs font-normal text-gelap/60">Ton</span>
           </div>
           <div className="text-[11px] text-gelap/70">
-            Bawang Merah & Cabai Rawit DIY
+            Unggas, Daging, Susu, Bumbu &amp; Sayur DIY
           </div>
         </div>
 
-        {/* KPI 2 */}
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-gelap/60">
             <span className="text-xs font-semibold uppercase tracking-wider">Terkunci Kontrak HoReKa</span>
@@ -89,7 +85,6 @@ export default function SupplierDashboardPage() {
           </div>
         </div>
 
-        {/* KPI 3 */}
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-gelap/60">
             <span className="text-xs font-semibold uppercase tracking-wider">Jadwal Drop Terdekat</span>
@@ -105,7 +100,6 @@ export default function SupplierDashboardPage() {
           </div>
         </div>
 
-        {/* KPI 4 */}
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
           <div className="flex items-center justify-between text-gelap/60">
             <span className="text-xs font-semibold uppercase tracking-wider">Dana Escrow Tertampung</span>
@@ -121,8 +115,29 @@ export default function SupplierDashboardPage() {
           </div>
         </div>
       </div>
+      <div className="bg-gradient-to-r from-primer-light/80 to-white rounded-xl border border-primer/30 p-4 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <span className="font-heading font-extrabold text-sm text-primer">
+              Etalase Pangan &amp; Reputasi Pembeli Terverifikasi
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primer text-white font-bold">
+              One-Stop Supplier
+            </span>
+          </div>
+          <p className="text-xs text-gelap/80">
+            Pajang produk unggas, daging sapi, susu, bumbu, atau hasil panen Anda di etalase katalog HoReKa, dan pantau ulasan kualitas dari para kepala dapur.
+          </p>
+        </div>
+        <Link
+          href="/supplier/market"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover shrink-0 min-h-[40px] shadow-xs"
+        >
+          <span>Buka Etalase & Ulasan</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
 
-      {/* Banner Kepatuhan Legalitas SK Kelompok Tani */}
       <div className="bg-white rounded-xl border border-primer/30 p-5 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -142,7 +157,6 @@ export default function SupplierDashboardPage() {
         </div>
       </div>
 
-      {/* Tabel Komitmen Pasok ke Sentra Hub DIY */}
       <div id="komitmen" className="bg-white rounded-xl border border-netral-border/70 shadow-2xs overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-netral-border/60 flex items-center justify-between">
           <div>
@@ -213,7 +227,6 @@ export default function SupplierDashboardPage() {
         </div>
       </div>
 
-      {/* Panduan Serah Terima QC Digital di Sentra Hub */}
       <div className="bg-netral-canvas rounded-xl border border-netral-border/60 p-5 space-y-3">
         <h3 className="text-xs font-bold text-primer uppercase tracking-wider flex items-center">
           <ClipboardCheck className="w-4 h-4 mr-1.5" />

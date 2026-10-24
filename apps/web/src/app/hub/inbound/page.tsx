@@ -43,7 +43,6 @@ export default function HubInboundPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Meja Kerja */}
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
@@ -61,7 +60,6 @@ export default function HubInboundPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Kolom 1: Informasi Manifes & Scanner */}
         <div className="bg-white p-5 rounded-2xl border border-netral-border/80 shadow-2xs space-y-4">
           <div className="flex items-center gap-2 text-xs font-bold text-gelap">
             <ScanQrCode className="w-4 h-4 text-primer" />
@@ -94,7 +92,6 @@ export default function HubInboundPage() {
           </div>
         </div>
 
-        {/* Kolom 2: Form Timbangan Digital & Kadar Air */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-netral-border/80 shadow-2xs space-y-5">
           <div className="flex items-center justify-between border-b border-netral-border/60 pb-3">
             <div className="flex items-center gap-2 text-xs font-bold text-gelap">

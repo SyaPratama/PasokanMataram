@@ -43,7 +43,7 @@ describe('Browser & Web Capture Automated Test', () => {
     const html = await response.text();
     expect(html).toContain('PasokMataram');
     expect(html).toContain('Digitalisasi Rantai Pasok Pangan');
-    expect(html).toContain('Beli Langsung ke Petani');
+    expect(html).toContain('One-Stop Supplier Pangan DIY');
     expect(html).toContain('href="/register"');
     expect(html).toContain('href="/onboarding-kyb"');
 
@@ -57,7 +57,7 @@ describe('Browser & Web Capture Automated Test', () => {
     expect(html).toContain('href="/komoditas"');
     expect(html).toContain('href="/kalkulator"');
     expect(html).toContain('href="/mekanisme"');
-    expect(html).toContain('href="/paket-b2b"');
+    expect(html).toContain('href="/paket-layanan"');
     expect(html).toContain('href="/prediksi-harga"');
     expect(html).toContain('href="/tentang"');
     expect(html).toContain('href="/faq"');

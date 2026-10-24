@@ -9,7 +9,7 @@ import { PwaFloatingButton } from '../../components/pwa-floating-button';
 export const metadata: Metadata = {
   title: 'Mekanisme Sourcing Kolektif & Pooling Kuota | PasokMataram',
   description:
-    'Bagaimana penggabungan volume kebutuhan dapur kuliner memungkinkan harga grosir langsung dari petani dengan proteksi rekening bersama (escrow).',
+    'Bagaimana penggabungan volume kebutuhan dapur kuliner memungkinkan harga grosir langsung dari produsen dengan proteksi rekening bersama (escrow).',
   alternates: {
     canonical: '/mekanisme',
   },

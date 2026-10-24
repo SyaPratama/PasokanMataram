@@ -19,7 +19,6 @@ export function usePwaInstall() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Check if running in standalone mode
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
@@ -29,7 +28,6 @@ export function usePwaInstall() {
       return;
     }
 
-    // Detect iOS
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIos(isIosDevice);

@@ -42,7 +42,6 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
     setUploadProgress(15);
 
     try {
-      // 1. Minta presigned URL dari backend
       const presignedRes = await fetch('/api/v1/kyb/upload-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,7 +61,6 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
       const { uploadUrl, fileStorageKey } = presignedData.data;
       setUploadProgress(50);
 
-      // 2. Upload file langsung ke MinIO S3
       const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
@@ -77,7 +75,6 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
 
       setUploadProgress(85);
 
-      // 3. Konfirmasi metadata dokumen ke backend
       const confirmRes = await fetch('/api/v1/kyb/documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

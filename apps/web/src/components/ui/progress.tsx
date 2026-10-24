@@ -3,7 +3,8 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: number; // 0 to 100
+  /** Nilai progres persentase antara 0 hingga 100 */
+  value: number;
   max?: number;
 }
 

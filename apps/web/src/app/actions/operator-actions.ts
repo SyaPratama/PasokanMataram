@@ -95,7 +95,6 @@ export async function createHubOperatorAction(
       client.release();
     }
   } catch {
-    // Mode hermetis fallback saat pengujian offline tanpa database aktif
   }
 
   const activationUrl = `/auth/activate?token=${rawActivationToken}`;

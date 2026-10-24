@@ -59,7 +59,6 @@ export function RemediationPanel({
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    // Simulasi pengiriman data perbaikan ke server
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -92,7 +91,6 @@ export function RemediationPanel({
 
   return (
     <div className="bg-white rounded-2xl border border-sekunder/40 shadow-xs overflow-hidden">
-      {/* Banner Peringatan Penolakan Berkas */}
       <div className="bg-sekunder-light/80 border-b border-sekunder/30 p-4 sm:p-5 flex items-start gap-3.5">
         <div className="p-2.5 bg-sekunder text-white rounded-xl shrink-0 mt-0.5 shadow-2xs">
           <AlertTriangle className="w-5 h-5 text-white" aria-hidden="true" />
@@ -110,7 +108,6 @@ export function RemediationPanel({
         </div>
       </div>
 
-      {/* Formulir Unggah Pengganti */}
       <form onSubmit={handleResubmit} className="p-5 sm:p-6 space-y-5">
         <div>
           <label htmlFor="remediation-file" className="block text-xs font-bold text-gelap mb-1.5">

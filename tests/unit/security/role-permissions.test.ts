@@ -56,8 +56,8 @@ describe('Role-Permission & Security Evaluator (FR-017, FR-018)', () => {
   });
 
   it('menyelesaikan rute portal utama secara deterministik berdasarkan Macro-Role', () => {
-    expect(resolveUserHomeRoute('HOREKA')).toBe('/horeka/dashboard');
-    expect(resolveUserHomeRoute('GAPOKTAN')).toBe('/farmer/dashboard');
+    expect(resolveUserHomeRoute('HOREKA')).toBe('/buyer/dashboard');
+    expect(resolveUserHomeRoute('GAPOKTAN')).toBe('/supplier/dashboard');
     expect(resolveUserHomeRoute('HUB_OPERATOR')).toBe('/hub/inbound');
     expect(resolveUserHomeRoute('SUPER_ADMIN')).toBe('/admin/tenants');
   });
@@ -66,10 +66,10 @@ describe('Role-Permission & Security Evaluator (FR-017, FR-018)', () => {
     expect(isRouteAllowedForRole('/admin/tenants', 'HOREKA', 'OWNER')).toBe(false);
     expect(isRouteAllowedForRole('/admin/logistics/operators', 'GAPOKTAN', 'CHAIRPERSON')).toBe(false);
     expect(isRouteAllowedForRole('/hub/inbound', 'HOREKA', 'HEAD_CHEF')).toBe(false);
-    expect(isRouteAllowedForRole('/farmer/dashboard', 'HOREKA', 'OWNER')).toBe(false);
+    expect(isRouteAllowedForRole('/supplier/dashboard', 'HOREKA', 'OWNER')).toBe(false);
 
-    expect(isRouteAllowedForRole('/horeka/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(true);
-    expect(isRouteAllowedForRole('/farmer/dashboard', 'GAPOKTAN', 'CHAIRPERSON')).toBe(true);
+    expect(isRouteAllowedForRole('/buyer/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(true);
+    expect(isRouteAllowedForRole('/supplier/dashboard', 'GAPOKTAN', 'CHAIRPERSON')).toBe(true);
     expect(isRouteAllowedForRole('/hub/inbound', 'HUB_OPERATOR', 'OPERATOR_QC')).toBe(true);
     expect(isRouteAllowedForRole('/admin/tenants', 'SUPER_ADMIN', 'SUPER_ADMIN')).toBe(true);
   });

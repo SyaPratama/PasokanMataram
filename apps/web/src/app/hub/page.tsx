@@ -34,14 +34,14 @@ export default function HubOverviewPage() {
             Meja Kerja Operasional Cross-Dock Hub Transit
           </h1>
           <p className="text-xs text-gelap/65 mt-1">
-            Sentra sortir fisik, stasiun timbangan tera digital, dan staging rantai dingin terpadu Sewon Bantul.
+            Sentra sortir fisik, timbangan digital tera, dan staging rantai dingin terpadu untuk hasil panen dan supplier pangan DIY.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/hub/inbound">
-            <Button variant="primary" size="sm" className="text-xs">
+            <Button variant="primary" size="sm" className="text-xs whitespace-nowrap shrink-0">
               <ScanQrCode className="w-4 h-4 mr-1.5" aria-hidden="true" />
-              Scan QR Inbound
+              Scan Inbound
             </Button>
           </Link>
         </div>
@@ -73,7 +73,7 @@ export default function HubOverviewPage() {
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gelap/70">Lolos QC Grade A</span>
-            <div className="w-8 h-8 rounded-lg bg-cta-green-light flex items-center justify-center text-primer">
+            <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
@@ -148,11 +148,11 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Jadwal Antar Subuh
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Manajemen 4 armada cold-chain menuju gerai HoReKa</p>
+              <p className="text-xs text-gelap/65 mt-0.5">Manajemen armada cold-chain hasil panen dan supplier menuju gerai HoReKa</p>
             </div>
           </div>
-          <div className="mt-4 flex items-center text-xs font-semibold text-primer">
-            <span>Lihat Rute Truk</span>
+          <div className="mt-4 flex items-center text-xs font-semibold text-primer whitespace-nowrap">
+            <span>Rute Truk</span>
             <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </div>
         </Link>

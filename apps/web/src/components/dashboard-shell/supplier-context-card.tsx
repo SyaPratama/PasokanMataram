@@ -4,10 +4,11 @@ import { StatusBadge } from '../shared/status-badge';
 import type { KybStatus } from '../../types/tenant';
 
 /**
- * Properti untuk kartu konteks informasi kelompok tani mitra Gapoktan.
+ * Properti untuk kartu konteks informasi mitra pemasok pangan.
  */
-export interface GapoktanContextCardProps {
-  /** Nama badan kelompok tani mitra */
+export interface SupplierContextCardProps {
+  /** Nama badan usaha atau kelompok pemasok mitra */
+  readonly supplierName?: string;
   readonly gapoktanName?: string;
   /** Lokasi kapanewon dan kabupaten */
   readonly location?: string;
@@ -16,22 +17,25 @@ export interface GapoktanContextCardProps {
 }
 
 /**
- * Komponen modular kartu konteks kemitraan Gapoktan untuk portal supplier.
- * Menampilkan nama kelompok tani, lokasi sentra binaan, dan status legalitas.
+ * Komponen modular kartu konteks kemitraan pemasok untuk portal supplier.
+ * Menampilkan nama badan usaha pemasok, lokasi sentra, dan status legalitas.
  */
-export function GapoktanContextCard({
-  gapoktanName = 'Gapoktan Srikayangan Makmur',
+export function SupplierContextCard({
+  supplierName,
+  gapoktanName,
   location = 'Panjatan, Kulon Progo',
   status = 'VERIFIED',
-}: GapoktanContextCardProps) {
+}: SupplierContextCardProps) {
+  const displayName = supplierName || gapoktanName || 'Sentra Supplier Sleman';
+
   return (
     <div className="space-y-2.5">
       <div className="text-[11px] font-semibold text-gelap/85 uppercase tracking-wider px-1">
-        Kelompok Tani Mitra:
+        Mitra Pemasok Pangan:
       </div>
       <div className="bg-white p-3 rounded-xl border border-netral-border/80 shadow-2xs space-y-1.5">
-        <div className="text-xs font-bold text-gelap leading-snug font-heading truncate" title={gapoktanName}>
-          {gapoktanName}
+        <div className="text-xs font-bold text-gelap leading-snug font-heading truncate" title={displayName}>
+          {displayName}
         </div>
         <div className="text-[11px] text-gelap/85 flex items-center font-medium">
           <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder flex-shrink-0" aria-hidden="true" />
@@ -45,3 +49,6 @@ export function GapoktanContextCard({
     </div>
   );
 }
+
+export const GapoktanContextCard = SupplierContextCard;
+export type GapoktanContextCardProps = SupplierContextCardProps;

@@ -36,7 +36,7 @@ describe('Minggu 2.0 - Clean Semantic Routing & AI Price Forecasting Verificatio
     expect(content).toContain("href: '/komoditas'");
     expect(content).toContain("href: '/kalkulator'");
     expect(content).toContain("href: '/mekanisme'");
-    expect(content).toContain("href: '/paket-b2b'");
+    expect(content).toContain("href: '/paket-layanan'");
     expect(content).toContain("href: '/prediksi-harga'");
     expect(content).toContain("href: '/tentang'");
     expect(content).toContain("href: '/faq'");
@@ -67,7 +67,7 @@ describe('Minggu 2.0 - Clean Semantic Routing & AI Price Forecasting Verificatio
       'alur-pengadaan',
       'kalkulator',
       'mekanisme',
-      'paket-b2b',
+      'paket-layanan',
       'tentang',
       'faq',
     ];

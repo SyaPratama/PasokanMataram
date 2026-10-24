@@ -16,7 +16,6 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
   return (
     <div className="bg-white rounded-xl border border-netral-border/70 p-5 space-y-3.5 shadow-2xs hover:shadow-md transition-shadow relative flex flex-col justify-between">
       <div>
-        {/* Header Kartu */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2.5 min-w-0">
             <div className={`p-2 rounded-lg ${outlet.isMain ? 'bg-primer text-white' : 'bg-netral-canvas text-gelap/80 border border-netral-border'}`}>
@@ -38,12 +37,10 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
           )}
         </div>
 
-        {/* Alamat Fisik */}
         <p className="text-xs text-gelap/70 line-clamp-2 pt-1">
           {outlet.streetAddress}
         </p>
 
-        {/* Info Narahubung & Koordinat */}
         <div className="pt-2.5 space-y-1.5 text-xs text-gelap/80 border-t border-netral-border/40">
           <div className="flex items-center text-[11px]">
             <UserCheck className="w-3.5 h-3.5 mr-1.5 text-sekunder flex-shrink-0" />
@@ -59,7 +56,6 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
         </div>
       </div>
 
-      {/* Footer Kartu & Aksi */}
       <div className="pt-3 border-t border-netral-border/60 flex items-center justify-between text-xs">
         <div className="flex items-center text-[11px] text-gelap/70">
           <Package className="w-3.5 h-3.5 mr-1 text-sekunder" />

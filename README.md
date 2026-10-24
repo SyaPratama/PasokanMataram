@@ -1,24 +1,26 @@
 # PasokMataram
 
-Platform orkestrasi rantai pasok pangan agrikultur terpadu untuk wilayah Daerah Istimewa Yogyakarta. Sistem ini menghubungkan pelaku usaha kuliner Hotel, Restoran, dan Kafe (HoReKa) secara langsung dengan Gabungan Kelompok Tani (Gapoktan) melalui sentra hub logistik pangan dan jadwal pengantaran subuh.
+Platform orkestrasi pengadaan bahan pangan terpadu untuk wilayah Daerah Istimewa Yogyakarta. Sistem ini menghubungkan pelaku usaha kuliner Hotel, Restoran, dan Kafe (HoReKa) secara langsung dengan ekosistem supplier pangan lokal (peternakan ayam, jagal sapi RPH, koperasi susu, pengrajin bumbu tradisional, dan produsen pangan) melalui sentra hub logistik pangan dan jadwal pengantaran fleksibel 24 jam.
 
 ---
 
 ## Fitur dan Modul Utama
 
-### 1. Portal HoReKa (Pembeli Bahan Baku)
+### 1. Portal HoReKa (Pembeli Bahan Pangan Dapur)
 - Ringkasan Dapur: Pemantauan ketersediaan stok bahan segar, jadwal drop subuh 04:30 WIB, dan alokasi pool kuota.
 - Manajemen Multi-Gerai: Pengelolaan cabang operasional di 5 wilayah kabupaten dan kota se-DIY (Kota Yogyakarta, Sleman, Bantul, Kulon Progo, Gunungkidul).
-- Prediksi Harga Pangan: Simulasi proyeksi harga komoditas pangan unggulan berdasarkan data historis dan tren musim tanam.
+- Prediksi Harga Pangan: Simulasi proyeksi harga komoditas pangan unggulan berbasis Machine Learning multi-horizon.
 - Pengadaan Rutin: Pengaturan jadwal kirim bahan baku dapur (Standing Orders), alur pengantaran subuh, dan verifikasi mutu dapur (QC Dapur).
+- Katalog Terpadu: Single Invoicing untuk seluruh kebutuhan dapur (ayam, daging sapi, susu, sayur, bumbu).
 
-### 2. Portal Gapoktan (Pemasok Hasil Tani)
-- Meja Kerja Panen: Pencatatan komitmen jadwal panen, kapasitas tonase, dan alokasi pasok ke sentra hub logistik.
-- Alur Logistik: Pengelolaan serah terima komoditas, pengecekan mutu kadar air dan sortasi panen (QC Cross-Dock Hub), serta distribusi sentra pasar.
-- Kemitraan Terlindungi: Akses data komitmen pengadaan terikat kontrak dengan transparansi alokasi dana escrow.
+### 2. Portal Pemasok (Supplier Bahan Pangan Lokal)
+- Etalase Dagangan Multi-SKU: Pengelolaan produk siap kirim (Ready Stock Chiller) maupun alokasi kuota panen kolektif.
+- Reputasi Pembeli: Transparansi profil pembeli HoReKa terverifikasi, rekam jejak kelancaran pembayaran, dan rating penerimaan.
+- Alur Logistik Hibrida: Direct Dispatch armada pendingin mandiri dan Cross-Dock transit subuh di Hub Bantul.
+- Kemitraan Terlindungi: Akses data komitmen pengadaan terikat kontrak dengan jaminan dana rekening bersama (escrow).
 
 ### 3. Otentikasi dan Onboarding KYB (Know Your Business)
-- Pendaftaran akun berbasis verifikasi legalitas resmi (Nomor Induk Berusaha / NIB untuk HoReKa dan Surat Keputusan Penetapan Kelompok Tani untuk Gapoktan).
+- Pendaftaran akun berbasis verifikasi legalitas resmi (Nomor Induk Berusaha / NIB OSS untuk HoReKa dan NIB/Sertifikat Mutu Pangan Halal/NKV/SKP untuk Supplier).
 - Penyimpanan berkas terisolasi menggunakan MinIO Object Storage dengan presigned URL.
 - Meja kerja verifikasi admin untuk pemeriksaan kepatuhan dan alur remediasi dokumen perbaikan.
 
@@ -31,7 +33,7 @@ Repositori ini dikelola menggunakan Turborepo dengan struktur modul terpisah:
 ```text
 pasokmataram/
 ├── apps/
-│   └── web/                     Aplikasi Next.js App Router (Antarmuka HoReKa, Gapoktan, Admin, dan Publik)
+│   └── web/                     Aplikasi Next.js App Router (Antarmuka HoReKa, Supplier, Admin, dan Publik)
 ├── packages/
 │   ├── config/                  Konfigurasi sistem, skema Zod terpusat, dan token tema warna resmi
 │   ├── database/                Koneksi pool PostgreSQL 16 dan isolasi Row-Level Security (withTenantContext)
@@ -50,7 +52,7 @@ pasokmataram/
 ## Standar Desain dan Antarmuka
 
 Antarmuka dibangun dengan aturan desain ketat sesuai panduan proyek:
-- Sistem Cangkang Modular (DashboardShell): Struktur tata letak dasbor terpadu dengan slot konteks gerai dan mitra kelompok tani yang dapat dipertukarkan.
+- Sistem Cangkang Modular (DashboardShell): Struktur tata letak dasbor terpadu dengan slot konteks gerai dan mitra pemasok yang dapat dipertukarkan.
 - Sidebar Ergonomis: Lebar desktop w-72 (288px) dengan pengguliran vertikal mandiri (overflow-y-auto) yang terkunci di viewport, serta jarak pemisah lapang pada status tenant.
 - Palet Warna Resmi: Menggunakan token warna tema terdaftar (@pasok/config) berbasis warna alam Mataram (Daun Tropis `#2E5339`, Bata Mataram `#B85324`, Sinar Senja `#D48028`, Rimbun Alam `#6E8B6E`, Tanah Jawa `#4A3525`, dan Laras Alami `#E6D7C3`).
 - Aksesibilitas WCAG 2.1 AA: Rasio kontras teks minimal 4.5:1 terhadap latar belakang dan ukuran area sentuh interaktif minimal 44x44px.
