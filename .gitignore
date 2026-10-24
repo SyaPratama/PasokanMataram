@@ -49,7 +49,7 @@ Thumbs.db
 /tests/screenshots/*
 !/tests/screenshots/.gitignore
 
-# internal workspace ignore
-business/
-contract/
-graphify-out/
+# Agent internal workspace ignore (root-only)
+/business/
+/contract/
+/graphify-out/
