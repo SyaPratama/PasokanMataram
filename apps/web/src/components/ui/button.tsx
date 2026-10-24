@@ -18,22 +18,21 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, loadingText, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl whitespace-nowrap';
+    const baseStyles = 'inline-flex items-center justify-center font-bold transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/40 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl whitespace-nowrap active:scale-[0.98] min-h-[48px] min-w-[48px]';
 
     const variants = {
       primary: 'bg-primer text-white hover:bg-primer-hover focus-visible:ring-primer shadow-sm',
       secondary: 'bg-sekunder text-white hover:bg-sekunder-hover focus-visible:ring-sekunder shadow-sm',
-      outline: 'border border-netral-border bg-transparent hover:bg-netral-canvas text-gelap focus-visible:ring-primer',
+      outline: 'border-2 border-netral-border bg-transparent hover:bg-netral-canvas text-gelap focus-visible:ring-primer',
       ghost: 'bg-transparent hover:bg-netral-canvas text-gelap focus-visible:ring-primer',
       danger: 'bg-status-danger text-white hover:opacity-90 focus-visible:ring-status-danger shadow-sm',
     };
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-xs min-h-[36px]',
-      md: 'px-4 py-2 text-sm min-h-[44px]',
-      lg: 'px-6 py-2.5 text-base min-h-[48px]',
+      sm: 'px-4 py-2.5 text-sm min-h-[48px] min-w-[48px]',
+      md: 'px-5 py-3 text-base min-h-[48px] min-w-[48px]',
+      lg: 'px-6 py-4 text-lg min-h-[56px] min-w-[56px]',
     };
-
     return (
       <button
         ref={ref}
@@ -42,7 +41,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading && (
-          <Loader2 className="w-4 h-4 mr-2 animate-spin text-current" aria-hidden="true" />
+          <Loader2 className="w-5 h-5 mr-2 animate-spin text-current" aria-hidden="true" />
         )}
         {isLoading && loadingText ? loadingText : children}
       </button>

@@ -1,9 +1,3 @@
-/**
- * PasokMataram Progressive Web App (PWA) Service Worker
- * Native lightweight offline shell and cache strategy.
- * Zero external libraries (Ponytail YAGNI).
- */
-
 const CACHE_NAME = 'pasokmataram-pwa-v1.5';
 
 const STATIC_ASSETS = [
@@ -41,17 +35,14 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
 
-  // Skip cross-origin requests
   if (url.origin !== self.location.origin) {
     return;
   }
 
-  // API requests: Network-First with offline fallback
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(request)
@@ -72,7 +63,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // UI Pages & Static Assets: Stale-While-Revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       cache.match(request).then((cachedResponse) => {
