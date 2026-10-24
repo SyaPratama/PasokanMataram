@@ -66,7 +66,7 @@ export default function HubOverviewPage() {
               <Scale className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-heading text-gelap mt-2">8.450 kg</div>
+          <div className="text-xl sm:text-2xl font-bold font-heading text-gelap mt-2 whitespace-nowrap tracking-tight tabular-nums">8.450 kg</div>
           <p className="text-[11px] text-gelap/60 mt-1">Deviasi rata-rata: -0.8% (Aman)</p>
         </div>
 

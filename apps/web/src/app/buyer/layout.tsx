@@ -82,7 +82,7 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
           active: pathname === '/buyer/katalog',
         },
         {
-          name: 'Simulasi Pooling',
+          name: 'Alokasi Pooling',
           href: '/buyer/pooling',
           icon: Layers,
           active: pathname === '/buyer/pooling',

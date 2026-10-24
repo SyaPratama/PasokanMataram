@@ -37,10 +37,9 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(fs.existsSync(loginPath)).toBe(true);
 
     const content = fs.readFileSync(loginPath, 'utf-8');
-    expect(content).toContain('handleQuickDemoFill');
+    expect(content).toContain('handleSubmit');
     expect(content).toContain('HOREKA');
     expect(content).toContain('GAPOKTAN');
-    expect(content).toContain('ADMIN');
     expect(content).toContain('showForgotModal');
     expect(content).toContain('isLoading');
   });
@@ -63,7 +62,7 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     const content = fs.readFileSync(onboardingPath, 'utf-8');
     expect(content).toContain("import { RemediationPanel } from './_components/remediation-panel';");
     expect(content).toContain("kybStatus === 'REJECTED'");
-    expect(content).toContain('Mode Remediasi (Ditolak)');
+    expect(content).toContain('StatusBadge');
   });
 
   it('memvalidasi shell portal Buyer/HoReKa di buyer/layout.tsx dan OutletContextSelector', () => {

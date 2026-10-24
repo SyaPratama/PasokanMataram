@@ -399,6 +399,7 @@ export default function HubWeighingPage() {
                   <th className="p-4">Suhu (&deg;C)</th>
                   <th className="p-4">Toleransi SNI</th>
                   <th className="p-4">Waktu</th>
+                  <th className="p-4 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-netral-border/60 text-gelap">
@@ -454,6 +455,22 @@ export default function HubWeighingPage() {
                       </span>
                     </td>
                     <td className="p-4 font-medium text-gelap">{rec.timestamp}</td>
+                    <td className="p-4 text-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setNotification(`Mencetak salinan fisik tiket tera digital ${rec.id} untuk pengemudi ${rec.driverName}.`);
+                          if (typeof window !== 'undefined') {
+                            window.print?.();
+                          }
+                        }}
+                        className="text-xs font-bold inline-flex items-center gap-1.5 min-h-[36px]"
+                      >
+                        <Printer className="w-3.5 h-3.5" aria-hidden="true" />
+                        <span>Cetak</span>
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -159,3 +159,17 @@ export function evaluateWeighingTolerance(params: {
     notes,
   };
 }
+
+export const StandingOrderSchema = z.object({
+  id: z.string().min(3),
+  commodity: z.string().min(3),
+  origin: z.string().min(3),
+  frequency: z.string().min(3),
+  dailyVolumeKg: z.number().positive(),
+  unitPrice: z.number().positive(),
+  totalWeeklyIdr: z.number().positive(),
+  deliveryTime: z.string().min(4),
+  status: z.enum(['UNVERIFIED', 'PENDING_VERIFICATION', 'VERIFIED', 'REJECTED']),
+});
+
+export type StandingOrder = z.infer<typeof StandingOrderSchema>;

@@ -107,7 +107,7 @@ export default function SupplierDashboardPage() {
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-primer font-heading">
+          <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight tabular-nums">
             Rp 65.000.000
           </div>
           <div className="text-[11px] text-gelap/70">

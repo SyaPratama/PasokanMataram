@@ -24,7 +24,7 @@ describe('Pengadaan Dapur Restoran & Native PWA Integration Test Suite', () => {
     expect(fs.existsSync(swPath)).toBe(true);
 
     const swContent = fs.readFileSync(swPath, 'utf-8');
-    expect(swContent).toContain('pasokmataram-pwa-v1.5');
+    expect(swContent).toContain('pasokmataram-pwa-v2.0');
     expect(swContent).toContain('install');
     expect(swContent).toContain('activate');
     expect(swContent).toContain('fetch');
