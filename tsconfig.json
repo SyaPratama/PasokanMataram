@@ -8,6 +8,8 @@
         "name": "next"
       }
     ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@pasok/config": ["./packages/config/src/index.ts"],
       "@pasok/domain": ["./packages/domain/src/index.ts"],

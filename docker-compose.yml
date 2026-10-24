@@ -65,6 +65,74 @@ services:
     networks:
       - pasokmataram-net
 
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: pasokmataram-api
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Tama123}
+      DB_NAME: ${DB_NAME:-pasokmataram_db}
+      REDIS_URL: redis://redis:6379
+      ML_SERVICE_URL: http://ml-service:8000
+      SOLOSMARTPAY_API_TOKEN: ${SOLOSMARTPAY_API_TOKEN:-ssp_test_pasokmataram_demo}
+      SOLOSMARTPAY_WEBHOOK_SECRET: ${SOLOSMARTPAY_WEBHOOK_SECRET:-ssp_secret_default_key}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pasokmataram-net
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    container_name: pasokmataram-web
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://api:3001/api/v1
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - pasokmataram-net
+
+  queue-worker:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    container_name: pasokmataram-queue-worker
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pasokmataram-net
+
+  ml-service:
+    build:
+      context: ../MLPasokanMataram
+      dockerfile: Dockerfile
+    container_name: pasokmataram-ml-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - pasokmataram-net
+
 volumes:
   postgres_data:
   redis_data:

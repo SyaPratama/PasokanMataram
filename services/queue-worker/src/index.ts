@@ -6,6 +6,17 @@
 import { createQueueWorker, type QueueJob, type WorkerInstance } from '@pasok/queue';
 import { lazyAsync } from '@pasok/domain';
 import { query } from '@pasok/database';
+import { handleDailyDataIngest } from './handlers/ml-ingest-handler';
+import { handleForecastPublish } from './handlers/ml-forecast-publisher';
+export * from './adapters/bapanas-adapter';
+export * from './adapters/pihps-adapter';
+export * from './adapters/bmkg-adapter';
+export * from './adapters/lelang-kulonprogo-adapter';
+export * from './handlers/ml-ingest-handler';
+export * from './ml/feature-store';
+export * from './ml/pasok-ensemble';
+export * from './handlers/ml-forecast-publisher';
+export * from './workers/escrow-disbursement';
 
 export interface WorkerSupervisor {
   workers: WorkerInstance[];
@@ -19,8 +30,6 @@ export interface WorkerSupervisor {
  */
 export async function handleKybDocumentUploaded(job: QueueJob<'kyb.document.uploaded'>): Promise<void> {
   const { tenantId, documentId, storageKey } = job.payload;
-
-  // Lazy DB record resolution: only queries database if handler reaches processing step
   const resolveFullDocument = lazyAsync(async () => {
     const res = await query(
       'SELECT id, file_storage_key, file_mime_type, status FROM kyb_documents WHERE id = $1',
@@ -28,11 +37,8 @@ export async function handleKybDocumentUploaded(job: QueueJob<'kyb.document.uplo
     );
     return res.rows[0] || null;
   });
-
-  // Log execution
   console.log(`[WORKER] Memproses KYB berkas tenant ${tenantId}, dokumen: ${documentId}, path: ${storageKey}`);
-
-  // In production, OCR or antivirus scanner would invoke resolveFullDocument() on demand
+  await resolveFullDocument();
 }
 
 /**
@@ -59,8 +65,9 @@ export function initializeWorkerSupervisor(): WorkerSupervisor {
     createQueueWorker('kyb.document.uploaded', handleKybDocumentUploaded),
     createQueueWorker('kyb.status.changed', handleKybStatusChanged),
     createQueueWorker('notification.welcome.email', handleWelcomeEmail),
+    createQueueWorker('ml.data.ingest.daily', handleDailyDataIngest),
+    createQueueWorker('ml.forecast.publish.daily', handleForecastPublish),
   ];
-
   return {
     workers,
     startAll() {
@@ -70,4 +77,11 @@ export function initializeWorkerSupervisor(): WorkerSupervisor {
       workers.forEach((w) => w.stop());
     },
   };
+}
+
+if (process.argv[1]?.includes('queue-worker') || process.env.RUN_WORKER === 'true') {
+  const supervisor = initializeWorkerSupervisor();
+  supervisor.startAll();
+  console.log('[PASOKMATARAM-WORKER] Background queue workers aktif dan mendengarkan antrean.');
+  setInterval(() => {}, 60000);
 }
