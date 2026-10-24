@@ -30,6 +30,17 @@ pnpm-debug.log*
 .env.production
 !.env.example
 
+
+# Secrets, keys and credentials
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.secret
+credentials.json
+service-account*.json
 # System files
 .DS_Store
 Thumbs.db
@@ -37,3 +48,8 @@ Thumbs.db
 # Test Screenshots Artifacts
 /tests/screenshots/*
 !/tests/screenshots/.gitignore
+
+# internal workspace ignore
+business/
+contract/
+graphify-out/

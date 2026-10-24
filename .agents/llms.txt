@@ -1,0 +1,23 @@
+# PasokMataram - B2B Local Food Supply Ecosystem (D.I. Yogyakarta)
+
+> Platform Pengadaan Bahan Baku Dapur Restoran, Kafe, dan Hotel Langsung dari Kelompok Tani dan Peternak Lokal D.I. Yogyakarta (Kulon Progo, Bantul, Sleman). Jadwal subuh terjamin, proteksi rekening bersama Bank BPD DIY dan Solosmartpay 100%, serta bebas tengkulak spekulatif.
+
+## Core Capabilities
+- Group Buying Pooling: Agregasi volume belanja dapur horeka untuk membuka kuota panen massal harga produsen langsung dengan batas transaksi terendah (MTV: Rp 500.000).
+- Multi-Temperature Cold Chain SNI: Perutean zona suhu Chilled (0-4°C) untuk daging & susu, Frozen (-18°C), dan Ambient Berventilasi (25-28°C) untuk bawang merah dan butiran.
+- Stasiun Timbangan Tera Digital Hub: Verifikasi timbangan digital otomatis (bruto, tara, netto) dengan analisis toleransi susut bobot metrologi resmi.
+- Escrow Vault & Solosmartpay Gateway: Pembayaran multi-channel QRIS dinamis EMVCo dan Virtual Account Bank BPD DIY/Mandiri/BNI/BRI/BCA dengan pemisahan biaya anti-surcharge (0.3% pembeli, 0.5% merchant).
+- Time-Series Machine Learning Forecasting: Proyeksi harga bahan pangan multi-horizon H+1 s/d H+7 berbasis model LightGBM multivariat.
+
+## API Documentation
+- [REST API Gateway](/api/v1): Dokumentasi endpoint backend NestJS
+- [Pooling API](/api/v1/pooling/campaigns): Kampanye pooling kuota panen terbuka
+- [Logistics & Timbangan API](/api/v1/logistics/routing): Direktif suhu dan log penimbangan tera hub
+- [Settlement & Gateway API](/api/v1/settlement/payments/solosmartpay): Integrasi pembayaran dan webhook
+- [Price Forecasting API](/api/v1/forecast/commodity): Proyeksi harga komoditas dan simulasi skenario cuaca BMKG/BBM
+
+## Key Resources
+- [Alur Pengadaan Dapur](/alur-pengadaan): Tahapan pemesanan subuh dan pengantaran Chiller Van
+- [Katalog Komoditas](/komoditas): Sentra komoditas pangan lokal DIY
+- [Kalkulator Penghematan Dapur](/kalkulator): Simulasi efisiensi biaya belanja dapur horeka
+- [FAQ & Bantuan](/faq): Pertanyaan umum pengadaan dan rekening bersama BPD DIY
