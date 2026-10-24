@@ -1,0 +1,32 @@
+# PasokMataram - Full Technical Specification for AI & LLM Search Agents
+
+## 1. System Overview
+PasokMataram adalah ekosistem pengadaan bahan pangan lokal B2B berbasis D.I. Yogyakarta yang menghubungkan restoran, kafe, dan hotel (HoReKa) langsung dengan kelompok tani (Gapoktan), peternak, dan Rumah Pemotongan Hewan (RPH).
+
+## 2. Microservices Architecture
+- Frontend: Next.js 14 App Router (Port 3000) dengan antarmuka Dapur Basah ramah semua umur (tap target >= 48x48px, kontras tinggi).
+- Backend: NestJS Modular Gateway (Port 3001) mengorkestrasi modul domain.
+- Domain Services:
+  - `@pasok/auth-kyb-service`: Identitas, verifikasi KYB, MinIO S3 presigner, watermarking digital.
+  - `@pasok/pooling-service`: Group buying pooling kuota panen massal dengan batas MTV Rp 500.000.
+  - `@pasok/logistics-hub-service`: Stasiun timbangan tera digital hub, routing rantai dingin SNI (Chilled 0-4C, Frozen -18C, Ambient 25-28C), dispute QC.
+  - `@pasok/settlement-service`: Rekening penampung escrow Bank BPD DIY dan Payment Gateway Solosmartpay (0.3% pembeli, 0.5% merchant, webhook HMAC-SHA256).
+  - `@pasok/queue-worker`: Background worker fail-fast dan pencairan otomatis H+1.
+  - `@pasok/ml-forecasting-service`: Model LightGBM proyeksi harga pangan 7 hari ke depan.
+
+## 3. Machine-Readable API Endpoints
+- `GET /api/v1/health`: Probe kesiapan database dan redis
+- `GET /api/v1/pooling/campaigns`: Daftar kampanye pooling aktif
+- `POST /api/v1/pooling/reservations`: Reservasi kuota pooling (MTV Rp 500.000)
+- `GET /api/v1/logistics/routing`: Rekomendasi armada dan zona suhu SNI
+- `POST /api/v1/logistics/weighing`: Pencatatan timbangan tera dan evaluasi deviasi susut
+- `POST /api/v1/settlement/payments/solosmartpay`: Penerbitan invoice pembayaran QRIS / Virtual Account
+- `POST /api/v1/settlement/webhook/solosmartpay`: Listener webhook status lunas dengan verifikasi signature
+- `GET /api/v1/buyer/catalog`: Katalog etalase multi-SKU supplier pangan lokal
+- `GET /api/v1/forecast/commodity/:id`: Proyeksi harga bahan pangan H+1 s.d. H+7
+
+## 4. Business & Regulatory Constraints
+- Minimum Transaction Value (MTV): Rp 500.000 per transaksi pooling.
+- SNI Cold Chain Standards: Daging dan susu murni wajib 0-4C.
+- Metrology Tolerances: Daging/susu 0.5%-1.0%, sayuran segar 3%-5%, beras 0.2%.
+- Non-Surcharge Payment Model: 0.3% biaya layanan sistem pembeli, 0.5% fee platform merchant.
