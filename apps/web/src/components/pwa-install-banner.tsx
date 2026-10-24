@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { usePwaInstall } from '../hooks/use-pwa-install';
-import { Download, X, CheckCircle, Share2, PlusSquare } from 'lucide-react';
+import { Download, X, Share2, PlusSquare, Smartphone } from 'lucide-react';
 
 export function PwaInstallBanner() {
   const { isInstallable, canPromptDirectly, isInstalled, isIos, promptInstall } = usePwaInstall();
@@ -24,75 +24,91 @@ export function PwaInstallBanner() {
 
   return (
     <aside
-      aria-label="Pemasangan Aplikasi Dapur PWA"
-      className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-40 animate-fade-in"
+      aria-label="Pemasangan Aplikasi Dapur ke Layar Utama"
+      className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-lg z-50 animate-fade-in"
     >
-      <div className="bg-primer-deep text-netral-canvas p-4 rounded-xl shadow-2xl border border-primer-pendukung/30 flex flex-col gap-3">
+      <div className="bg-primer-deep text-netral-canvas p-5 md:p-6 rounded-2xl shadow-2xl border-2 border-primer-pendukung/40 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 p-1 overflow-hidden border border-white/20">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primer-darkest flex items-center justify-center shrink-0 p-1 border border-primer-pendukung/30 shadow-inner">
               <Image
                 src="/icons/icon-192.svg"
-                alt="PasokMataram Icon"
-                width={36}
-                height={36}
-                className="w-full h-full object-contain"
+                alt="Logo PasokMataram"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain"
               />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-aksen">Aplikasi Dapur PWA</p>
-              <h3 className="text-sm font-bold text-white">Pasang di Tablet & Smartphone</h3>
+              <span className="text-xs font-bold uppercase tracking-wider text-aksen block">
+                Aplikasi Dapur PasokMataram
+              </span>
+              <h2 className="text-base md:text-lg font-bold text-white leading-tight">
+                Pasang di Layar Utama HP / Tablet Dapur
+              </h2>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setIsDismissed(true)}
             aria-label="Tutup pemberitahuan pasang aplikasi"
-            className="text-netral-muted hover:text-white transition-colors p-1 rounded-md"
+            className="min-w-12 min-h-12 w-12 h-12 flex items-center justify-center rounded-xl text-netral-muted hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
-            <X className="w-4 h-4" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <p className="text-xs text-netral-muted leading-relaxed">
-          Akses portal pengadaan dapur lebih cepat, hemat kuota, dan tetap dapat meninjau katalog saat sinyal dapur melemah tanpa unduh dari toko aplikasi.
+        <p className="text-sm md:text-base text-netral-canvas leading-relaxed">
+          Buka aplikasi langsung dari layar utama tanpa membuka browser internet. Lebih cepat, hemat kuota data, dan tetap dapat melihat daftar pesanan saat sinyal dapur lemah.
         </p>
 
         {showIosGuide ? (
-          <div className="bg-primer-darkest/80 p-3 rounded-lg text-xs space-y-2 border border-primer-pendukung/20">
-            <p className="font-semibold text-aksen">Cara Pasang di Safari iOS:</p>
-            <ol className="list-decimal list-inside space-y-1 text-netral-light">
-              <li className="flex items-center gap-1.5">
-                <Share2 className="w-3.5 h-3.5 text-aksen inline shrink-0" />
-                Ketuk tombol <strong>Bagikan (Share)</strong> di bilah navigasi.
+          <div className="bg-primer-darkest p-4 rounded-xl text-sm space-y-3 border border-primer-pendukung/30">
+            <p className="font-bold text-aksen text-base">Petunjuk Pasang di HP iPhone / iPad:</p>
+            <ol className="space-y-3 text-netral-canvas">
+              <li className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-primer-pendukung/20 text-aksen flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                  1
+                </span>
+                <span className="leading-snug">
+                  Ketuk tombol <strong className="text-white">Bagikan (Share)</strong> <Share2 className="w-4 h-4 text-aksen inline mx-1" /> pada bilah menu Safari di bagian bawah.
+                </span>
               </li>
-              <li className="flex items-center gap-1.5">
-                <PlusSquare className="w-3.5 h-3.5 text-aksen inline shrink-0" />
-                Pilih <strong>Tambahkan ke Layar Utama</strong>.
+              <li className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-primer-pendukung/20 text-aksen flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                  2
+                </span>
+                <span className="leading-snug">
+                  Geser menu ke atas, lalu ketuk <strong className="text-white">Tambahkan ke Layar Utama</strong> <PlusSquare className="w-4 h-4 text-aksen inline mx-1" />.
+                </span>
               </li>
             </ol>
             <button
               type="button"
               onClick={() => setShowIosGuide(false)}
-              className="text-aksen hover:underline text-xs pt-1 block"
+              className="min-h-12 w-full mt-2 text-aksen hover:text-aksen-hover font-bold text-base underline flex items-center justify-center rounded-lg"
             >
-              Tutup Panduan
+              Kembali ke Menu Utama
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
             <button
               type="button"
               onClick={handleInstallClick}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-sekunder hover:bg-sekunder-hover text-white text-xs font-semibold rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-sekunder/50"
+              className="min-h-12 flex-1 inline-flex items-center justify-center gap-3 px-5 py-3 bg-sekunder hover:bg-sekunder-hover text-white text-base font-bold rounded-xl transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-sekunder/40 active:scale-[0.98]"
             >
-              <Download className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{isIos ? 'Lihat Panduan Pasang' : 'Pasang Aplikasi Sekarang'}</span>
+              {isIos ? (
+                <Smartphone className="w-5 h-5 shrink-0" aria-hidden="true" />
+              ) : (
+                <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
+              )}
+              <span>{isIos ? 'Lihat Panduan Pasang di HP' : 'Pasang Aplikasi ke Layar Utama Dapur'}</span>
             </button>
             <button
               type="button"
               onClick={() => setIsDismissed(true)}
-              className="px-3 py-2 text-xs text-netral-muted hover:text-white transition-colors"
+              className="min-h-12 px-4 py-3 text-sm font-semibold text-netral-muted hover:text-white transition-colors rounded-xl flex items-center justify-center"
             >
               Nanti Saja
             </button>

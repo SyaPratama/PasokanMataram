@@ -14,7 +14,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold text-gelap mb-1">
+          <label htmlFor={inputId} className="block text-sm font-bold text-gelap mb-1.5">
             {label}
           </label>
         )}
@@ -24,16 +24,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={twMerge(
             clsx(
-              'w-full px-3 py-2 text-sm bg-white border rounded-md text-gelap transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer focus-visible:border-primer',
+              'w-full px-4 py-3 text-base bg-white border-2 rounded-xl text-gelap transition-colors min-h-[48px]',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/30 focus-visible:border-primer',
               'disabled:bg-netral-canvas disabled:opacity-60 disabled:cursor-not-allowed',
-              error ? 'border-red-500 focus-visible:ring-red-500' : 'border-netral-border',
+              error ? 'border-status-danger focus-visible:ring-status-danger' : 'border-netral-border',
               className
             )
           )}
           {...props}
         />
-        {error && <p className="mt-1 text-xs text-red-600 font-medium">{error}</p>}
+        {error && <p className="mt-1.5 text-sm text-status-danger font-semibold">{error}</p>}
       </div>
     );
   }
