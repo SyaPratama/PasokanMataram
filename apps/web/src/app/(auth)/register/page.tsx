@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Utensils,
-  Tractor,
+  Store,
   AlertCircle,
   ArrowRight,
   ArrowLeft,
@@ -103,10 +103,8 @@ export default function RegisterPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) {
-          // Backend offline atau mock mode: lanjutkan ke sesi tiruan mandiri
         }
       } catch {
-        // Backend offline: lanjutkan ke sesi tiruan mandiri (Hermetic & Mock-Ready)
       }
 
       if (typeof document !== 'undefined') {
@@ -134,10 +132,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-2xl border border-netral-border/70 overflow-hidden p-6 sm:p-8">
-      {/* Header Kartu Pendaftaran */}
-      <div className="bg-primer rounded-2xl p-5 sm:p-6 text-white text-center mb-6 shadow-xs relative">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white/10 mb-3 border border-white/20 shadow-inner">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-md border border-netral-border/80 overflow-hidden p-6 sm:p-8">
+      <div className="bg-gradient-to-b from-primer-deep to-primer rounded-2xl p-5 sm:p-6 text-white text-center mb-6 shadow-xs relative">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white mb-3 shadow-xs p-2">
           <Image
             src="/icons/icon.svg"
             alt="Logo PasokMataram"
@@ -153,8 +150,6 @@ export default function RegisterPage() {
           Pilih jenis usaha Anda untuk bergabung langsung dalam rantai pasok pangan D.I. Yogyakarta
         </p>
       </div>
-
-      {/* Langkah 1: Kategori Usaha Dual-Track Switcher */}
       <div className="mb-6">
         <label className="block text-xs sm:text-sm font-bold text-gelap uppercase tracking-wider mb-2.5">
           Langkah 1: Pilih Kategori Usaha Anda
@@ -196,23 +191,22 @@ export default function RegisterPage() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="w-9 h-9 rounded-xl bg-sekunder-light flex items-center justify-center text-sekunder">
-                <Tractor className="w-5 h-5" aria-hidden="true" />
+                <Store className="w-5 h-5" aria-hidden="true" />
               </div>
               {intent === 'GAPOKTAN' && (
                 <CheckCircle2 className="w-5 h-5 text-sekunder" aria-hidden="true" />
               )}
             </div>
             <div>
-              <div className="text-sm font-bold text-gelap">Pemasok Gapoktan</div>
+              <div className="text-sm font-bold text-gelap">Pemasok Gapoktan &amp; Supplier Pangan</div>
               <div className="text-xs text-gelap/75 mt-0.5 leading-snug">
-                Kelompok Tani dan Produsen Panen daerah DIY yang menyuplai komoditas.
+                Peternakan, RPH daging, koperasi susu, dan produsen lokal yang menyuplai bahan pangan.
               </div>
             </div>
           </button>
         </div>
       </div>
 
-      {/* Alert Error jika Ada */}
       {errorMessage ? (
         <div
           role="alert"
@@ -224,7 +218,6 @@ export default function RegisterPage() {
         </div>
       ) : null}
 
-      {/* Formulir Pendaftaran PIC Utama */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center justify-between border-b border-netral-border/60 pb-2">
           <label className="block text-xs sm:text-sm font-bold text-gelap uppercase tracking-wider">
@@ -356,7 +349,6 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      {/* Navigasi Alternatif ke Login */}
       <div className="mt-6 pt-4 border-t border-netral-border/60 text-center">
         <span className="text-xs sm:text-sm text-gelap/85 font-body">Sudah memiliki akun terdaftar? </span>
         <Link href="/login" className="text-xs sm:text-sm text-sekunder-dark font-bold hover:underline min-h-[44px] inline-flex items-center">

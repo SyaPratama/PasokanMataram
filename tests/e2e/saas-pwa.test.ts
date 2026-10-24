@@ -57,11 +57,11 @@ describe('Pengadaan Dapur Restoran & Native PWA Integration Test Suite', () => {
     expect(hookContent).toContain('display-mode: standalone');
   });
 
-  it('memverifikasi komponen pemasaran pengadaan dapur (Hero, Alur Pengadaan, Kalkulator, Paket B2B) terpasang', () => {
+  it('memverifikasi komponen pemasaran pengadaan dapur (Hero, Alur Pengadaan, Kalkulator, Paket Layanan) terpasang', () => {
     const heroPath = path.join(rootDir, 'apps/web/src/app/_components/hero-section.tsx');
     const alurPath = path.join(rootDir, 'apps/web/src/app/_components/alur-pengadaan.tsx');
     const kalkulatorPath = path.join(rootDir, 'apps/web/src/app/_components/kalkulator-penghematan.tsx');
-    const paketPath = path.join(rootDir, 'apps/web/src/app/_components/paket-b2b.tsx');
+    const paketPath = path.join(rootDir, 'apps/web/src/app/_components/paket-layanan.tsx');
     const pagePath = path.join(rootDir, 'apps/web/src/app/page.tsx');
 
     expect(fs.existsSync(heroPath)).toBe(true);
@@ -72,11 +72,11 @@ describe('Pengadaan Dapur Restoran & Native PWA Integration Test Suite', () => {
     const pageContent = fs.readFileSync(pagePath, 'utf-8');
     expect(pageContent).toContain('AlurPengadaan');
     expect(pageContent).toContain('KalkulatorPenghematan');
-    expect(pageContent).toContain('PaketB2b');
+    expect(pageContent).toContain('PaketLayanan');
     expect(pageContent.includes('PwaInstallBanner') || pageContent.includes('PwaFloatingButton')).toBe(true);
 
     const heroContent = fs.readFileSync(heroPath, 'utf-8');
-    expect(heroContent).toContain('Pengadaan Bahan Baku Dapur Restoran & Petani');
+    expect(heroContent).toContain('Pengadaan Bahan Pangan Dapur HoReKa & Supplier DIY');
     expect(heroContent).toContain('Mulai Pengadaan');
 
     const alurContent = fs.readFileSync(alurPath, 'utf-8');
@@ -88,7 +88,7 @@ describe('Pengadaan Dapur Restoran & Native PWA Integration Test Suite', () => {
     const paketContent = fs.readFileSync(paketPath, 'utf-8');
     expect(paketContent).toContain('Dapur Mandiri');
     expect(paketContent).toContain('Jaringan Multi-Outlet');
-    expect(paketContent).toContain('Mitra Gapoktan');
+    expect(paketContent).toContain('Mitra Supplier');
   });
 
   it('memverifikasi batasan Zero-IoT: tidak ada modul atau pustaka perangkat keras IoT', () => {

@@ -105,13 +105,11 @@ export default function AdminTenantsPage() {
           return;
         }
       }
-      // Fallback ke dataset tiruan lokal
       const mockItems = MOCK_TENANTS_KYB.map(mapMockToQueueItem);
       const filtered = statusFilter === 'ALL' ? mockItems : mockItems.filter((i) => i.kybStatus === statusFilter);
       setItems(filtered);
       setPagination({ currentPage: 1, totalPages: 1, totalItems: filtered.length, limit: 25 });
     } catch {
-      // Offline fallback mandiri
       const mockItems = MOCK_TENANTS_KYB.map(mapMockToQueueItem);
       const filtered = statusFilter === 'ALL' ? mockItems : mockItems.filter((i) => i.kybStatus === statusFilter);
       setItems(filtered);
@@ -194,7 +192,6 @@ export default function AdminTenantsPage() {
         }),
       }).catch(() => null);
 
-      // Mutasi status lokal untuk simulasi mulus
       const newStatus = actionModal.decision === 'APPROVED' ? 'VERIFIED' : 'REJECTED';
       setItems((prev) =>
         prev.map((i) => (i.tenantId === selectedTenant.tenantId ? { ...i, kybStatus: newStatus } : i))
@@ -215,7 +212,6 @@ export default function AdminTenantsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Banner Informasi / Notifikasi Berhasil */}
       {successBanner && (
         <div className="p-4 bg-primer-light border border-primer/30 rounded-xl flex items-start justify-between text-xs text-primer shadow-xs">
           <div className="flex items-center space-x-2 font-medium">
@@ -244,7 +240,6 @@ export default function AdminTenantsPage() {
         </div>
       )}
 
-      {/* Header Dashboard & Tab Filter */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-netral-border/60 pb-4">
         <div>
           <h1 className="text-xl font-heading font-extrabold text-gelap tracking-tight flex items-center">
@@ -260,7 +255,6 @@ export default function AdminTenantsPage() {
 
         {!selectedTenant && (
           <div className="flex flex-wrap items-center gap-2">
-            {/* Filter Tabs Status Antrean */}
             <div className="inline-flex rounded-lg border border-netral-border p-1 bg-white shadow-2xs">
               {(
                 [
@@ -301,7 +295,6 @@ export default function AdminTenantsPage() {
         )}
       </div>
 
-      {/* Bar Pencarian */}
       {!selectedTenant && (
         <div className="bg-white p-3.5 rounded-xl border border-netral-border/60 shadow-2xs flex items-center justify-between gap-3">
           <div className="relative w-full max-w-md">
@@ -325,7 +318,6 @@ export default function AdminTenantsPage() {
         </div>
       )}
 
-      {/* Tampilan Detail Split-Pane vs Tabel Antrean */}
       {selectedTenant ? (
         <KybAuditPanel
           tenant={selectedTenant}
@@ -400,7 +392,6 @@ export default function AdminTenantsPage() {
             </table>
           </div>
 
-          {/* Kontrol Paginasi */}
           <div className="p-3.5 border-t border-netral-border flex items-center justify-between text-xs text-gelap/75 bg-netral-canvas/40">
             <div>
               Menampilkan <strong>{displayedItems.length}</strong> mitra di D.I. Yogyakarta
@@ -429,7 +420,6 @@ export default function AdminTenantsPage() {
         </div>
       )}
 
-      {/* Modal Dialog Keputusan Review */}
       <KybActionModal
         isOpen={actionModal.isOpen}
         businessName={selectedTenant?.businessName || ''}

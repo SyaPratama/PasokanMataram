@@ -7,9 +7,9 @@ import { Footer } from '../_components/footer';
 import { PwaFloatingButton } from '../../components/pwa-floating-button';
 
 export const metadata: Metadata = {
-  title: 'Sentra Komoditas Pangan D.I. Yogyakarta | PasokMataram',
+  title: 'Katalog Bahan Pangan Lokal D.I. Yogyakarta | PasokMataram',
   description:
-    'Katalog komoditas unggulan pertanian Kulon Progo, Bantul, Sleman, dan Gunungkidul. Pasokan segar langsung dari Gapoktan mitra terverifikasi untuk dapur HoReKa.',
+    'Katalog bahan pangan unggulan Yogyakarta (Sleman, Bantul, Kulon Progo). Pasokan segar langsung dari produsen lokal mitra terverifikasi untuk dapur HoReKa.',
   alternates: {
     canonical: '/komoditas',
   },
@@ -37,10 +37,10 @@ export default function KomoditasPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-gelap tracking-tight">
-                  Sentra Komoditas Pangan D.I. Yogyakarta
+                  Katalog Bahan Pangan Sentra Produsen DIY
                 </h1>
                 <p className="text-xs sm:text-sm text-gelap/70 mt-1 max-w-2xl">
-                  Transparansi asal panen dari sentra pertanian Kulon Progo, Bantul, dan Sleman dengan standar QC transit Bantul.
+                  Transparansi asal pasokan dari produsen pangan Sleman, Bantul, dan Kulon Progo dengan standar QC transit Bantul.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-primer-light/60 text-primer w-fit">

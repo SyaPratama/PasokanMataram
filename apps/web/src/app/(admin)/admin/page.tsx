@@ -39,9 +39,9 @@ export default function AdminOverviewPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/tenants">
-            <Button variant="primary" size="sm" className="text-xs">
+            <Button variant="primary" size="sm" className="text-xs whitespace-nowrap shrink-0">
               <ShieldCheck className="w-4 h-4 mr-1.5" aria-hidden="true" />
-              Antrean Audit KYB
+              Audit KYB
             </Button>
           </Link>
         </div>
@@ -56,7 +56,7 @@ export default function AdminOverviewPage() {
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">142 Entitas</div>
-          <p className="text-[11px] text-gelap/60 mt-1">84 Restoran HoReKa, 58 Gapoktan</p>
+          <p className="text-[11px] text-gelap/60 mt-1">84 Restoran HoReKa, 58 Supplier &amp; Gapoktan</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
@@ -73,12 +73,12 @@ export default function AdminOverviewPage() {
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gelap/70">Alokasi Kuota Terkunci</span>
-            <div className="w-8 h-8 rounded-lg bg-cta-green-light flex items-center justify-center text-primer">
+            <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">42.8 Ton</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Bawang merah, cabai, &amp; beras subuh</p>
+          <p className="text-[11px] text-gelap/60 mt-1">Ayam, sapi, susu, bumbu &amp; panen sayur</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">

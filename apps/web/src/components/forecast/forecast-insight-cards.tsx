@@ -32,17 +32,17 @@ export function ForecastInsightCards({
 
   const actionBadgeMap = {
     BELI_SEKARANG: {
-      label: 'Beli Sekarang (Harga Optimal)',
+      label: 'Beli Sekarang',
       color: 'bg-status-success/15 text-status-success border-status-success/30',
       icon: CheckCircle2,
     },
     TUNGGU_PANEN_RAYA: {
-      label: 'Tunggu Puncak Panen Raya',
+      label: 'Tunggu Panen Raya',
       color: 'bg-aksen-light text-aksen-dark border-aksen/30',
       icon: Calendar,
     },
     KUNCI_KONTRAK: {
-      label: 'Kunci Kontrak Forward Segera',
+      label: 'Kunci Kontrak Forward',
       color: 'bg-sekunder-light text-sekunder border-sekunder/30',
       icon: Sparkles,
     },
@@ -74,21 +74,20 @@ export function ForecastInsightCards({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      {/* Kartu Rekomendasi Aksi */}
       <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-netral-border/80 shadow-xs flex flex-col justify-between space-y-4">
         <div className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-primer-light flex items-center justify-center text-primer">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-primer-light flex items-center justify-center text-primer shrink-0">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <h3 className="font-heading font-extrabold text-sm text-gelap">
-                Rekomendasi Waktu Pengadaan Cerdas
+              <h3 className="font-heading font-extrabold text-xs sm:text-sm text-gelap truncate">
+                Rekomendasi Pengadaan
               </h3>
             </div>
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${actionBadge.color}`}>
-              <ActionIcon className="w-3.5 h-3.5" />
-              <span>{actionBadge.label}</span>
+            <span className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap shrink-0 shadow-2xs ${actionBadge.color}`}>
+              <ActionIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+              <span className="whitespace-nowrap">{actionBadge.label}</span>
             </span>
           </div>
 
@@ -155,21 +154,20 @@ export function ForecastInsightCards({
         </div>
       </div>
 
-      {/* Kartu Anomali Cuaca BMKG */}
       <div className="p-5 rounded-2xl bg-white border border-netral-border/80 shadow-xs flex flex-col justify-between space-y-4">
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-aksen-light flex items-center justify-center text-aksen-dark">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-aksen-light flex items-center justify-center text-aksen-dark shrink-0">
                 <CloudRain className="w-4 h-4" />
               </div>
-              <h3 className="font-heading font-extrabold text-sm text-gelap">
+              <h3 className="font-heading font-extrabold text-xs sm:text-sm text-gelap truncate">
                 Anomali Cuaca Agrikultur
               </h3>
             </div>
-            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${weatherBadge.color}`}>
-              <WeatherIcon className="w-3 h-3" />
-              <span>{weatherBadge.label}</span>
+            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap shrink-0 shadow-2xs ${weatherBadge.color}`}>
+              <WeatherIcon className="w-3 h-3 shrink-0" />
+              <span className="whitespace-nowrap">{weatherBadge.label}</span>
             </span>
           </div>
 

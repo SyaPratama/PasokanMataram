@@ -1,12 +1,5 @@
 'use client';
 
-/**
- * @file src/app/_components/footer.tsx
- * @description Footer terstruktur dengan tema hijau botol gelap mengadopsi layout referensi (Agrova style).
- * Seluruh styling dan tautan menggunakan rute semantik App Router bebas anchor hash.
- * Mematuhi Prinsip VIII dan IX Konstitusi PasokMataram v1.5.0.
- */
-
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -33,7 +26,7 @@ export function Footer() {
               </span>
             </div>
             <p className="text-xs text-white/75 leading-relaxed max-w-sm font-body">
-              Platform agregasi pengadaan komoditas pangan langsung dari Gapoktan lokal D.I. Yogyakarta ke jaringan dapur kafe & restoran dengan jaminan mutu timbangan digital dan sistem escrow bersama.
+              Platform agregasi pengadaan bahan pangan terpadu langsung dari supplier lokal D.I. Yogyakarta ke jaringan dapur kafe dan restoran dengan jaminan mutu timbangan digital dan sistem escrow bersama.
             </p>
             <div className="mt-4 flex items-center text-xs text-aksen">
               <MapPin className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
@@ -62,13 +55,18 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/paket-layanan" className="hover:text-white transition-colors">
+                  Paket Layanan
+                </Link>
+              </li>
+              <li>
                 <Link href="/komoditas" className="hover:text-white transition-colors">
                   Sentra Komoditas
                 </Link>
               </li>
               <li>
                 <Link href="/prediksi-harga" className="hover:text-white transition-colors">
-                  Prediksi Harga AI
+                  Prediksi Harga Pasok
                 </Link>
               </li>
             </ul>
@@ -123,7 +121,7 @@ export function Footer() {
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
             <Link href="/register" className="hover:text-white transition-colors">
-              Pendaftaran Gapoktan
+              Pendaftaran Supplier Pangan
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
             <Link href="/onboarding-kyb" className="hover:text-white transition-colors">

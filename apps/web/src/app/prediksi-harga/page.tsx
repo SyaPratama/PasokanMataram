@@ -7,22 +7,22 @@ import { PwaFloatingButton } from '../../components/pwa-floating-button';
 import { PublicForecastSimulator } from './public-forecast-simulator';
 
 export const metadata: Metadata = {
-  title: 'Prediksi Harga Komoditas Pangan AI D.I. Yogyakarta | PasokMataram',
+  title: 'Prediksi Harga Pasok Pangan D.I. Yogyakarta | PasokMataram',
   description:
-    'Simulasi tren dan prakiraan harga pangan hasil panen Kulon Progo, Bantul, dan Sleman berbasis Machine Learning. Bantu pelaku HoReKa hemat hingga 24% dan petani raih harga adil.',
+    'Simulasi tren dan prakiraan harga bahan pangan Kulon Progo, Bantul, dan Sleman berbasis Machine Learning. Bantu pelaku HoReKa hemat hingga 24% dan supplier raih kepastian harga.',
   alternates: {
     canonical: '/prediksi-harga',
   },
   openGraph: {
-    title: 'Prediksi Harga Pangan DIY Berbasis Machine Learning | PasokMataram',
+    title: 'Prediksi Harga Pasok Pangan DIY Berbasis Machine Learning | PasokMataram',
     description:
-      'Prakiraan tren harga komoditas pangan Yogyakarta dengan akurasi MAPE 3.8%, data cuaca BMKG, dan kalender agrikultur terpadu.',
+      'Prakiraan tren harga bahan pangan Yogyakarta dengan akurasi MAPE 3.8%, data cuaca BMKG, dan kalender suplai terpadu.',
     url: '/prediksi-harga',
   },
 };
 
 /**
- * Halaman etalase publik Prediksi Harga Pasokan Pangan AI Yogyakarta.
+ * Halaman etalase publik Prediksi Harga Pasokan Pangan Yogyakarta.
  * Mengintegrasikan simulator interaktif multi-horizon dan edukasi keterbukaan model ML.
  */
 export default function PrediksiHargaPage() {
@@ -31,7 +31,6 @@ export default function PrediksiHargaPage() {
       <Navbar />
 
       <main className="flex-1">
-        {/* Banner Header Rute Semantik */}
         <div className="bg-white border-b border-netral-border/70 py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <nav className="flex items-center text-xs text-gelap/60 mb-3" aria-label="Breadcrumb">
@@ -39,14 +38,14 @@ export default function PrediksiHargaPage() {
                 Beranda
               </Link>
               <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-gelap/40" />
-              <span className="font-semibold text-primer">Prediksi Harga AI</span>
+              <span className="font-semibold text-primer">Prediksi Harga Pasok</span>
             </nav>
 
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-aksen-light text-aksen-dark text-xs font-bold mb-3 border border-aksen/30">
-                  <Sparkles className="w-3.5 h-3.5 text-aksen-dark" />
-                  <span>PasokML Forecasting Intelligence v2.1</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-aksen-light text-aksen-dark text-xs font-bold mb-3 border border-aksen/30 whitespace-nowrap shrink-0 shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-aksen-dark shrink-0" />
+                  <span className="whitespace-nowrap">PasokML Forecasting Intelligence v2.1</span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-heading font-extrabold text-gelap tracking-tight">
                   Prakiraan Tren Harga Pasokan Pangan D.I. Yogyakarta
@@ -75,7 +74,6 @@ export default function PrediksiHargaPage() {
           </div>
         </div>
 
-        {/* Simulator Interaktif */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <PublicForecastSimulator />
         </div>

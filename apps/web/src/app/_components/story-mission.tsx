@@ -1,16 +1,9 @@
 'use client';
 
-/**
- * @file src/app/_components/story-mission.tsx
- * @description Komponen Story & Mission 2-kolom memotong rantai distribusi pangan DIY.
- * Sisi kiri: 1 kartu foto hasil panen segar responsif dengan kurasi mutu.
- * Sisi kanan: Narasi misi rantai pasok dengan tombol aksi alur kerja.
- */
-
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Check, ShieldCheck, TrendingUp } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function StoryMissionSection() {
@@ -18,7 +11,6 @@ export function StoryMissionSection() {
     <section id="cerita" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Sisi Kiri: 1 Kartu Foto Hasil Panen Responsif & Elegan */}
           <div className="lg:col-span-6 relative">
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
@@ -65,7 +57,7 @@ export function StoryMissionSection() {
               </p>
 
               <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body leading-relaxed text-justify sm:text-left">
-                PasokMataram memfasilitasi pemesanan langsung dari Gapoktan Kulon Progo, Bantul, dan Sleman dengan jaminan standar mutu, kalibrasi timbangan digital di Hub Transit, serta sistem pembayaran escrow yang adil bagi petani dan pelaku usaha kuliner.
+                PasokMataram memfasilitasi pengadaan bahan pangan terpadu langsung dari supplier lokal D.I. Yogyakarta dengan jaminan standar mutu koki, kalibrasi timbangan digital di Hub Transit, serta sistem pembayaran escrow yang adil bagi pemasok dan pelaku usaha kuliner.
               </p>
 
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gelap/85 font-medium">
@@ -73,20 +65,20 @@ export function StoryMissionSection() {
                   <div className="w-6 h-6 rounded-full bg-primer-light text-primer flex items-center justify-center">
                     <Check className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
                   </div>
-                  <span>Panen tiba dalam 24 jam</span>
+                  <span>Bahan segar tiba terjadwal</span>
                 </div>
 
                 <div className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-netral-border/60">
                   <div className="w-6 h-6 rounded-full bg-primer-light text-primer flex items-center justify-center">
                     <Check className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
                   </div>
-                  <span>Harga grosir petani langsung</span>
+                  <span>Harga grosir produsen langsung</span>
                 </div>
               </div>
 
               <div className="mt-8">
                 <Link
-                  href="/alur-pengadaan"
+                  href="#alur-pengadaan"
                   className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold rounded-full bg-primer text-white hover:bg-primer-hover shadow-sm transition-all hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primer min-h-[44px]"
                 >
                   Pelajari Alur Kerja

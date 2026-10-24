@@ -1,13 +1,5 @@
 'use client';
 
-/**
- * @file src/app/_components/prefooter-cta.tsx
- * @description Komponen Banner CTA pra-footer mengadopsi layout referensi (Agrova style).
- * Wadah melengkung besar dengan latar belakang fotografi lanskap pertanian DIY dan tombol pill.
- * Seluruh styling dan warna berbasis token semantik Tailwind konfigurasi.
- * Mematuhi Prinsip VIII dan IX Konstitusi PasokMataram v1.5.0.
- */
-
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,7 +20,7 @@ export function PreFooterCtaSection() {
           <div className="absolute inset-0 z-0">
             <Image
               src="/images/cta/agricultural-landscape.webp"
-              alt="Lanskap pertanian hijau D.I. Yogyakarta"
+              alt="Suasana dapur kuliner dan bahan pangan segar D.I. Yogyakarta"
               fill
               sizes="(max-width: 1280px) 100vw, 1280px"
               className="object-cover object-center brightness-[0.7] contrast-[1.1]"
@@ -39,7 +31,7 @@ export function PreFooterCtaSection() {
           <div className="relative z-10 max-w-2xl mx-auto">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/15 text-white/90 backdrop-blur-sm border border-white/20 mb-4">
               <ShieldCheck className="w-3.5 h-3.5 mr-1 text-aksen" />
-              Ekosistem Pertanian & Kuliner D.I. Yogyakarta
+              Ekosistem Kuliner &amp; Supplier Pangan D.I. Yogyakarta
             </span>
 
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white font-heading tracking-tight leading-tight">
@@ -47,7 +39,7 @@ export function PreFooterCtaSection() {
             </h2>
 
             <p className="mt-4 text-xs sm:text-sm md:text-base text-white/85 font-body leading-relaxed max-w-xl mx-auto">
-              Gabung bersama jaringan dapur kafe, restoran, dan puluhan kelompok tani se-D.I. Yogyakarta. Pendaftaran gratis dan proses verifikasi legalitas 1x24 jam.
+              Gabung bersama jaringan dapur kafe, restoran, dan puluhan supplier pangan lokal se-D.I. Yogyakarta. Pendaftaran gratis dan proses verifikasi legalitas 1x24 jam.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">

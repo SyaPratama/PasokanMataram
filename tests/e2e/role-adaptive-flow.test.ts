@@ -22,8 +22,8 @@ describe('E2E: Role-Adaptive Flow, Closed Logistics & Quick Demo Switching', () 
     const hubRoute = resolveUserHomeRoute('HUB_OPERATOR');
     const adminRoute = resolveUserHomeRoute('SUPER_ADMIN');
 
-    expect(chefRoute).toBe('/horeka/dashboard');
-    expect(farmerRoute).toBe('/farmer/dashboard');
+    expect(chefRoute).toBe('/buyer/dashboard');
+    expect(farmerRoute).toBe('/supplier/dashboard');
     expect(hubRoute).toBe('/hub/inbound');
     expect(adminRoute).toBe('/admin/tenants');
   });
@@ -95,10 +95,10 @@ describe('E2E: Role-Adaptive Flow, Closed Logistics & Quick Demo Switching', () 
     expect(isRouteAllowedForRole('/admin/tenants', 'HOREKA', 'HEAD_CHEF')).toBe(false);
     expect(isRouteAllowedForRole('/admin/logistics/operators', 'GAPOKTAN', 'CHAIRPERSON')).toBe(false);
     expect(isRouteAllowedForRole('/hub/inbound', 'HOREKA', 'OWNER')).toBe(false);
-    expect(isRouteAllowedForRole('/farmer/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(false);
+    expect(isRouteAllowedForRole('/supplier/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(false);
 
-    expect(isRouteAllowedForRole('/horeka/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(true);
-    expect(isRouteAllowedForRole('/farmer/dashboard', 'GAPOKTAN', 'CHAIRPERSON')).toBe(true);
+    expect(isRouteAllowedForRole('/buyer/dashboard', 'HOREKA', 'HEAD_CHEF')).toBe(true);
+    expect(isRouteAllowedForRole('/supplier/dashboard', 'GAPOKTAN', 'CHAIRPERSON')).toBe(true);
     expect(isRouteAllowedForRole('/hub/inbound', 'HUB_OPERATOR', 'OPERATOR_QC')).toBe(true);
     expect(isRouteAllowedForRole('/admin/tenants', 'SUPER_ADMIN', 'SUPER_ADMIN')).toBe(true);
   });

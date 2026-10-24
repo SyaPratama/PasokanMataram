@@ -91,8 +91,8 @@ describe('Minggu 1.65 - Brand Identity & UI Contrast Harmony Verification', () =
     expect(content).toContain('Proteksi Escrow 100%');
   });
 
-  it('memvalidasi pencegahan line-wrap (whitespace-nowrap) dan kontras tinggi pada badge paket-b2b.tsx', () => {
-    const paketPath = path.join(webAppDir, '_components/paket-b2b.tsx');
+  it('memvalidasi pencegahan line-wrap (whitespace-nowrap) dan kontras tinggi pada badge paket-layanan.tsx', () => {
+    const paketPath = path.join(webAppDir, '_components/paket-layanan.tsx');
     expect(fs.existsSync(paketPath)).toBe(true);
 
     const content = fs.readFileSync(paketPath, 'utf-8');

@@ -122,7 +122,7 @@ export default function BuyerOrdersPage() {
             Rp 9.310.000
           </div>
           <div className="text-[11px] text-gelap/60 mt-1">
-            Terproteksi rekening escrow B2B
+            Terproteksi rekening bersama escrow
           </div>
         </div>
       </div>

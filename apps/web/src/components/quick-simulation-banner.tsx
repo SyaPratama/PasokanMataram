@@ -1,11 +1,5 @@
 'use client';
 
-/**
- * @file apps/web/src/components/quick-simulation-banner.tsx
- * @description Dock & Modal Simulasi Cepat 1-Klik untuk menguji 4 persona enterprise
- * tanpa perlu pendaftaran manual.
- * Mematuhi Aturan Desain Sistem Ketat PasokMataram & WCAG 2.1 AA.
- */
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -63,9 +57,9 @@ const ROLES: SimulationRole[] = [
   },
   {
     id: 'gapoktan',
-    title: 'Ketua Kelompok Tani',
-    organization: 'Gapoktan Srikayangan Sentolo',
-    roleType: 'Pemasok Panen',
+    title: 'Pemasok Bahan Pangan',
+    organization: 'Sentra Pemasok Srikayangan',
+    roleType: 'Pemasok Pangan',
     macroRole: 'GAPOKTAN',
     microRole: 'CHAIRPERSON',
     destination: '/supplier/dashboard',
@@ -125,7 +119,6 @@ export function QuickSimulationBanner() {
 
         document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
       } catch {
-        // fallback cookie
       }
 
       document.cookie = `pasok_session_role=${role.microRole}; path=/; max-age=604800; SameSite=Lax`;
@@ -140,7 +133,7 @@ export function QuickSimulationBanner() {
     }, 400);
   };
 
-  const modalContent = isOpen && isMounted && (
+  const modalContent = (
     <div
       role="dialog"
       aria-modal="true"
@@ -151,7 +144,6 @@ export function QuickSimulationBanner() {
       className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
     >
       <div className="relative w-full max-w-lg bg-white rounded-2xl border border-netral-border shadow-2xl p-4 sm:p-5 max-h-[85vh] overflow-y-auto">
-        {/* Header Modal Ringkas */}
         <div className="flex items-start justify-between pb-3 border-b border-netral-border/60">
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-primer/10 p-1 flex items-center justify-center border border-primer/20 shrink-0">
@@ -187,7 +179,6 @@ export function QuickSimulationBanner() {
           </button>
         </div>
 
-        {/* 4 Kartu Peran Grid 2x2 Compact */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3.5">
           {ROLES.map((role) => {
             const Icon = role.icon;
@@ -230,7 +221,6 @@ export function QuickSimulationBanner() {
           })}
         </div>
 
-        {/* Footer Info */}
         <div className="mt-3.5 pt-3 border-t border-netral-border/60 flex items-center justify-between text-[10px] sm:text-[11px] text-gelap/60">
           <span className="flex items-center gap-1.5">
             <Check className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
@@ -244,11 +234,10 @@ export function QuickSimulationBanner() {
 
   return (
     <>
-      {/* Banner Ringkas di Bawah Hero / Atas Navigasi */}
       <div id="quick-sim-banner" className="bg-primer-deep text-white border-y border-white/10 px-3 sm:px-6 py-2">
         <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-1.5 sm:gap-2 shrink min-w-0">
-            <span className="flex h-2 w-2 rounded-full bg-cta-green animate-pulse shrink-0" aria-hidden="true" />
+            <span className="flex h-2 w-2 rounded-full bg-aksen animate-pulse shrink-0" aria-hidden="true" />
             <span className="font-semibold text-white/95 text-[11px] sm:text-xs whitespace-nowrap">
               Mode Uji Coba Cepat:
             </span>
@@ -270,8 +259,7 @@ export function QuickSimulationBanner() {
         </div>
       </div>
 
-      {/* Render Modal via React Portal ke document.body dengan z-[9999] */}
-      {isMounted && typeof document !== 'undefined' && createPortal(modalContent, document.body)}
+      {isMounted && isOpen && typeof document !== 'undefined' && createPortal(modalContent, document.body)}
     </>
   );
 }

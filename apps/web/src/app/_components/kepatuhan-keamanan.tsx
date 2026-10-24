@@ -1,9 +1,3 @@
-/**
- * @file src/app/_components/kepatuhan-keamanan.tsx
- * @description Komponen penjelasan kepatuhan KYB dan arsitektur keamanan transaksi escrow.
- * Mematuhi prinsip antislop-ui (R-05, C-1, C-5 tanpa klaim palsu) & antislop-human.
- */
-
 import React from 'react';
 import { ShieldCheck, Lock, FileCheck, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
@@ -25,14 +19,13 @@ export function KepatuhanKeamananSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Pilar 1: Verifikasi KYB Resmi */}
-          <div className="flex flex-col p-6 rounded-lg bg-netral-canvas/40 border border-netral-border">
-            <div className="w-10 h-10 rounded-md bg-primer-light text-primer flex items-center justify-center mb-5">
+          <div className="flex flex-col p-6 rounded-2xl bg-netral-canvas/40 border border-netral-border shadow-xs hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-primer-light text-primer flex items-center justify-center mb-5">
               <FileCheck className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Verifikasi Entitas Sah (KYB)</h3>
             <p className="mt-2 text-xs text-gelap/70 leading-relaxed">
-              Setiap pihak yang bertransaksi wajib diverifikasi secara hukum. HoReKa melampirkan Nomor Induk Berusaha (NIB OSS), sedangkan Gapoktan diverifikasi berdasarkan SK Kelompok Tani binaan dinas pertanian kabupaten setempat.
+              Setiap pihak yang bertransaksi wajib diverifikasi secara hukum. HoReKa melampirkan Nomor Induk Berusaha (NIB OSS), sedangkan supplier melampirkan NIB atau sertifikasi mutu resmi (Halal, NKV, SKP, P-IRT).
             </p>
             <ul className="mt-4 space-y-2 text-xs text-gelap/80">
               <li className="flex items-center">
@@ -41,19 +34,18 @@ export function KepatuhanKeamananSection() {
               </li>
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 mr-2 text-primer flex-shrink-0" />
-                Audit SK Pengukuhan Kelompok Tani
+                Audit Legalitas Usaha & Sertifikasi Mutu
               </li>
             </ul>
           </div>
 
-          {/* Pilar 2: Rekening Escrow Terproteksi */}
-          <div className="flex flex-col p-6 rounded-lg bg-netral-canvas/40 border border-netral-border">
-            <div className="w-10 h-10 rounded-md bg-sekunder-light text-sekunder flex items-center justify-center mb-5">
+          <div className="flex flex-col p-6 rounded-2xl bg-netral-canvas/40 border border-netral-border shadow-xs hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-sekunder-light text-sekunder flex items-center justify-center mb-5">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Rekening Penampung Escrow</h3>
             <p className="mt-2 text-xs text-gelap/70 leading-relaxed">
-              Dana pembelian dikunci pada rekening penampung bersama saat kuota ditutup. Petani menerima kepastian pasar, sementara pemilik kafe terlindungi dari risiko barang susut atau tidak terkirim.
+              Dana pembelian dikunci pada rekening penampung bersama saat pesanan diterbitkan. Supplier menerima kepastian pasar, sementara pemilik kafe terlindungi dari risiko barang susut atau tidak terkirim.
             </p>
             <ul className="mt-4 space-y-2 text-xs text-gelap/80">
               <li className="flex items-center">
@@ -67,9 +59,8 @@ export function KepatuhanKeamananSection() {
             </ul>
           </div>
 
-          {/* Pilar 3: Isolasi Data Multi-Tenant */}
-          <div className="flex flex-col p-6 rounded-lg bg-netral-canvas/40 border border-netral-border">
-            <div className="w-10 h-10 rounded-md bg-aksen-light text-aksen flex items-center justify-center mb-5">
+          <div className="flex flex-col p-6 rounded-2xl bg-netral-canvas/40 border border-netral-border shadow-xs hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-aksen-light text-aksen flex items-center justify-center mb-5">
               <Lock className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Isolasi Data Multi-Tenant (RLS)</h3>
@@ -89,19 +80,18 @@ export function KepatuhanKeamananSection() {
           </div>
         </div>
 
-        {/* CTA Bawah Section */}
-        <div className="mt-12 p-6 rounded-lg bg-primer text-white flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-primer text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
           <div>
             <h4 className="font-heading font-bold text-base md:text-lg">
               Siap Mendaftarkan Usaha Anda ke Jaringan PasokMataram?
             </h4>
             <p className="text-xs text-white/80 mt-1">
-              Pendaftaran akun bisnis gratis dan terbuka untuk entitas kuliner dan gabungan kelompok tani wilayah D.I. Yogyakarta.
+              Pendaftaran akun bisnis gratis dan terbuka untuk entitas kuliner dan supplier bahan pangan wilayah D.I. Yogyakarta.
             </p>
           </div>
           <Link
             href="/register"
-            className="flex-shrink-0 px-5 py-2.5 bg-white text-primer font-bold text-xs rounded-md hover:bg-netral-canvas transition-colors shadow-sm"
+            className="flex-shrink-0 px-6 py-3 bg-white text-primer font-bold text-xs rounded-full hover:bg-netral-canvas transition-colors shadow-xs min-h-[44px] flex items-center justify-center"
           >
             Mulai Registrasi Kemitraan
           </Link>

@@ -1,11 +1,5 @@
 'use client';
 
-/**
- * @file apps/web/src/app/_components/kalkulator-penghematan.tsx
- * @description Kalkulator interaktif estimasi penghematan pengadaan dapur HoReKa.
- * Mematuhi Prinsip VIII & IX Konstitusi PasokMataram v1.6.0 & WCAG 2.1 AA.
- */
-
 import React, { useState, useId } from 'react';
 import Link from 'next/link';
 import { Calculator, TrendingDown, ArrowRight, ShieldCheck, Check } from 'lucide-react';
@@ -16,7 +10,6 @@ export function KalkulatorPenghematan() {
   const [businessType, setBusinessType] = useState<'KAFE' | 'RESTO' | 'HOTEL'>('RESTO');
   const sliderId = useId();
 
-  // Formula penghematan B2B vs pasar eceran: rata-rata 21%
   const monthlyTraditional = dailyExpense * 30 * outletCount;
   const estimatedSavingsPercent = businessType === 'HOTEL' ? 0.23 : businessType === 'RESTO' ? 0.21 : 0.18;
   const monthlySavings = Math.round(monthlyTraditional * estimatedSavingsPercent);
@@ -37,16 +30,14 @@ export function KalkulatorPenghematan() {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Hitung Potensi Penghematan Dapur Usaha Anda
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
-            Bandingkan pengeluaran belanja eceran pasar harian dengan kontrak pasokan langsung dari Gapoktan D.I. Yogyakarta.
+          <p className="mt-3 text-sm sm:text-base text-gelap/80 font-body">
+            Bandingkan pengeluaran belanja eceran pasar harian dengan pengadaan terpadu dari ekosistem supplier pangan lokal D.I. Yogyakarta.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto">
-          {/* Panel Input Interaktif */}
-          <div className="lg:col-span-7 bg-white p-4 sm:p-8 rounded-2xl shadow-sm border border-netral-border flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl shadow-xs border border-netral-border flex flex-col justify-between">
             <div className="space-y-6">
-              {/* Tipe Bisnis */}
               <div>
                 <label className="block text-xs font-bold text-gelap uppercase tracking-wider mb-2">
                   Kategori Usaha Kuliner
@@ -57,19 +48,16 @@ export function KalkulatorPenghematan() {
                       key={type}
                       type="button"
                       onClick={() => setBusinessType(type)}
-                      className={`px-1 sm:px-3 py-2.5 text-[10.5px] sm:text-xs font-semibold rounded-lg border transition-all text-center whitespace-nowrap min-h-[44px] flex items-center justify-center ${
+                      className={`px-1 sm:px-3 py-2.5 text-[10.5px] sm:text-xs font-semibold rounded-xl border transition-all text-center whitespace-nowrap min-h-[44px] flex items-center justify-center ${
                         businessType === type
-                          ? 'bg-primer-deep text-white border-primer-deep shadow-sm'
+                          ? 'bg-primer-deep text-white border-primer-deep shadow-xs'
                           : 'bg-netral-canvas text-gelap border-netral-border hover:bg-netral-surface'
                       }`}
                     >
                       {type === 'KAFE' ? (
                         <span>Kafe / Kedai</span>
                       ) : type === 'RESTO' ? (
-                        <>
-                          <span className="hidden md:inline">Restoran / Rumah Makan</span>
-                          <span className="md:hidden">Restoran</span>
-                        </>
+                        <span>Restoran</span>
                       ) : (
                         <span>Hotel / Katering</span>
                       )}
@@ -78,113 +66,110 @@ export function KalkulatorPenghematan() {
                 </div>
               </div>
 
-              {/* Jumlah Gerai Cabang */}
               <div>
                 <label className="block text-xs font-bold text-gelap uppercase tracking-wider mb-2">
-                  Jumlah Gerai Fisik (Outlet)
+                  Jumlah Gerai Cabang di DIY
                 </label>
-                <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
-                  {[1, 2, 3, 5].map((count) => (
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 5, 10].map((num) => (
                     <button
-                      key={count}
+                      key={num}
                       type="button"
-                      onClick={() => setOutletCount(count)}
-                      className={`px-1 sm:px-2.5 py-2 text-[10.5px] sm:text-xs font-semibold rounded-lg border transition-all text-center whitespace-nowrap min-h-[44px] flex items-center justify-center ${
-                        outletCount === count
-                          ? 'bg-primer-deep text-white border-primer-deep shadow-sm'
+                      onClick={() => setOutletCount(num)}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all min-h-[44px] flex items-center justify-center ${
+                        outletCount === num
+                          ? 'bg-primer text-white border-primer shadow-xs'
                           : 'bg-netral-canvas text-gelap border-netral-border hover:bg-netral-surface'
                       }`}
                     >
-                      {count === 5 ? (
-                        <>
-                          <span className="hidden sm:inline">5+ Cabang</span>
-                          <span className="sm:hidden">5+ Gerai</span>
-                        </>
-                      ) : (
-                        `${count} Gerai`
-                      )}
+                      {num} {num === 10 ? '+' : ''}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Slider Belanja Harian */}
               <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <label htmlFor={sliderId} className="text-xs font-bold text-gelap uppercase tracking-wider truncate">
-                    <span className="hidden sm:inline">Estimasi Belanja Dapur per Gerai / Hari</span>
-                    <span className="sm:hidden">Belanja Dapur / Hari</span>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor={sliderId} className="text-xs font-bold text-gelap uppercase tracking-wider">
+                    Estimasi Belanja Dapur / Hari per Gerai
                   </label>
-                  <span className="text-sm sm:text-base font-extrabold text-primer-deep font-mono whitespace-nowrap shrink-0">
+                  <span className="text-sm font-extrabold text-primer font-heading font-mono tabular-nums">
                     {formatRupiah(dailyExpense)}
                   </span>
                 </div>
                 <input
                   id={sliderId}
                   type="range"
-                  min={1000000}
-                  max={20000000}
-                  step={500000}
+                  min={500000}
+                  max={15000000}
+                  step={250000}
                   value={dailyExpense}
                   onChange={(e) => setDailyExpense(Number(e.target.value))}
+                  className="w-full accent-primer cursor-pointer h-2 bg-netral-border rounded-lg"
                   aria-label="Estimasi belanja dapur per hari"
-                  className="w-full h-2 bg-netral-border rounded-lg appearance-none cursor-pointer accent-primer-deep"
                 />
-                <div className="flex justify-between text-[11px] text-gelap-muted mt-1 font-mono">
-                  <span>Rp 1 Jt</span>
-                  <span>Rp 10 Jt</span>
-                  <span>Rp 20 Jt</span>
+                <div className="flex justify-between text-[10px] text-gelap/60 mt-1 font-mono">
+                  <span>Rp 500 rb</span>
+                  <span>Rp 7.5 jt</span>
+                  <span>Rp 15 jt</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-netral-border text-xs text-gelap-muted flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-primer-deep shrink-0" aria-hidden="true" />
-              <span>Simulasi mengacu pada disparitas harga komoditas cabai, bawang, dan beras di D.I. Yogyakarta 2026.</span>
+            <div className="mt-6 pt-4 border-t border-netral-border flex items-center gap-2 text-xs text-gelap/70">
+              <ShieldCheck className="w-4 h-4 text-primer shrink-0" />
+              <span>Simulasi berdasarkan deviasi harga pasar eceran vs kontrak supplier pangan DIY 2026</span>
             </div>
           </div>
 
-          {/* Panel Hasil Estimasi */}
-          <div className="lg:col-span-5 bg-primer-deep text-white p-6 sm:p-8 rounded-2xl shadow-md flex flex-col justify-between border border-primer-pendukung/30">
+          <div className="lg:col-span-5 bg-primer text-white p-6 sm:p-8 rounded-3xl shadow-xl ring-1 ring-white/20 flex flex-col justify-between relative overflow-hidden">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 text-aksen-light border border-white/20 mb-3">
-                <TrendingDown className="w-3.5 h-3.5 text-aksen-light" aria-hidden="true" />
-                Estimasi Penghematan Margin
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-aksen-light mb-4">
+                Estimasi Efisiensi Belanja
               </span>
 
-              <p className="text-xs text-netral-light/90 uppercase tracking-wider font-semibold">
-                Potensi Penghematan per Bulan
-              </p>
-              <div className="text-2xl sm:text-4xl font-extrabold text-white font-heading mt-1 whitespace-nowrap">
-                {formatRupiah(monthlySavings)}
-              </div>
-              <p className="text-xs text-netral-light/90 mt-1 font-body">
-                Atau setara dengan <strong className="text-white font-bold whitespace-nowrap">{formatRupiah(yearlySavings)}</strong> per tahun.
-              </p>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-xs text-white/70">Potensi Hemat per Bulan</div>
+                  <div className="text-2xl sm:text-3xl font-extrabold font-heading text-white mt-0.5 font-mono tabular-nums">
+                    {formatRupiah(monthlySavings)}
+                  </div>
+                  <div className="text-[11px] text-aksen-light mt-0.5">
+                    Efisiensi sekitar {Math.round(estimatedSavingsPercent * 100)}% dari belanja tradisional
+                  </div>
+                </div>
 
-              <div className="mt-6 space-y-2.5 pt-6 border-t border-white/15 text-xs font-body">
-                <div className="flex items-start gap-2 text-white">
-                  <Check className="w-4 h-4 text-cta-green-light shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>Harga terkunci dari petani (bebas spekulasi tengkulak).</span>
+                <div className="pt-4 border-t border-white/15">
+                  <div className="text-xs text-white/70">Potensi Hemat per Tahun</div>
+                  <div className="text-xl sm:text-2xl font-extrabold font-heading text-white mt-0.5 font-mono tabular-nums">
+                    {formatRupiah(yearlySavings)}
+                  </div>
                 </div>
-                <div className="flex items-start gap-2 text-white">
-                  <Check className="w-4 h-4 text-cta-green-light shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>Kirim subuh 04:30 WIB langsung ke masing-masing cabang gerai.</span>
-                </div>
-                <div className="flex items-start gap-2 text-white">
-                  <Check className="w-4 h-4 text-cta-green-light shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>Dana escrow hanya cair setelah QC digital koki disetujui.</span>
-                </div>
+
+                <ul className="space-y-2 pt-4 border-t border-white/15 text-xs text-white/90">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-aksen shrink-0" />
+                    <span>Bebas biaya mark-up tengkulak</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-aksen shrink-0" />
+                    <span>Garansi timbangan digital 100% pas</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-aksen shrink-0" />
+                    <span>Pengiriman subuh tepat waktu</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-white/15">
+            <div className="mt-8">
               <Link
                 href="/register"
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-sekunder hover:bg-sekunder-hover text-white text-xs font-bold font-heading transition-all shadow-md hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-white min-h-[44px]"
+                className="w-full py-3.5 px-6 rounded-full bg-sekunder text-white font-bold font-heading text-xs sm:text-sm text-center hover:bg-sekunder-hover transition-all flex items-center justify-center gap-2 shadow-md min-h-[44px]"
               >
-                <span>Mulai Kunci Harga Dapur Anda</span>
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                <span>Kunci Kuota Panen</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

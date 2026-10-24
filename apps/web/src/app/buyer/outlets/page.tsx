@@ -51,7 +51,6 @@ export default function OutletsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Toast Notifikasi Berhasil */}
       {successToast && (
         <div className="p-3.5 bg-primer-light border border-primer/30 text-primer text-xs rounded-xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center">
@@ -68,7 +67,6 @@ export default function OutletsPage() {
         </div>
       )}
 
-      {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-netral-border/60 pb-4">
         <div>
           <div className="flex items-center gap-2">
@@ -94,7 +92,6 @@ export default function OutletsPage() {
         </Button>
       </div>
 
-      {/* Filter & Pencarian Bar */}
       <div className="bg-white p-4 rounded-xl border border-netral-border/60 shadow-2xs space-y-3">
         <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
           <div className="relative w-full md:w-80">
@@ -113,7 +110,6 @@ export default function OutletsPage() {
             />
           </div>
 
-          {/* Filter Wilayah Kabupaten DIY */}
           <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
             <span className="text-[11px] font-semibold text-gelap/50 uppercase mr-1 hidden lg:inline">
               Wilayah:
@@ -188,7 +184,6 @@ export default function OutletsPage() {
         </div>
       </div>
 
-      {/* Grid Kartu Gerai / Shimmer Skeleton */}
       {isLoading ? (
         <OutletSkeleton />
       ) : filteredOutlets.length > 0 ? (
@@ -204,7 +199,6 @@ export default function OutletsPage() {
           ))}
         </div>
       ) : (
-        /* Status Kosong (Empty State) */
         <div className="bg-white rounded-xl border border-netral-border/60 p-12 text-center space-y-3">
           <div className="w-12 h-12 rounded-full bg-netral-canvas flex items-center justify-center text-gelap/40 mx-auto">
             <MapPin className="w-6 h-6" />
@@ -227,7 +221,6 @@ export default function OutletsPage() {
         </div>
       )}
 
-      {/* Paginasi Terstruktur */}
       <div className="bg-white p-3.5 rounded-xl border border-netral-border/60 flex items-center justify-between text-xs text-gelap/70">
         <div>
           Menampilkan <strong>{filteredOutlets.length}</strong> dari <strong>{outlets.length}</strong> gerai terdaftar
@@ -253,7 +246,6 @@ export default function OutletsPage() {
         </div>
       </div>
 
-      {/* Dialog Tambah Gerai */}
       <AddOutletDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}

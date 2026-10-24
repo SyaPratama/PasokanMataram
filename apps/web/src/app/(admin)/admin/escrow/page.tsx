@@ -60,7 +60,7 @@ export default function AdminEscrowPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Kemitraan Perbankan BPD DIY &amp; BI</Badge>
-            <span className="text-xs text-gelap/60">Perlindungan Pembeli &amp; Petani 100%</span>
+            <span className="text-xs text-gelap/60">Perlindungan Pembeli &amp; Pemasok 100%</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Pengawasan Rekening Bersama (Escrow) Konsorsium

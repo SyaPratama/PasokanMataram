@@ -28,7 +28,7 @@ const SOP_LIST: SopSection[] = [
     icon: Scale,
     points: [
       'Timbangan digital wajib dikalibrasi harian pukul 02:30 WIB dengan beban uji bertingkat.',
-      'Batas toleransi susut wajar dalam perjalanan darat adalah maksimal \u00B15% dari manifes kebun.',
+      'Batas toleransi susut wajar dalam perjalanan darat adalah maksimal \u00B15% dari manifes supplier.',
       'Pencatatan bobot neto dicetak secara otomatis dan tercatat dalam ledger konsorsium.',
     ],
   },
@@ -65,7 +65,7 @@ export default function HubSopPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Standar Operasional Prosedur Resmi</Badge>
-            <span className="text-xs text-gelap/60">Versi 2.4 - Disahkan Dinas Pertanian DIY</span>
+            <span className="text-xs text-gelap/60">Versi 2.4 - Standar Mutu Pangan DIY</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             SOP Standar Fasilitas Hub Transit

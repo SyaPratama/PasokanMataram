@@ -29,7 +29,7 @@ export interface PriceDataPoint {
 export interface CommodityForecast {
   readonly id: string;
   readonly name: string;
-  readonly category: 'Hortikultura' | 'Pangan Pokok' | 'Perkebunan';
+  readonly category: string;
   readonly originRegion: string;
   readonly unit: string;
   readonly currentPrice: number;

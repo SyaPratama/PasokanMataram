@@ -10,7 +10,7 @@ import { PwaFloatingButton } from '../../components/pwa-floating-button';
 export const metadata: Metadata = {
   title: 'Tentang Misi & Ekosistem Sourcing Pangan DIY | PasokMataram',
   description:
-    'Menjembatani kelompok tani lokal D.I. Yogyakarta dengan pelaku industri kuliner melalui digitalisasi rantai pasok yang berkeadilan, transparan, dan berkelanjutan.',
+    'Menjembatani produsen dan supplier pangan lokal D.I. Yogyakarta dengan pelaku industri kuliner melalui digitalisasi rantai pasok yang berkeadilan, transparan, dan berkelanjutan.',
   alternates: {
     canonical: '/tentang',
   },
@@ -41,7 +41,7 @@ export default function TentangPage() {
                   Kisah, Visi & Komitmen Kemitraan DIY
                 </h1>
                 <p className="text-xs sm:text-sm text-gelap/70 mt-1 max-w-2xl">
-                  Membangun kedaulatan pangan lokal dengan memastikan petani mendapat harga layak dan dapur kuliner menerima pasokan konsisten.
+                  Membangun ketahanan pangan lokal dengan memastikan supplier dan produsen mendapat kepastian pasar dan dapur kuliner menerima pasokan konsisten.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-primer-light/60 text-primer w-fit">

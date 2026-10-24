@@ -77,6 +77,11 @@ export default function LogisticsOperatorsPage() {
     expiresAt: string;
   } | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [origin, setOrigin] = React.useState('');
+
+  React.useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const handleOpenModal = () => {
     setFullName('');
@@ -135,7 +140,7 @@ export default function LogisticsOperatorsPage() {
 
   const handleCopy = () => {
     if (issuedResult && typeof navigator !== 'undefined') {
-      const fullUrl = `${window.location.origin}${issuedResult.activationUrl}`;
+      const fullUrl = origin ? `${origin}${issuedResult.activationUrl}` : issuedResult.activationUrl;
       navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -144,7 +149,6 @@ export default function LogisticsOperatorsPage() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 font-body">
-      {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-netral-border pb-4">
         <div>
           <div className="flex items-center gap-2">
@@ -169,7 +173,6 @@ export default function LogisticsOperatorsPage() {
         </Button>
       </div>
 
-      {/* Tabel Operator Hub */}
       <div className="bg-white rounded-2xl border border-netral-border/80 shadow-2xs overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-netral-border/70 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-gelap">
@@ -245,7 +248,6 @@ export default function LogisticsOperatorsPage() {
         </div>
       </div>
 
-      {/* Modal Dialog Penerbitan Operator */}
       {modalOpen && (
         <div
           role="dialog"
@@ -398,10 +400,16 @@ export default function LogisticsOperatorsPage() {
                       {copied ? 'Tersalin!' : 'Salin Tautan'}
                     </button>
                   </div>
-                  <div className="p-2 bg-white rounded-lg border border-netral-border font-mono text-[11px] break-all text-gelap/80 select-all">
-                    {typeof window !== 'undefined' ? `${window.location.origin}${issuedResult.activationUrl}` : issuedResult.activationUrl}
+                  <div
+                    suppressHydrationWarning
+                    className="p-2 bg-white rounded-lg border border-netral-border font-mono text-[11px] break-all text-gelap/80 select-all"
+                  >
+                    {origin ? `${origin}${issuedResult.activationUrl}` : issuedResult.activationUrl}
                   </div>
-                  <div className="text-[10px] text-gelap/60 flex items-center gap-1">
+                  <div
+                    suppressHydrationWarning
+                    className="text-[10px] text-gelap/60 flex items-center gap-1"
+                  >
                     <Clock className="w-3 h-3 text-sekunder" />
                     Kedaluwarsa: {new Date(issuedResult.expiresAt).toLocaleString('id-ID')}
                   </div>
