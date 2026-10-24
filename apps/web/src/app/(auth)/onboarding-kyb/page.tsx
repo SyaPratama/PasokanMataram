@@ -10,7 +10,7 @@ import { ShieldCheck, FileCheck, Clock, ArrowRight, CheckCircle2 } from 'lucide-
 
 /**
  * Halaman Alur Onboarding Legalitas KYB & Remediasi.
- * Mendukung simulasi peninjauan status PENDING_VERIFICATION maupun remediasi REJECTED.
+ * Mendukung peninjauan status resmi PENDING_VERIFICATION maupun alur pengajuan perbaikan REJECTED.
  */
 export default function OnboardingKybPage() {
   const [kybStatus, setKybStatus] = React.useState<'PENDING_VERIFICATION' | 'REJECTED'>('PENDING_VERIFICATION');

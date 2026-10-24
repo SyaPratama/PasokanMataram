@@ -14,7 +14,7 @@ import {
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 /**
- * Komponen formulir masuk mandiri dan dock peralihan akun demo.
+ * Komponen formulir masuk mandiri untuk seluruh peran ekosistem pangan PasokMataram.
  */
 function LoginForm() {
   const router = useRouter();
