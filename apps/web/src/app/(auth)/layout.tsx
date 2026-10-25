@@ -35,7 +35,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </Link>
 
           <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-netral-border shadow-2xs text-gelap">
-            <div className="w-6 h-6 rounded-lg bg-primer-light/80 border border-primer/20 p-0.5 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 flex items-center justify-center shrink-0">
               <Image
                 src="/icons/icon.svg"
                 alt="Logo PasokMataram"

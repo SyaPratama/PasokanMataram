@@ -223,7 +223,7 @@ export function Navbar() {
             onClick={handleScrollToTop}
             className="flex items-center space-x-2.5 focus-visible:ring-2 focus-visible:ring-primer rounded-full py-1 pr-2 group"
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-primer/10 flex items-center justify-center p-0.5 shadow-2xs border border-primer/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image
                 src="/icons/icon.svg"
                 alt="Logo PasokMataram"
@@ -366,7 +366,7 @@ export function Navbar() {
                   }}
                   className="flex items-center space-x-2.5"
                 >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-primer/10 flex items-center justify-center p-0.5 shadow-sm border border-primer/20">
+                  <div className="w-8 h-8 flex items-center justify-center shrink-0">
                     <Image
                       src="/icons/icon.svg"
                       alt="Logo PasokMataram"

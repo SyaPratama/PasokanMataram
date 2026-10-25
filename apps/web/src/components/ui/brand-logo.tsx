@@ -33,12 +33,8 @@ export function BrandLogo({
   const content = (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       <div
-        className={`rounded-xl flex items-center justify-center p-1 shrink-0 ${
-          variant === 'white'
-            ? 'bg-white/15 border border-white/20'
-            : 'bg-primer-light/80 border border-primer/20 shadow-2xs'
-        }`}
-        style={{ width: `${imageSize + 8}px`, height: `${imageSize + 8}px` }}
+        className="flex items-center justify-center shrink-0"
+        style={{ width: `${imageSize}px`, height: `${imageSize}px` }}
       >
         <Image
           src="/icons/icon.svg"

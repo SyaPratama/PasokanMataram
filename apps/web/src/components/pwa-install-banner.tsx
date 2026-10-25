@@ -56,13 +56,13 @@ export function PwaInstallBanner() {
       <div className="bg-primer-deep text-netral-canvas p-4 sm:p-5 rounded-2xl shadow-2xl border-2 border-primer-pendukung/40 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white border border-netral-border flex items-center justify-center shrink-0 p-1.5 shadow-sm">
+            <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Image
                 src="/icons/icon-192.svg"
                 alt="Logo PasokMataram"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain"
               />
             </div>
             <div>

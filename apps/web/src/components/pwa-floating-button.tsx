@@ -90,7 +90,7 @@ export function PwaFloatingButton() {
             >
               <div className="flex items-start justify-between pb-4 border-b border-netral-border/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-white border border-netral-border/60 shadow-sm flex items-center justify-center p-1 overflow-hidden">
+                  <div className="w-10 h-10 flex items-center justify-center shrink-0">
                     <Image
                       src="/icons/icon-192.svg"
                       alt="Ikon PasokMataram PWA"
