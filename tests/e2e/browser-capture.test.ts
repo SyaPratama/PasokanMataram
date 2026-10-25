@@ -45,7 +45,7 @@ describe('Browser & Web Capture Automated Test', () => {
     expect(html).toContain('Digitalisasi Rantai Pasok Pangan');
     expect(html).toContain('One-Stop Supplier Pangan DIY');
     expect(html).toContain('href="/register"');
-    expect(html).toContain('href="/onboarding-kyb"');
+    expect(html).toContain('href="/buyer/legalitas"');
 
     // Validasi skip link aksesibilitas (antislop-human)
     expect(html).toContain('href="#main-content"');
@@ -121,12 +121,12 @@ describe('Browser & Web Capture Automated Test', () => {
     expect(html).toContain('Pemasok Gapoktan');
   });
 
-  it('berhasil memvalidasi komponen onboarding KYB (GET /onboarding-kyb)', async () => {
-    const response = await fetch(`${BASE_URL}/onboarding-kyb`);
+  it('berhasil memvalidasi komponen legalitas KYB di dashboard (GET /buyer/legalitas)', async () => {
+    const response = await fetch(`${BASE_URL}/buyer/legalitas?sandbox=true&persona=BUYER`);
     expect(response.status).toBe(200);
 
     const html = await response.text();
-    expect(html).toContain('Verifikasi Kepatuhan');
+    expect(html).toContain('Legalitas');
     expect(html).toContain('KYB');
     expect(html).toContain('PDF atau WebP');
   });

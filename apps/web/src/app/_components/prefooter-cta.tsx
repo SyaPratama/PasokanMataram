@@ -52,7 +52,7 @@ export function PreFooterCtaSection() {
               </Link>
 
               <Link
-                href="/onboarding-kyb"
+                href="/buyer/legalitas"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 text-xs sm:text-sm font-semibold rounded-full bg-white/15 text-white hover:bg-white/25 border border-white/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white min-h-[44px]"
               >
                 Lanjutkan Verifikasi Berkas

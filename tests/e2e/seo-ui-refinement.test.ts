@@ -70,7 +70,7 @@ describe('Minggu 1.6: UI Refinement, Asset Localization & Enterprise Technical S
     expect(sitemapContent).toContain("priority: 0.9");
     expect(sitemapContent).toContain("priority: 0.8");
     expect(sitemapContent).toContain("/register");
-    expect(sitemapContent).toContain("/onboarding-kyb");
+    expect(sitemapContent).not.toContain("/onboarding-kyb");
   });
 
   it('memverifikasi komponen Structured Data JSON-LD (Organization, BreadcrumbList, Product, AggregateOffer)', () => {
