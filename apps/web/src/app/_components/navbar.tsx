@@ -212,10 +212,10 @@ export function Navbar() {
       >
         <div
           ref={dropdownRef}
-          className={`max-w-7xl mx-auto rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between pointer-events-auto transition-all duration-200 ${
+          className={`max-w-7xl mx-auto rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between pointer-events-auto transition-all duration-200 bg-white border ${
             isScrolled
-              ? 'bg-white/98 backdrop-blur-lg border border-netral-border shadow-md'
-              : 'bg-white/95 backdrop-blur-md border border-netral-border/80 shadow-xs'
+              ? 'shadow-md border-netral-border'
+              : 'shadow-sm border-netral-border/80'
           }`}
         >
           <Link

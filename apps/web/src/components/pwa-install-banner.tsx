@@ -1,27 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { usePwaInstall } from '../hooks/use-pwa-install';
 import { Download, X, Share2, PlusSquare, Smartphone } from 'lucide-react';
 
+const PWA_DISMISSED_KEY = 'pasokmataram_pwa_banner_dismissed';
+
 export function PwaInstallBanner() {
   const { isInstallable, canPromptDirectly, isInstalled, isIos, promptInstall } = usePwaInstall();
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(true);
   const [showIosGuide, setShowIosGuide] = useState(false);
+
+  useEffect(() => {
+    try {
+      const dismissed = typeof window !== 'undefined' ? localStorage.getItem(PWA_DISMISSED_KEY) : null;
+      if (dismissed === 'true') {
+        setIsDismissed(true);
+      } else {
+        setIsDismissed(false);
+      }
+    } catch {
+      setIsDismissed(false);
+    }
+  }, []);
 
   if (isDismissed || isInstalled || !isInstallable) {
     return null;
   }
 
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(PWA_DISMISSED_KEY, 'true');
+      }
+    } catch {}
+  };
+
   const handleInstallClick = async () => {
     if (canPromptDirectly) {
-      await promptInstall();
+      const success = await promptInstall();
+      if (success) {
+        handleDismiss();
+      }
     } else if (isIos) {
       setShowIosGuide(true);
     }
   };
-
   return (
     <aside
       aria-label="Pemasangan Aplikasi Dapur ke Layar Utama"
@@ -50,7 +76,7 @@ export function PwaInstallBanner() {
           </div>
           <button
             type="button"
-            onClick={() => setIsDismissed(true)}
+            onClick={handleDismiss}
             aria-label="Tutup pemberitahuan pasang aplikasi"
             className="min-w-12 min-h-12 w-12 h-12 flex items-center justify-center rounded-xl text-netral-muted hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
@@ -106,9 +132,9 @@ export function PwaInstallBanner() {
               <span>{isIos ? 'Lihat Panduan Pasang di HP' : 'Pasang Sekarang'}</span>
             </button>
             <button
-              type="button"
-              onClick={() => setIsDismissed(true)}
-              className="min-h-12 px-4 py-3 text-sm font-semibold text-netral-muted hover:text-white transition-colors rounded-xl flex items-center justify-center"
+            type="button"
+            onClick={handleDismiss}
+            className="min-h-12 px-4 py-3 text-sm font-semibold text-netral-muted hover:text-white transition-colors rounded-xl flex items-center justify-center"
             >
               Nanti Saja
             </button>
