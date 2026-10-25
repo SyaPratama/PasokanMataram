@@ -69,7 +69,7 @@ describe('Browser & Web Capture Automated Test', () => {
 
     expect(html).toContain('5 Kabupaten/Kota');
     expect(html).toContain('Kulon Progo, Bantul, Sleman, Gunungkidul');
-    expect(html).toContain('Mulai Pendaftaran KYB');
+    expect(html).toContain('Lihat Komoditas Pangan');
   });
 
   it('berhasil memvalidasi Story Mission 2-kolom dengan foto tumpang tindih', async () => {

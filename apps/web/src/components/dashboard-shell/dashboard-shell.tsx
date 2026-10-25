@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import { StatusBadge } from '../shared/status-badge';
+import { NotificationCenter } from '../notifications/notification-center';
 import type { DashboardShellProps } from './types';
 
 export function DashboardShell({
@@ -175,14 +176,7 @@ export function DashboardShell({
             {topBarMeta.titleMeta}
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
-            <button
-              type="button"
-              className="p-2 rounded-lg text-gelap/60 hover:text-primer hover:bg-netral-canvas relative min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-              aria-label={topBarMeta.notificationAriaLabel || 'Pemberitahuan Sistem'}
-            >
-              <Bell className="w-4 h-4" aria-hidden="true" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sekunder" />
-            </button>
+            <NotificationCenter />
             <div className="h-4 w-px bg-netral-border" />
             <span className="text-xs font-semibold text-primer flex items-center gap-1.5 whitespace-nowrap shrink-0">
               <ShieldCheck className="w-4 h-4 text-primer flex-shrink-0" aria-hidden="true" />
@@ -213,6 +207,7 @@ export function DashboardShell({
             <span className="text-[11px] font-semibold text-primer bg-primer-light/80 px-2.5 py-1 rounded-full border border-primer/20 whitespace-nowrap shrink-0">
               {portalBadge.label}
             </span>
+            <NotificationCenter />
           </div>
         </div>
 

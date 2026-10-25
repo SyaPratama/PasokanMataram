@@ -206,8 +206,9 @@ export function PaymentGatewaySimulatorModal({
       aria-labelledby="solosmartpay-sim-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/60 backdrop-blur-xs animate-in fade-in"
     >
-      <div className="bg-white rounded-3xl max-w-2xl w-full border-2 border-netral-border shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b-2 border-netral-border pb-4">
+      <div className="bg-white rounded-3xl max-w-2xl w-full border-2 border-netral-border shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+          <div className="flex items-center justify-between border-b-2 border-netral-border pb-4">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-primer-light text-primer rounded-2xl border border-primer/20">
               <CreditCard className="w-6 h-6" />
@@ -248,24 +249,32 @@ export function PaymentGatewaySimulatorModal({
               </p>
             </div>
             <div className="p-3 bg-white rounded-xl border border-primer/20 text-xs font-mono font-bold text-primer">
-              STATUS: ESCROW_HELD | ZERO DB MUTATION
+              STATUS: ESCROW_HELD
             </div>
           </div>
         ) : (
           <div className="space-y-6">
             <div>
               <label htmlFor="sim-amount-input" className="block text-sm font-bold text-gelap mb-2">
-                Nominal Transaksi Dasar Belanja (Rupiah)
+                Nominal Transaksi Dasar Belanja
               </label>
-              <input
-                id="sim-amount-input"
-                type="number"
-                min="100000"
-                step="50000"
-                value={amountRp}
-                onChange={(e) => setAmountRp(Number(e.target.value))}
-                className="w-full px-4 py-3 border-2 border-netral-border rounded-2xl text-xl font-bold font-mono text-gelap focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/30 min-h-[48px]"
-              />
+              <div className="relative flex items-center">
+                <span className="absolute left-4 font-mono font-extrabold text-xl text-primer select-none pointer-events-none">
+                  Rp
+                </span>
+                <input
+                  id="sim-amount-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={amountRp > 0 ? amountRp.toLocaleString('id-ID') : ''}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, '');
+                    setAmountRp(raw ? parseInt(raw, 10) : 0);
+                  }}
+                  placeholder="0"
+                  className="w-full pl-14 pr-4 py-3 border-2 border-netral-border rounded-2xl text-xl font-bold font-mono text-gelap focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/30 min-h-[48px] tabular-nums"
+                />
+              </div>
               {isBelowMtv && (
                 <div className="mt-2 p-3 rounded-xl bg-status-warning/15 border-2 border-status-warning/40 text-status-warning text-xs font-semibold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -377,7 +386,7 @@ export function PaymentGatewaySimulatorModal({
                       className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-netral-border bg-white hover:bg-netral-canvas text-xs font-bold text-gelap min-h-[48px]"
                     >
                       {copied ? <Check className="w-4 h-4 text-primer" /> : <Copy className="w-4 h-4" />}
-                      <span>{copied ? 'Tersalin' : 'Salin String EMVCo'}</span>
+                      <span>{copied ? 'Tersalin' : 'Salin QRIS'}</span>
                     </button>
                   </div>
                 </div>
@@ -422,14 +431,15 @@ export function PaymentGatewaySimulatorModal({
               >
                 <span>
                   {isProcessing
-                    ? 'Memproses Verifikasi HMAC...'
-                    : 'Simulasikan Pembayaran Berhasil (Bayar via Sandbox)'}
+                    ? 'Memverifikasi...'
+                    : 'Bayar via Sandbox'}
                 </span>
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
