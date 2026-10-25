@@ -26,7 +26,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build --workspace=@pasok/web
+RUN npx turbo run build --filter=@pasok/web...
 
 FROM base AS runner
 WORKDIR /app

@@ -24,10 +24,7 @@ import {
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
-  useTransform,
-  useSpring,
 } from 'framer-motion';
-
 interface NavItem {
   href: string;
   label: string;
@@ -198,49 +195,35 @@ export function Navbar() {
 
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hasBanner, setHasBanner] = useState(false);
-
-  useEffect(() => {
-    const banner = document.getElementById('quick-sim-banner');
-    setHasBanner(!!banner);
-  }, []);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setIsScrolled(latest > 20);
   });
 
-  const rawY = useTransform(scrollY, [0, 40], [hasBanner ? 36 : 0, 0]);
-  const smoothY = useSpring(rawY, { stiffness: 350, damping: 32, mass: 0.8 });
-
   return (
     <>
-      <div className="h-[68px] sm:h-[72px]" aria-hidden="true" />
+      <div className="h-[76px] sm:h-[84px]" aria-hidden="true" />
 
       <motion.header
-        style={{ y: smoothY }}
-        initial={{ y: -30, opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 pointer-events-none"
+        initial={{ y: -16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 right-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3.5 sm:pt-4 pb-2 pointer-events-none"
       >
-        <motion.div
+        <div
           ref={dropdownRef}
-          animate={{
-            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.92)',
-            boxShadow: isScrolled
-              ? '0 12px 30px -10px rgba(46, 83, 57, 0.18), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-              : '0 2px 6px 0 rgba(0, 0, 0, 0.04)',
-            borderColor: isScrolled ? 'rgba(216, 198, 174, 0.95)' : 'rgba(216, 198, 174, 0.7)',
-          }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-7xl mx-auto backdrop-blur-md rounded-full px-5 py-2.5 flex items-center justify-between border pointer-events-auto"
+          className={`max-w-7xl mx-auto rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between pointer-events-auto transition-all duration-200 bg-white border ${
+            isScrolled
+              ? 'shadow-md border-netral-border'
+              : 'shadow-sm border-netral-border/80'
+          }`}
         >
           <Link
             href="/"
             onClick={handleScrollToTop}
-            className="flex items-center space-x-2.5 focus-visible:ring-2 focus-visible:ring-primer rounded-full py-1 pr-2"
+            className="flex items-center space-x-2.5 focus-visible:ring-2 focus-visible:ring-primer rounded-full py-1 pr-2 group"
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-primer/10 flex items-center justify-center p-0.5 shadow-sm border border-primer/20">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-primer/10 flex items-center justify-center p-0.5 shadow-2xs border border-primer/20 group-hover:scale-105 transition-transform">
               <Image
                 src="/icons/icon.svg"
                 alt="Logo PasokMataram"
@@ -250,19 +233,18 @@ export function Navbar() {
                 priority
               />
             </div>
-            <span className="font-heading font-extrabold text-lg text-gelap tracking-tight">
+            <span className="font-heading font-extrabold text-lg text-gelap tracking-tight group-hover:text-primer transition-colors">
               Pasok<span className="text-primer">Mataram</span>
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-3 text-xs font-semibold text-gelap/85" aria-label="Navigasi Utama">
+          <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gelap/85" aria-label="Navigasi Utama">
             <Link
               href="/"
-              className="hover:text-primer transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3 text-gelap/80 hover:bg-netral-canvas"
+              className="hover:text-primer transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 text-gelap/80 hover:bg-primer-light/40"
             >
               Beranda
             </Link>
-
             {NAV_GROUPS.map((group) => {
               const isOpen = activeDropdown === group.id;
               return (
@@ -272,10 +254,10 @@ export function Navbar() {
                     onClick={() => handleDropdownToggle(group.id)}
                     aria-expanded={isOpen}
                     aria-haspopup="true"
-                    className={`inline-flex items-center gap-1 py-2 px-3 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-primer min-h-[44px] ${
+                    className={`inline-flex items-center gap-1.5 py-2 px-3.5 rounded-full text-xs sm:text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-primer min-h-[44px] ${
                       isOpen
-                        ? 'text-primer bg-primer-light/60 font-bold'
-                        : 'text-gelap/80 hover:text-primer hover:bg-netral-canvas'
+                        ? 'text-primer bg-primer-light/70 font-bold shadow-2xs'
+                        : 'text-gelap/80 hover:text-primer hover:bg-primer-light/40'
                     }`}
                   >
                     <span>{group.title}</span>
@@ -289,7 +271,7 @@ export function Navbar() {
                   <div
                     id={`nav-dropdown-${group.id}`}
                     role="menu"
-                    className={`absolute top-full left-0 mt-2.5 w-80 bg-white rounded-2xl border border-netral-border/80 shadow-xl p-2 z-50 overflow-hidden transition-all duration-200 ${
+                    className={`absolute top-full left-0 mt-3 w-80 sm:w-84 bg-white rounded-2xl border border-netral-border/90 shadow-xl p-2.5 z-50 overflow-hidden transition-all duration-200 origin-top ${
                       isOpen
                         ? 'opacity-100 visible translate-y-0 pointer-events-auto'
                         : 'opacity-0 invisible -translate-y-2 pointer-events-none'
@@ -304,7 +286,7 @@ export function Navbar() {
                             href={item.href}
                             role="menuitem"
                             onClick={(e) => handleScrollToSection(e, item.sectionId, item.href)}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-netral-canvas transition-colors group/item focus-visible:ring-2 focus-visible:ring-primer"
+                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-primer-light/40 transition-colors group/item focus-visible:ring-2 focus-visible:ring-primer"
                           >
                             <div className="w-8 h-8 rounded-lg bg-primer-light text-primer flex items-center justify-center shrink-0 mt-0.5 group-hover/item:bg-primer group-hover/item:text-white transition-colors">
                               <IconComponent className="w-4 h-4" />
@@ -315,7 +297,7 @@ export function Navbar() {
                                 <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity text-primer" />
                               </div>
                               {item.desc && (
-                                <p className="text-[11px] text-gelap/60 leading-tight mt-0.5 font-normal">
+                                <p className="text-[11px] text-gelap/65 leading-snug mt-0.5 font-normal">
                                   {item.desc}
                                 </p>
                               )}
@@ -333,13 +315,13 @@ export function Navbar() {
           <div className="hidden lg:flex items-center space-x-3">
             <Link
               href="/login"
-              className="text-xs font-semibold text-gelap hover:text-primer transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3 min-h-[44px] flex items-center"
+              className="text-xs sm:text-sm font-semibold text-gelap/85 hover:text-primer hover:bg-netral-canvas transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 min-h-[44px] flex items-center"
             >
               Masuk Portal
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold font-heading rounded-full bg-primer text-white hover:bg-primer-hover shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-primer min-h-[44px]"
+              className="inline-flex items-center justify-center px-5 py-2.5 text-xs sm:text-sm font-bold font-heading rounded-full bg-primer text-white hover:bg-primer-hover shadow-xs hover:shadow-sm transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-primer min-h-[44px]"
             >
               Daftar Kemitraan
             </Link>
@@ -353,7 +335,7 @@ export function Navbar() {
           >
             {mobileMenuOpen ? <X className="w-5 h-5 text-gelap" /> : <Menu className="w-5 h-5 text-gelap" />}
           </button>
-        </motion.div>
+        </div>
       </motion.header>
 
       <AnimatePresence>

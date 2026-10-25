@@ -19,6 +19,7 @@
     "test:watch": "vitest",
     "test:e2e": "vitest run tests/e2e",
     "db:migrate": "node scripts/migrate.mjs",
+    "db:sandbox:reset": "node scripts/db-clean-sandbox.mjs",
     "audit:cleanliness": "node scripts/audit-cleanliness.mjs"
   },
   "dependencies": {

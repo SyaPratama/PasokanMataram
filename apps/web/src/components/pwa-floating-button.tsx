@@ -45,8 +45,7 @@ export function PwaFloatingButton() {
         >
           <div className="relative">
             <Tablet className="w-5 h-5 text-aksen" aria-hidden="true" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sekunder animate-ping" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sekunder" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-sekunder" />
           </div>
           <span className="text-xs font-bold font-heading tracking-wide hidden sm:inline">
             Aplikasi Dapur PWA

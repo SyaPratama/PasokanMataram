@@ -128,7 +128,7 @@ export default function BuyerDashboardPage() {
                 <Wallet className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-primer font-heading">
+            <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight tabular-nums">
               Rp 24.500.000
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
@@ -143,7 +143,7 @@ export default function BuyerDashboardPage() {
                 <CookingPot className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-primer font-heading">
+            <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight">
               320 <span className="text-xs font-medium text-gelap/80">Kilogram</span>
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
@@ -160,7 +160,7 @@ export default function BuyerDashboardPage() {
                 <TrendingDown className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-sekunder font-heading">
+            <div className="text-xl sm:text-2xl font-bold text-sekunder font-heading whitespace-nowrap tracking-tight tabular-nums">
               Rp 1.840.000
             </div>
             <div className="text-[11px] text-gelap/85 flex items-center font-medium">
@@ -175,7 +175,7 @@ export default function BuyerDashboardPage() {
                 <Sparkles className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gelap font-heading">
+            <div className="text-xl sm:text-2xl font-bold text-gelap font-heading whitespace-nowrap tracking-tight">
               8 <span className="text-xs font-medium text-gelap/80">Menu Terhubung</span>
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">

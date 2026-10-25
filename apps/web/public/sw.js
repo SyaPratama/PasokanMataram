@@ -1,4 +1,12 @@
-const CACHE_NAME = 'pasokmataram-pwa-v1.5';
+/**
+ * Service Worker PasokMataram PWA v2.0
+ * Strategi:
+ * - Navigasi (HTML): Network-First (mencegah FOUC).
+ * - Aset Statis (CSS/JS/Icons): Stale-While-Revalidate.
+ * - API & RSC: Network-Only / Bypass.
+ */
+
+const CACHE_NAME = 'pasokmataram-pwa-v2.0';
 
 const STATIC_ASSETS = [
   '/',
@@ -43,21 +51,48 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (
+    request.headers.get('RSC') === '1' ||
+    url.searchParams.has('_rsc') ||
+    url.pathname.includes('webpack-hmr')
+  ) {
+    return;
+  }
+
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
+      fetch(request).catch(() => {
+        return new Response(
+          JSON.stringify({
+            error: 'OFFLINE_MODE',
+            message: 'Perangkat sedang luring. Silakan periksa koneksi internet dapur Anda.',
+          }),
+          {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      })
+    );
+    return;
+  }
+
+  if (request.mode === 'navigate') {
+    event.respondWith(
       fetch(request)
-        .then((response) => response)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
         .catch(() => {
-          return new Response(
-            JSON.stringify({
-              error: 'OFFLINE_MODE',
-              message: 'Perangkat sedang luring. Silakan periksa koneksi internet dapur Anda.',
-            }),
-            {
-              status: 503,
-              headers: { 'Content-Type': 'application/json' },
-            }
-          );
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || caches.match('/');
+          });
         })
     );
     return;

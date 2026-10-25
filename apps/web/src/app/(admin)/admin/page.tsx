@@ -66,7 +66,7 @@ export default function AdminOverviewPage() {
               <Banknote className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-heading text-gelap mt-2">Rp 482.500.000</div>
+          <div className="text-xl sm:text-2xl font-bold font-heading text-gelap mt-2 whitespace-nowrap tracking-tight tabular-nums">Rp 482.500.000</div>
           <p className="text-[11px] text-gelap/60 mt-1">Terproteksi Bank Indonesia &amp; BPD DIY</p>
         </div>
 

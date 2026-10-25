@@ -5,6 +5,8 @@
  * - Organization: Entitas PasokMataram & Wilayah D.I. Yogyakarta
  * - BreadcrumbList: Hirarki navigasi remah roti untuk Google Sitelinks
  * - Product & AggregateOffer: Katalog kuota pooling pangan sentra DIY
+ * - WebSite: Definisi situs dengan SearchAction
+ * - FAQPage: Daftar pertanyaan umum operasional pengadaan & escrow
  */
 
 import React from 'react';
@@ -124,6 +126,61 @@ export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonL
     publisher: {
       '@id': `${baseUrl}/#organization`,
     },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/#komoditas?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Bagaimana jika kualitas atau timbangan komoditas saat tiba di dapur tidak sesuai?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Dana pembelian tertahan aman di rekening escrow bersama. Saat pengiriman tiba pukul subuh, staf dapur melakukan pemeriksaan fisik dan penimbangan digital bersama kurir. Jika ditemukan selisih timbangan atau penurunan grade mutu, bukti unboxing diajukan di aplikasi dan sistem escrow secara otomatis menyesuaikan nilai pembayaran sebelum dana dirilis ke supplier atau Gapoktan.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Apakah kafe atau warung makan dengan kebutuhan di bawah 50 kg bisa bergabung?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Bisa. Justru inilah tujuan utama mekanisme pooling. PasokMataram mengagregasi pesanan 20-50 kg dari puluhan kafe independen di Sleman, Bantul, dan Kota Yogyakarta menjadi 1 kuota muatan langsung dari sentra produsen. Anda tetap mendapatkan harga grosir tanpa harus membeli 1 ton sendirian.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Berapa lama proses verifikasi kepatuhan (KYB) setelah dokumen diunggah?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Tim verifikasi kepatuhan kami memproses berkas legalitas NIB (HoReKa) atau NIB/Sertifikasi Mutu (Supplier) maksimal 1x24 jam kerja. Setelah akun berstatus diverifikasi, portal pemesanan dan penguncian kuota dapat langsung diakses penuh.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Kapan komoditas dikirimkan ke alamat dapur restoran?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Komoditas yang dipanen pagi hari akan masuk ke Hub Transit Bantul pada sore hari untuk uji petik kadar air dan sortir fisik. Armada distribusi diberangkatkan subuh pukul 04:00 - 08:00 pagi langsung ke dapur restoran Anda agar bahan pangan siap diolah sebelum operasional resto dibuka.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Apakah ada biaya langganan bulanan untuk mendaftar sebagai mitra?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Tidak ada biaya pendaftaran maupun langganan bulanan. PasokMataram menggunakan skema komisi transaksi transparan pada harga agregasi tanpa markup tersembunyi.',
+        },
+      },
+    ],
   };
 
   return (
@@ -143,6 +200,10 @@ export function EnterpriseJsonLd({ baseUrl = 'https://pasokmataram.com' }: JsonL
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
     </>
   );

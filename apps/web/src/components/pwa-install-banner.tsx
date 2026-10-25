@@ -1,36 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { usePwaInstall } from '../hooks/use-pwa-install';
 import { Download, X, Share2, PlusSquare, Smartphone } from 'lucide-react';
 
+const PWA_DISMISSED_KEY = 'pasokmataram_pwa_banner_dismissed';
+
 export function PwaInstallBanner() {
   const { isInstallable, canPromptDirectly, isInstalled, isIos, promptInstall } = usePwaInstall();
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(true);
   const [showIosGuide, setShowIosGuide] = useState(false);
+
+  useEffect(() => {
+    try {
+      const dismissed = typeof window !== 'undefined' ? localStorage.getItem(PWA_DISMISSED_KEY) : null;
+      if (dismissed === 'true') {
+        setIsDismissed(true);
+      } else {
+        setIsDismissed(false);
+      }
+    } catch {
+      setIsDismissed(false);
+    }
+  }, []);
 
   if (isDismissed || isInstalled || !isInstallable) {
     return null;
   }
 
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(PWA_DISMISSED_KEY, 'true');
+      }
+    } catch {}
+  };
+
   const handleInstallClick = async () => {
     if (canPromptDirectly) {
-      await promptInstall();
+      const success = await promptInstall();
+      if (success) {
+        handleDismiss();
+      }
     } else if (isIos) {
       setShowIosGuide(true);
     }
   };
-
   return (
     <aside
       aria-label="Pemasangan Aplikasi Dapur ke Layar Utama"
       className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-lg z-50 animate-fade-in"
     >
-      <div className="bg-primer-deep text-netral-canvas p-5 md:p-6 rounded-2xl shadow-2xl border-2 border-primer-pendukung/40 flex flex-col gap-4">
+      <div className="bg-primer-deep text-netral-canvas p-4 sm:p-5 rounded-2xl shadow-2xl border-2 border-primer-pendukung/40 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primer-darkest flex items-center justify-center shrink-0 p-1 border border-primer-pendukung/30 shadow-inner">
+            <div className="w-12 h-12 rounded-xl bg-white border border-netral-border flex items-center justify-center shrink-0 p-1.5 shadow-sm">
               <Image
                 src="/icons/icon-192.svg"
                 alt="Logo PasokMataram"
@@ -43,14 +69,14 @@ export function PwaInstallBanner() {
               <span className="text-xs font-bold uppercase tracking-wider text-aksen block">
                 Aplikasi Dapur PasokMataram
               </span>
-              <h2 className="text-base md:text-lg font-bold text-white leading-tight">
+              <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
                 Pasang di Layar Utama HP / Tablet Dapur
               </h2>
             </div>
           </div>
           <button
             type="button"
-            onClick={() => setIsDismissed(true)}
+            onClick={handleDismiss}
             aria-label="Tutup pemberitahuan pasang aplikasi"
             className="min-w-12 min-h-12 w-12 h-12 flex items-center justify-center rounded-xl text-netral-muted hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
@@ -103,12 +129,12 @@ export function PwaInstallBanner() {
               ) : (
                 <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
               )}
-              <span>{isIos ? 'Lihat Panduan Pasang di HP' : 'Pasang Aplikasi ke Layar Utama Dapur'}</span>
+              <span>{isIos ? 'Lihat Panduan Pasang di HP' : 'Pasang Sekarang'}</span>
             </button>
             <button
-              type="button"
-              onClick={() => setIsDismissed(true)}
-              className="min-h-12 px-4 py-3 text-sm font-semibold text-netral-muted hover:text-white transition-colors rounded-xl flex items-center justify-center"
+            type="button"
+            onClick={handleDismiss}
+            className="min-h-12 px-4 py-3 text-sm font-semibold text-netral-muted hover:text-white transition-colors rounded-xl flex items-center justify-center"
             >
               Nanti Saja
             </button>
