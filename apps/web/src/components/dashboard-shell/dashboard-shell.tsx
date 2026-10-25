@@ -59,7 +59,7 @@ export function DashboardShell({
       <aside className="hidden md:flex flex-col w-72 bg-white border-r border-netral-border/80 shadow-2xs flex-shrink-0 md:h-screen md:max-h-screen md:sticky md:top-0 md:self-start overflow-hidden">
         <div className="p-5 border-b border-netral-border/70 flex items-center justify-between flex-shrink-0">
           <Link href="/" className="flex items-center space-x-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-lg">
-            <div className="w-8 h-8 rounded-xl bg-primer-light/80 border border-primer/20 flex items-center justify-center p-1 shrink-0 shadow-2xs">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0">
               <Image
                 src="/icons/icon.svg"
                 alt="Logo PasokMataram"
@@ -190,7 +190,7 @@ export function DashboardShell({
             href="/"
             className="flex items-center space-x-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-lg"
           >
-            <div className="w-7 h-7 rounded-lg bg-primer-light/80 border border-primer/20 flex items-center justify-center p-1 shrink-0 shadow-2xs">
+            <div className="w-7 h-7 flex items-center justify-center shrink-0">
               <Image
                 src="/icons/icon.svg"
                 alt="Logo PasokMataram"
@@ -226,7 +226,7 @@ export function DashboardShell({
             <div className="relative w-4/5 max-w-xs bg-white h-full shadow-2xl flex flex-col z-10 overflow-hidden">
               <div className="p-4 border-b border-netral-border flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center space-x-2">
-                  <div className="w-7 h-7 rounded-lg bg-primer-light/80 border border-primer/20 flex items-center justify-center p-0.5 shrink-0 shadow-2xs">
+                  <div className="w-7 h-7 flex items-center justify-center shrink-0">
                     <Image
                       src="/icons/icon.svg"
                       alt="Logo PasokMataram"
