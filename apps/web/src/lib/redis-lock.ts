@@ -95,9 +95,7 @@ export async function acquireLock(
       }
     }
 
-    const { promise: delayPromise, resolve: delayResolve } = Promise.withResolvers<void>();
-    setTimeout(delayResolve, cacheConfig.retryIntervalMs);
-    await delayPromise;
+    await new Promise<void>((resolve) => setTimeout(resolve, cacheConfig.retryIntervalMs));
   }
 
   return null;
