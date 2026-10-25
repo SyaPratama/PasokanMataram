@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Clock, Plus, Filter, FileText, CheckCircle2, X } from 'lucide-react';
 import { StatusBadge } from '../../../components/shared/status-badge';
+import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { StandingOrderSchema, type StandingOrder } from '@pasok/domain';
@@ -68,7 +69,17 @@ export default function BuyerOrdersPage() {
   const [unitPrice, setUnitPrice] = React.useState<number>(30000);
   const [deliveryTime, setDeliveryTime] = React.useState('05:00 WIB');
   const [notification, setNotification] = React.useState<string | null>(null);
+  const [isKybVerified, setIsKybVerified] = React.useState<boolean>(true);
+  const [isKybModalOpen, setIsKybModalOpen] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
+      if (match && match[1]) {
+        setIsKybVerified(match[1] === 'VERIFIED');
+      }
+    }
+  }, []);
   const totalContracts = orders.length;
   const totalVolumeWeekly = orders.reduce((sum, o) => sum + o.dailyVolumeKg * 7, 0);
   const totalSpendWeekly = orders.reduce((sum, o) => sum + o.totalWeeklyIdr, 0);
@@ -122,7 +133,13 @@ export default function BuyerOrdersPage() {
           </button>
           <button
             type="button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              if (!isKybVerified) {
+                setIsKybModalOpen(true);
+                return;
+              }
+              setIsModalOpen(true);
+            }}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primer text-white text-xs font-bold hover:bg-primer-hover min-h-[44px] shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
@@ -383,6 +400,11 @@ export default function BuyerOrdersPage() {
           </div>
         </div>
       )}
+      <KybBlockerModal
+        isOpen={isKybModalOpen}
+        onClose={() => setIsKybModalOpen(false)}
+        actionAttempted="Penerbitan Kontrak Standing Order Rutin"
+      />
     </div>
   );
 }

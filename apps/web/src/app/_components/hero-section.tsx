@@ -81,12 +81,12 @@ export function HeroSection() {
                 </Link>
 
                 <Link
-                  href="/onboarding-kyb"
-                  aria-label="Mulai Pendaftaran KYB"
+                  href="/komoditas"
+                  aria-label="Lihat Komoditas Pangan"
                   className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-semibold rounded-full bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all focus-visible:ring-2 focus-visible:ring-white min-h-[48px]"
                 >
-                  <span>Verifikasi Usaha</span>
-                  <ShieldCheck className="w-4 h-4 ml-2 text-white" aria-hidden="true" />
+                  <span>Lihat Komoditas Pangan</span>
+                  <ArrowRight className="w-4 h-4 ml-2 text-white" aria-hidden="true" />
                 </Link>
               </div>
 

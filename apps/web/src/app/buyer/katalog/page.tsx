@@ -20,6 +20,7 @@ import {
   MOCK_LOCAL_SUPPLIERS,
   MOCK_B2B_REVIEWS,
 } from '../../../lib/supplier-ecosystem-mock';
+import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
 import type { SupplierProduct, SupplierProfile, B2BReview } from '@pasok/domain';
 
 const CATEGORIES = [
@@ -36,7 +37,17 @@ export default function BuyerKatalogPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeSupplierModal, setActiveSupplierModal] = React.useState<SupplierProfile | null>(null);
   const [orderNotice, setOrderNotice] = React.useState<string | null>(null);
+  const [isKybVerified, setIsKybVerified] = React.useState<boolean>(true);
+  const [isKybModalOpen, setIsKybModalOpen] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
+      if (match && match[1]) {
+        setIsKybVerified(match[1] === 'VERIFIED');
+      }
+    }
+  }, []);
   const filteredProducts = MOCK_ECOSYSTEM_PRODUCTS.filter((item) => {
     const matchCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
     const matchSearch =
@@ -52,6 +63,10 @@ export default function BuyerKatalogPage() {
   };
 
   const handleQuickAdd = (productName: string) => {
+    if (!isKybVerified) {
+      setIsKybModalOpen(true);
+      return;
+    }
     setOrderNotice(`"${productName}" berhasil ditambahkan ke Faktur Terpadu Dapur!`);
     setTimeout(() => setOrderNotice(null), 3000);
   };
@@ -318,6 +333,12 @@ export default function BuyerKatalogPage() {
           </div>
         </div>
       )}
+
+      <KybBlockerModal
+        isOpen={isKybModalOpen}
+        onClose={() => setIsKybModalOpen(false)}
+        actionAttempted="Pemesanan Komoditas ke Faktur Dapur"
+      />
     </div>
   );
 }

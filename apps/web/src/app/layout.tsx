@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
 import { PwaRegistrar } from '../components/pwa-registrar';
 import { PwaInstallBanner } from '../components/pwa-install-banner';
 import { EnterpriseJsonLd } from '../components/seo/json-ld';
+import { SandboxProvider } from '../components/sandbox/sandbox-context';
+import { SandboxBanner } from '../components/sandbox/sandbox-banner';
 import '../styles/globals.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -137,9 +139,12 @@ export default function RootLayout({
         className="min-h-screen flex flex-col font-body bg-netral-canvas text-gelap antialiased"
       >
         <EnterpriseJsonLd baseUrl={appUrl} />
-        <PwaRegistrar />
-        <PwaInstallBanner />
-        {children}
+        <SandboxProvider>
+          <SandboxBanner />
+          <PwaRegistrar />
+          <PwaInstallBanner />
+          {children}
+        </SandboxProvider>
       </body>
     </html>
   );

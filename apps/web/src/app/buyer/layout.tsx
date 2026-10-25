@@ -73,7 +73,7 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
           href: '/buyer/forecast',
           icon: TrendingUp,
           active: pathname === '/buyer/forecast',
-          badge: 'ML v2.1',
+          badge: 'Tren DIY',
         },
         {
           name: 'Katalog Komoditas',
@@ -123,9 +123,9 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
         },
         {
           name: 'Legalitas & KYB',
-          href: '/onboarding-kyb',
+          href: '/buyer/legalitas',
           icon: ShieldCheck,
-          active: pathname === '/onboarding-kyb',
+          active: pathname === '/buyer/legalitas',
         },
         {
           name: 'Pusat Bantuan',
@@ -136,10 +136,37 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
       ],
     },
   ];
+  const bottomNavItems = [
+    {
+      name: 'Beranda',
+      href: '/buyer/dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/buyer/dashboard',
+    },
+    {
+      name: 'Katalog',
+      href: '/buyer/katalog',
+      icon: ShoppingBag,
+      active: pathname === '/buyer/katalog',
+    },
+    {
+      name: 'Pooling',
+      href: '/buyer/pooling',
+      icon: Layers,
+      active: pathname === '/buyer/pooling',
+    },
+    {
+      name: 'Legalitas',
+      href: '/buyer/legalitas',
+      icon: ShieldCheck,
+      active: pathname === '/buyer/legalitas',
+    },
+  ];
 
   return (
     <DashboardShell
       portalBadge={{ label: 'HoReKa', variant: 'primer' }}
+      bottomNavItems={bottomNavItems}
       contextSlot={
         <OutletContextSelector
           activeOutletId={activeOutletId}

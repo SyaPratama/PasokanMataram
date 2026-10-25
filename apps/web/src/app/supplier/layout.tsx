@@ -48,11 +48,11 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
           active: pathname === '/supplier/allocations',
         },
         {
-          name: 'Proyeksi Harga Panen AI',
+          name: 'Proyeksi Tren Harga Panen',
           href: '/supplier/forecast',
           icon: TrendingUp,
           active: pathname === '/supplier/forecast',
-          badge: 'ML v2.1',
+          badge: 'Tren DIY',
         },
       ],
     },
@@ -78,9 +78,9 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
       items: [
         {
           name: 'Legalitas Gapoktan',
-          href: '/onboarding-kyb',
+          href: '/supplier/legalitas',
           icon: ShieldCheck,
-          active: pathname === '/onboarding-kyb',
+          active: pathname === '/supplier/legalitas',
         },
         {
           name: 'Pusat Bantuan Mitra',
@@ -91,10 +91,37 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
       ],
     },
   ];
+  const bottomNavItems = [
+    {
+      name: 'Beranda',
+      href: '/supplier/dashboard',
+      icon: Tractor,
+      active: pathname === '/supplier/dashboard',
+    },
+    {
+      name: 'Alokasi',
+      href: '/supplier/allocations',
+      icon: Calendar,
+      active: pathname === '/supplier/allocations',
+    },
+    {
+      name: 'Pasar Hub',
+      href: '/supplier/market',
+      icon: Store,
+      active: pathname === '/supplier/market',
+    },
+    {
+      name: 'Legalitas',
+      href: '/supplier/legalitas',
+      icon: ShieldCheck,
+      active: pathname === '/supplier/legalitas',
+    },
+  ];
 
   return (
     <DashboardShell
       portalBadge={{ label: 'Pemasok', variant: 'sekunder' }}
+      bottomNavItems={bottomNavItems}
       contextSlot={
         <SupplierContextCard
           supplierName="Sentra Supplier Sleman"

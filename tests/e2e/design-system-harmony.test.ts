@@ -92,21 +92,21 @@ describe('Minggu 1.9 - Unified Design System & Layout Harmony Verification', () 
     expect(shellContent).toContain('min-h-[44px]');
   });
 
-  it('memvalidasi aturan ruang kerja .agents/rules/design-system.md dan AGENTS.md terdefinisi ketat', () => {
-    const rulesPath = path.join(rootDir, '.agents/rules/design-system.md');
+  it('memvalidasi aturan ruang kerja AGENTS.md dan konstitusi terdefinisi ketat', () => {
     const agentsPath = path.join(rootDir, 'AGENTS.md');
+    const constitutionPath = path.join(rootDir, '.specify/memory/constitution.md');
 
-    expect(fs.existsSync(rulesPath)).toBe(true);
     expect(fs.existsSync(agentsPath)).toBe(true);
-
-    const rulesContent = fs.readFileSync(rulesPath, 'utf-8');
-    expect(rulesContent).toContain('Aturan Desain Sistem PasokMataram');
-    expect(rulesContent).toContain('DILARANG KERAS menggunakan emotikon');
-    expect(rulesContent).toContain('Lucide Icons');
+    expect(fs.existsSync(constitutionPath)).toBe(true);
 
     const agentsContent = fs.readFileSync(agentsPath, 'utf-8');
     expect(agentsContent).toContain('Aturan Desain Sistem Ketat');
     expect(agentsContent).toContain('Nol Toleransi Emotikon');
+    expect(agentsContent).toContain('DILARANG KERAS');
+    expect(agentsContent).toContain('Lucide Icons');
+
+    const constitutionContent = fs.readFileSync(constitutionPath, 'utf-8');
+    expect(constitutionContent).toContain('Prinsip XIII');
   });
 
   it('memvalidasi ketiadaan karakter emotikon dan karakter Unicode dekoratif di seluruh apps/web/src', () => {

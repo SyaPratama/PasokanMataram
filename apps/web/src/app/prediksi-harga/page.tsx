@@ -45,7 +45,7 @@ export default function PrediksiHargaPage() {
               <div className="max-w-3xl">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-aksen-light text-aksen-dark text-xs font-bold mb-3 border border-aksen/30 whitespace-nowrap shrink-0 shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5 text-aksen-dark shrink-0" />
-                  <span className="whitespace-nowrap">PasokML Forecasting Intelligence v2.1</span>
+                  <span className="whitespace-nowrap">Pusat Analisis Tren Harga Pangan DIY</span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-heading font-extrabold text-gelap tracking-tight">
                   Prakiraan Tren Harga Pasokan Pangan D.I. Yogyakarta
