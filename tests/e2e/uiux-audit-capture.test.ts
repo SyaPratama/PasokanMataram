@@ -4,7 +4,7 @@
  * pada seluruh rute utama PasokMataram:
  * - / (Landing)
  * - /login, /register
- * - /onboarding-kyb
+ * - /buyer/legalitas
  * - /buyer/dashboard, /buyer/pooling, /buyer/orders
  * - /supplier/dashboard, /supplier/market
  * - /hub, /hub/weighing
@@ -77,7 +77,7 @@ const AUDIT_ROUTES: AuditRoute[] = [
   { name: 'landing', route: '/' },
   { name: 'login', route: '/login' },
   { name: 'register', route: '/register' },
-  { name: 'onboarding-kyb', route: '/onboarding-kyb' },
+  { name: 'buyer-legalitas', route: '/buyer/legalitas', macroRole: 'HOREKA', microRole: 'HEAD_CHEF' },
   { name: 'buyer-dashboard', route: '/buyer/dashboard', macroRole: 'HOREKA', microRole: 'HEAD_CHEF' },
   { name: 'buyer-pooling', route: '/buyer/pooling', macroRole: 'HOREKA', microRole: 'HEAD_CHEF' },
   { name: 'buyer-orders', route: '/buyer/orders', macroRole: 'HOREKA', microRole: 'HEAD_CHEF' },

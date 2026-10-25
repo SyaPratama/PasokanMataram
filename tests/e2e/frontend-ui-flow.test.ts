@@ -44,8 +44,8 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(content).toContain('isLoading');
   });
 
-  it('memvalidasi komponen panel remediasi KYB di (auth)/onboarding-kyb/_components/remediation-panel.tsx', () => {
-    const panelPath = path.join(webAppDir, '(auth)/onboarding-kyb/_components/remediation-panel.tsx');
+  it('memvalidasi komponen panel remediasi KYB di components/kyb/remediation-panel.tsx', () => {
+    const panelPath = path.join(rootDir, 'apps/web/src/components/kyb/remediation-panel.tsx');
     expect(fs.existsSync(panelPath)).toBe(true);
 
     const content = fs.readFileSync(panelPath, 'utf-8');
@@ -55,12 +55,12 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(content).toContain('PENDING_VERIFICATION');
   });
 
-  it('memvalidasi integrasi panel remediasi dan status simulator di (auth)/onboarding-kyb/page.tsx', () => {
-    const onboardingPath = path.join(webAppDir, '(auth)/onboarding-kyb/page.tsx');
-    expect(fs.existsSync(onboardingPath)).toBe(true);
+  it('memvalidasi integrasi panel remediasi dan status legalitas di buyer/legalitas/page.tsx', () => {
+    const legalitasPath = path.join(webAppDir, 'buyer/legalitas/page.tsx');
+    expect(fs.existsSync(legalitasPath)).toBe(true);
 
-    const content = fs.readFileSync(onboardingPath, 'utf-8');
-    expect(content).toContain("import { RemediationPanel } from './_components/remediation-panel';");
+    const content = fs.readFileSync(legalitasPath, 'utf-8');
+    expect(content).toContain("import { DocumentUploader, RemediationPanel } from '@/components/kyb';");
     expect(content).toContain("kybStatus === 'REJECTED'");
     expect(content).toContain('StatusBadge');
   });

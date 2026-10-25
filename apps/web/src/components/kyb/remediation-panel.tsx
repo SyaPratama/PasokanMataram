@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { AlertTriangle, UploadCloud, CheckCircle2, FileText, ArrowRight } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 
 interface RemediationPanelProps {
   rejectionReason: string;

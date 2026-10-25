@@ -20,8 +20,7 @@ import {
   Info,
 } from 'lucide-react';
 import { StatusBadge } from '../../../components/shared/status-badge';
-import { DocumentUploader } from '../../(auth)/onboarding-kyb/_components/document-uploader';
-import { RemediationPanel } from '../../(auth)/onboarding-kyb/_components/remediation-panel';
+import { DocumentUploader, RemediationPanel } from '@/components/kyb';
 import type { KybStatus } from '@pasok/domain';
 
 /**

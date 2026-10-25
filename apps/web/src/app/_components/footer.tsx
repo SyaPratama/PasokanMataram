@@ -124,8 +124,8 @@ export function Footer() {
               Pendaftaran Supplier Pangan
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
-            <Link href="/onboarding-kyb" className="hover:text-white transition-colors">
-              Status KYB
+            <Link href="/buyer/legalitas" className="hover:text-white transition-colors">
+              Legalitas & KYB
             </Link>
           </div>
         </div>
