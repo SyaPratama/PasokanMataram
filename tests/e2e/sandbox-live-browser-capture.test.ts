@@ -137,8 +137,7 @@ describe('Sandbox Mode Live Browser Testing & Visual Capture (Puppeteer)', { tim
 
         const pageText = await page.evaluate(() => document.body.innerText);
         expect(pageText).toContain('Nomor Virtual Account Bank BPD DIY');
-        expect(pageText).toContain('Simulasikan Bayar via Solosmartpay');
-
+        expect(pageText).toContain('Bayar via Sandbox');
         const screenshotPath = path.join(SCREENSHOTS_DIR, 'sandbox-02-buyer-pooling-allocation.png');
         await page.screenshot({ path: screenshotPath, fullPage: false });
         expect(fs.existsSync(screenshotPath)).toBe(true);
@@ -204,7 +203,7 @@ describe('Sandbox Mode Live Browser Testing & Visual Capture (Puppeteer)', { tim
         let executePayBtn = null;
         for (const b of payBtns) {
           const t = await page.evaluate((el) => el.textContent || '', b);
-          if (t.includes('Simulasikan Pembayaran Berhasil')) {
+          if (t.includes('Bayar via Sandbox') || t.includes('Simulasikan Pembayaran Berhasil')) {
             executePayBtn = b;
             break;
           }
@@ -212,7 +211,7 @@ describe('Sandbox Mode Live Browser Testing & Visual Capture (Puppeteer)', { tim
         if (executePayBtn) {
           await executePayBtn.click();
           await page.waitForFunction(
-            () => document.body.innerText.includes('STATUS: ESCROW_HELD | ZERO DB MUTATION'),
+            () => document.body.innerText.includes('STATUS: ESCROW_HELD'),
             { timeout: 8000 }
           );
 

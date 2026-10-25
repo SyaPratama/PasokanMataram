@@ -13,7 +13,7 @@ import { BuyerModule } from './buyer/buyer.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { AdminModule } from './admin/admin.module';
 import { HealthModule } from './health/health.module';
-
+import { NotificationsModule } from './notifications/notifications.module';
 @Module({
   imports: [
     AuthModule,
@@ -25,6 +25,7 @@ import { HealthModule } from './health/health.module';
     SupplierModule,
     AdminModule,
     HealthModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
