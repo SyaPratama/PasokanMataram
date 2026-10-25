@@ -52,28 +52,27 @@ export function KybBlockerModal({
           Verifikasi Legalitas Usaha Diperlukan
         </h2>
 
-        <p className="text-xs text-gelap/75 mt-2 leading-relaxed">
-          Akun Anda saat ini berstatus <span className="font-bold text-aksen-dark">KYB_PENDING</span>. Anda bebas
-          mengeksplorasi etalase komoditas dan menghitung simulasi COGS resep dapur.
+        <p className="text-xs text-gelap/85 mt-2 leading-relaxed">
+          Aktivitas memesan dan membeli pasokan dapur mewajibkan akun usaha terdaftar lengkap dengan identitas resmi (KTP Penanggung Jawab &amp; NIB / Izin Usaha). Verifikasi berkas dapat dilengkapi kapan saja melalui menu <strong>Legalitas &amp; KYB</strong> di dashboard.
         </p>
 
         <div className="my-4 p-3.5 rounded-2xl bg-netral-canvas/60 border border-netral-border/80 text-xs">
           <div className="font-semibold text-gelap flex items-center gap-2">
             <FileText className="w-4 h-4 text-primer" aria-hidden="true" />
-            <span>Pemicu Batas Pengadaan:</span>
+            <span>Syarat Memesan &amp; Membeli:</span>
           </div>
-          <p className="text-[11px] text-gelap/70 mt-1">
-            Tindakan <span className="font-semibold">{actionAttempted}</span>
-            {quotaKg ? ` (${quotaKg} kg)` : ''} memerlukan validasi Nomor Induk Berusaha (NIB) atau Surat Keterangan Usaha (SKU) sesuai regulasi kliring escrow pangan.
+          <p className="text-[11px] text-gelap/75 mt-1 leading-relaxed">
+            Tindakan <span className="font-semibold text-gelap">{actionAttempted}</span>
+            {quotaKg ? ` (${quotaKg} kg)` : ''} memerlukan validasi identitas resmi KTP penanggung jawab dan Nomor Induk Berusaha (NIB) sesuai regulasi kliring perbankan escrow pangan.
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2.5 mt-5">
           <Link
-            href="/onboarding-kyb"
-            className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-primer text-white hover:bg-primer-dark text-xs font-bold transition-all shadow-xs"
+            href="/buyer/legalitas"
+            className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-primer text-white hover:bg-primer-dark text-xs font-bold transition-all shadow-xs min-h-[44px]"
           >
-            Unggah Berkas KYB
+            <span>Buka Legalitas &amp; KYB</span>
             <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
           </Link>
           <Button

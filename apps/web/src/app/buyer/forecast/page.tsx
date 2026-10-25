@@ -49,10 +49,10 @@ export default function BuyerForecastPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-gelap tracking-tight">
-              Prediksi Harga Pasokan Pangan AI
+              Prediksi Tren Harga Pasokan Pangan
             </h1>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-aksen-light text-aksen-dark font-extrabold border border-aksen/30">
-              ML v2.1
+              Tren DIY
             </span>
           </div>
           <p className="text-xs sm:text-sm text-gelap/70 mt-1">

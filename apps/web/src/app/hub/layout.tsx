@@ -85,9 +85,37 @@ export default function HubLayout({ children }: HubLayoutProps) {
     },
   ];
 
+  const bottomNavItems = [
+    {
+      name: 'Inbound',
+      href: '/hub/inbound',
+      icon: ScanQrCode,
+      active: pathname === '/hub/inbound' || pathname === '/hub',
+    },
+    {
+      name: 'Timbangan',
+      href: '/hub/weighing',
+      icon: Scale,
+      active: pathname === '/hub/weighing',
+    },
+    {
+      name: 'Antaran',
+      href: '/hub/deliveries',
+      icon: Truck,
+      active: pathname === '/hub/deliveries',
+    },
+    {
+      name: 'Karantina',
+      href: '/hub/quarantine',
+      icon: ShieldAlert,
+      active: pathname === '/hub/quarantine',
+    },
+  ];
+
   return (
     <DashboardShell
       portalBadge={{ label: 'Hub Transit', variant: 'primer' }}
+      bottomNavItems={bottomNavItems}
       contextSlot={<HubContextCard />}
       navGroups={navGroups}
       tenantProfile={{

@@ -76,6 +76,8 @@ export interface DashboardShellProps {
   readonly contextSlot?: React.ReactNode;
   /** Daftar grup menu navigasi sidebar */
   readonly navGroups: readonly NavGroup[];
+  /** Daftar menu navigasi bar bawah mobile (maksimal 4 item + 1 tombol drawer Lainnya) */
+  readonly bottomNavItems?: readonly NavItem[];
   /** Informasi profil tenant dan sesi akun di footer */
   readonly tenantProfile: TenantProfileConfig;
   /** Konfigurasi bilah atas desktop */

@@ -15,6 +15,40 @@ function getAdminSession(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const cookieHeader = request.headers.get('cookie') || '';
+    const isSandbox =
+      request.headers.get('x-pasok-sandbox-mode') === 'true' ||
+      cookieHeader.includes('pasok_sandbox_mode=true');
+
+    if (isSandbox) {
+      const body = await request.json();
+      const parseResult = AuditKybReviewSchema.safeParse(body);
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Payload review tidak valid.',
+              details: parseResult.error.flatten().fieldErrors,
+            },
+          },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        data: {
+          tenantId: parseResult.data.tenantId,
+          decision: parseResult.data.decision,
+          reviewedAt: new Date().toISOString(),
+          isSandbox: true,
+          databaseMutated: false,
+        },
+        message: 'Keputusan verifikasi KYB berhasil diperbarui (Mode Sandbox: Zero DB Mutation).',
+      });
+    }
+
     const session = getAdminSession(request);
     if (!session) {
       return NextResponse.json(

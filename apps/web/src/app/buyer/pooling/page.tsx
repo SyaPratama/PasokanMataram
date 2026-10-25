@@ -7,10 +7,13 @@
 'use client';
 
 import * as React from 'react';
-import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Minus } from 'lucide-react';
+import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Minus, CreditCard } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { PoolSpecAccordion } from './_components/pool-spec-accordion';
 import { trackFunnelStep } from '@/lib/telemetry';
+import { useSandbox } from '@/components/sandbox/sandbox-context';
+import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
+
 interface PoolItem {
   id: string;
   campaignUuid: string;
@@ -97,20 +100,35 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
+  const { isSandboxMode, openPaymentModal, addPoolingReservation } = useSandbox();
   const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);
   const [selectedPool, setSelectedPool] = React.useState<PoolItem | null>(null);
   const [orderKg, setOrderKg] = React.useState<number>(20);
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
   const [notification, setNotification] = React.useState<string | null>(null);
+  const [isKybVerified, setIsKybVerified] = React.useState<boolean>(true);
+  const [isKybModalOpen, setIsKybModalOpen] = React.useState<boolean>(false);
   const [vaInstruction, setVaInstruction] = React.useState<{
     vaNumber: string;
     totalAmountRp: number;
   } | null>(null);
 
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
+      if (match && match[1]) {
+        setIsKybVerified(match[1] === 'VERIFIED');
+      }
+    }
+  }, []);
   const totalOrderValue = selectedPool ? orderKg * selectedPool.pooledPricePerKg : 0;
   const isBelowMtv = totalOrderValue < MINIMUM_TRANSACTION_VALUE;
 
   const handleOpenDialog = (pool: PoolItem) => {
+    if (!isSandboxMode && !isKybVerified) {
+      setIsKybModalOpen(true);
+      return;
+    }
     setSelectedPool(pool);
     const minKgToMtv = Math.ceil(MINIMUM_TRANSACTION_VALUE / pool.pooledPricePerKg);
     setOrderKg(Math.max(15, minKgToMtv));
@@ -151,8 +169,11 @@ export default function BuyerPoolingPage() {
           deliveryAddress: 'Jl. Malioboro No. 45, Danurejan, Kota Yogyakarta',
         }),
       });
-
       const resJson = await response.json();
+
+      if (isSandboxMode) {
+        addPoolingReservation(selectedPool.id, orderKg);
+      }
 
       setPools((prev) =>
         prev.map((p) =>
@@ -253,6 +274,24 @@ export default function BuyerPoolingPage() {
           <p className="text-xs sm:text-sm font-medium text-gelap leading-relaxed">
             Dana Anda tersimpan aman di rekening bersama Bank BPD DIY. Dana baru diteruskan ke petani setelah timbangan fisik dan uji mutu subuh di hub dinyatakan lolos SNI.
           </p>
+          {isSandboxMode && (
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() =>
+                  openPaymentModal({
+                    orderId: `RSV-SBX-${Date.now().toString().slice(-4)}`,
+                    amountRp: vaInstruction.totalAmountRp,
+                    method: 'BPD_DIY',
+                  })
+                }
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primer text-white hover:bg-primer-hover active:scale-[0.98] font-bold text-sm min-h-[48px] shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/40"
+              >
+                <CreditCard className="w-4 h-4 text-aksen-light" />
+                <span>Simulasikan Bayar via Solosmartpay</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -468,6 +507,12 @@ export default function BuyerPoolingPage() {
           </div>
         </div>
       )}
+
+      <KybBlockerModal
+        isOpen={isKybModalOpen}
+        onClose={() => setIsKybModalOpen(false)}
+        actionAttempted="Alokasi Kuota Pooling Bahan Dapur"
+      />
     </div>
   );
 }

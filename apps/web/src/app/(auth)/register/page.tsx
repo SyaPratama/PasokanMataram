@@ -11,7 +11,7 @@ import {
   Store,
   AlertCircle,
   ArrowRight,
-  ArrowLeft,
+  ChevronDown,
   ShieldCheck,
   CheckCircle2,
 } from 'lucide-react';
@@ -122,7 +122,8 @@ export default function RegisterPage() {
         document.cookie = `pasok_kyb_status=KYB_PENDING; path=/; max-age=604800; SameSite=Lax`;
       }
 
-      router.push('/onboarding-kyb');
+      const targetDashboard = intent === 'HOREKA' ? '/buyer/dashboard' : '/supplier/dashboard';
+      router.push(targetDashboard);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem saat mendaftar.';
       setErrorMessage(msg);
@@ -219,13 +220,10 @@ export default function RegisterPage() {
       ) : null}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center justify-between border-b border-netral-border/60 pb-2">
+        <div className="border-b border-netral-border/60 pb-2">
           <label className="block text-xs sm:text-sm font-bold text-gelap uppercase tracking-wider">
             Langkah 2: Data Profil Usaha (PIC Utama)
           </label>
-          <span className="text-xs font-bold text-gelap/85 font-mono">
-            Pendaftar Pertama = OWNER
-          </span>
         </div>
 
         <div>
@@ -249,19 +247,25 @@ export default function RegisterPage() {
             <label htmlFor="reg-regency" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
               Wilayah Operasional DIY
             </label>
-            <select
-              id="reg-regency"
-              name="regency"
-              value={formData.regency}
-              onChange={handleChange}
-              className="w-full text-sm min-h-[48px] px-3.5 bg-white border border-netral-border rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium text-gelap"
-            >
-              <option value="KULON_PROGO">Kabupaten Kulon Progo</option>
-              <option value="BANTUL">Kabupaten Bantul</option>
-              <option value="SLEMAN">Kabupaten Sleman</option>
-              <option value="GUNUNGKIDUL">Kabupaten Gunungkidul</option>
-              <option value="YOGYAKARTA">Kota Yogyakarta</option>
-            </select>
+            <div className="relative">
+              <select
+                id="reg-regency"
+                name="regency"
+                value={formData.regency}
+                onChange={handleChange}
+                className="w-full text-sm min-h-[48px] pl-3.5 pr-10 bg-white border border-netral-border rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium text-gelap appearance-none cursor-pointer"
+              >
+                <option value="KULON_PROGO">Kabupaten Kulon Progo</option>
+                <option value="BANTUL">Kabupaten Bantul</option>
+                <option value="SLEMAN">Kabupaten Sleman</option>
+                <option value="GUNUNGKIDUL">Kabupaten Gunungkidul</option>
+                <option value="YOGYAKARTA">Kota Yogyakarta</option>
+              </select>
+              <ChevronDown
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gelap/60 pointer-events-none"
+                aria-hidden="true"
+              />
+            </div>
           </div>
 
           <div>

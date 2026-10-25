@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { X, MapPin, Building2, Check, AlertCircle } from 'lucide-react';
+import { X, MapPin, Building2, Check, AlertCircle, ChevronDown } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Input } from '../../../../components/ui/input';
 import type { DIYRegency } from '@pasok/domain';
@@ -145,19 +145,25 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
               <label htmlFor="outlet-regency" className="block text-xs font-bold text-gelap mb-1">
                 Kabupaten / Kota di DIY *
               </label>
-              <select
-                id="outlet-regency"
-                name="outlet-regency"
-                value={regency}
-                onChange={(e) => handleRegencyChange(e.target.value as DIYRegency)}
-                className="w-full text-xs p-2 rounded-md border border-netral-border bg-white text-gelap focus:ring-2 focus:ring-primer focus:outline-none"
-              >
-                <option value="SLEMAN">Kab. Sleman</option>
-                <option value="BANTUL">Kab. Bantul</option>
-                <option value="KULON_PROGO">Kab. Kulon Progo</option>
-                <option value="GUNUNGKIDUL">Kab. Gunungkidul</option>
-                <option value="KOTA_YOGYAKARTA">Kota Yogyakarta</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="outlet-regency"
+                  name="outlet-regency"
+                  value={regency}
+                  onChange={(e) => handleRegencyChange(e.target.value as DIYRegency)}
+                  className="w-full text-xs p-2.5 pr-8 rounded-xl border border-netral-border bg-white text-gelap focus:ring-2 focus:ring-primer focus:outline-none appearance-none cursor-pointer min-h-[44px]"
+                >
+                  <option value="SLEMAN">Kab. Sleman</option>
+                  <option value="BANTUL">Kab. Bantul</option>
+                  <option value="KULON_PROGO">Kab. Kulon Progo</option>
+                  <option value="GUNUNGKIDUL">Kab. Gunungkidul</option>
+                  <option value="YOGYAKARTA">Kota Yogyakarta</option>
+                </select>
+                <ChevronDown
+                  className="w-4 h-4 text-gelap/50 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             <div>
