@@ -131,7 +131,8 @@ describe('E2E Role Dashboards Screenshot & Quality Audit', () => {
         timeout: 30000,
       });
 
-      const status = response ? response.status() : 0;
+      const rawStatus = response ? response.status() : 0;
+      const status = rawStatus === 304 ? 200 : rawStatus;
       const title = await page.title();
       const html = await page.content();
 

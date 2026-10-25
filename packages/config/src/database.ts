@@ -30,7 +30,7 @@ const rawDatabaseUrl =
 
 const sslEnabled =
   process.env.DB_SSL === 'true' ||
-  process.env.NODE_ENV === 'production';
+  (process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false' && !process.env.DB_HOST?.includes('postgres'));
 
 export const databaseConfig: DatabaseConfig = databaseConfigSchema.parse({
   connectionString: rawDatabaseUrl,

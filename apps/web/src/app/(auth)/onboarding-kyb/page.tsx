@@ -6,14 +6,24 @@ import Image from 'next/image';
 import { DocumentUploader } from './_components/document-uploader';
 import { RemediationPanel } from './_components/remediation-panel';
 import { StatusBadge } from '../../../components/shared/status-badge';
-import { ShieldCheck, FileCheck, Clock, ArrowRight, ToggleLeft, ToggleRight, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, FileCheck, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 /**
  * Halaman Alur Onboarding Legalitas KYB & Remediasi.
- * Mendukung simulasi peninjauan status PENDING_VERIFICATION maupun remediasi REJECTED.
+ * Mendukung peninjauan status resmi PENDING_VERIFICATION maupun alur pengajuan perbaikan REJECTED.
  */
 export default function OnboardingKybPage() {
   const [kybStatus, setKybStatus] = React.useState<'PENDING_VERIFICATION' | 'REJECTED'>('PENDING_VERIFICATION');
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const statusParam = params.get('status');
+      if (statusParam === 'REJECTED') {
+        setKybStatus('REJECTED');
+      }
+    }
+  }, []);
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-3xl shadow-md border border-netral-border/80 overflow-hidden p-6 sm:p-8 space-y-6">
@@ -48,28 +58,6 @@ export default function OnboardingKybPage() {
           <span className="text-xs font-bold text-gelap font-heading">Status Pengajuan:</span>
           <StatusBadge status={kybStatus} />
         </div>
-        <button
-          type="button"
-          onClick={() =>
-            setKybStatus((prev) =>
-              prev === 'PENDING_VERIFICATION' ? 'REJECTED' : 'PENDING_VERIFICATION'
-            )
-          }
-          className="inline-flex items-center gap-2 text-xs font-semibold text-gelap bg-white border border-netral-border hover:border-primer hover:bg-netral-canvas/40 px-3.5 py-2 rounded-xl shadow-2xs hover:shadow-xs transition-all min-h-[44px]"
-          title="Klik untuk mensimulasikan tampilan status Ditolak (Remediasi) vs Menunggu Verifikasi"
-        >
-          {kybStatus === 'REJECTED' ? (
-            <>
-              <ToggleRight className="w-5 h-5 text-status-danger shrink-0" aria-hidden="true" />
-              <span>Simulasi: Mode Remediasi (Ditolak)</span>
-            </>
-          ) : (
-            <>
-              <ToggleLeft className="w-5 h-5 text-primer shrink-0" aria-hidden="true" />
-              <span>Simulasi: Mode Pendaftaran Baru</span>
-            </>
-          )}
-        </button>
       </div>
 
       {kybStatus === 'REJECTED' ? (
@@ -131,14 +119,7 @@ export default function OnboardingKybPage() {
         </>
       )}
 
-      <div className="pt-4 border-t border-netral-border/70 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs sm:text-sm">
-        <Link
-          href="/buyer/dashboard"
-          className="font-bold text-sekunder hover:text-sekunder-dark hover:underline inline-flex items-center min-h-[44px] transition-colors"
-        >
-          <span>Lihat Simulasi Dashboard Pembeli</span>
-          <ArrowRight className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
-        </Link>
+      <div className="pt-4 border-t border-netral-border/70 flex justify-end items-center text-xs sm:text-sm">
         <Link
           href="/"
           className="inline-flex items-center font-bold text-primer hover:text-primer-hover hover:underline min-h-[44px] transition-colors"

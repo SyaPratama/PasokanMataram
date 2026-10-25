@@ -12,7 +12,6 @@ import { FaqAccordionSection } from './_components/faq-accordion';
 import { PreFooterCtaSection } from './_components/prefooter-cta';
 import { Footer } from './_components/footer';
 import { PwaFloatingButton } from '../components/pwa-floating-button';
-import { QuickSimulationBanner } from '../components/quick-simulation-banner';
 import { SectionScrollHandler } from '../components/section-scroll-handler';
 
 import type { Metadata } from 'next';
@@ -60,7 +59,6 @@ export default function HomePage() {
       </a>
 
       <SectionScrollHandler />
-      <QuickSimulationBanner />
       <Navbar />
       <main id="main-content" className="relative z-10 flex-1">
         <HeroSection />

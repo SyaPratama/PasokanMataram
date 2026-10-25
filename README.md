@@ -131,6 +131,52 @@ npx --prefix apps/web tsc --noEmit
 
 ---
 
+## Manajemen Basis Data & Sandbox
+
+- Menjalankan migrasi deklaratif PostgreSQL (001 - 010):
+```bash
+npm run db:migrate
+```
+
+- Melakukan pembersihan menyeluruh dan reset database sandbox (schema reset & seed fixtures terisolasi):
+```bash
+npm run db:sandbox:reset
+```
+
+- Menjalankan audit kebersihan kode (kepatuhan zero-comment dan zero-emoji):
+```bash
+npm run audit:cleanliness
+```
+
+---
+
+## Pembangunan Citra Docker
+
+Pembangunan kontainer produksi untuk web dan API backend:
+```bash
+docker build -f docker/web.Dockerfile -t pasokmataram-web:latest .
+docker build -f docker/api.Dockerfile -t pasokmataram-api:latest .
+```
+
+---
+
+## Catatan Rilis Optimasi UI/UX, FOUC & SEO
+
+1. **Remediasi FOUC (Flash of Unstyled Content) & Service Worker**:
+   - Service Worker v2.0 mengadopsi strategi Network-First untuk navigasi HTML, melewati internal Next.js RSC chunks, dan menggunakan Stale-While-Revalidate untuk aset statis.
+   - `PwaRegistrar` dibatasi hanya aktif pada lingkungan produksi; pada mode pengembangan secara otomatis melakukan unregister service worker lama guna menghindari konflik HMR dan stylesheet usang.
+2. **Pembersihan Simulasi Mock**:
+   - Menghapus komponen `QuickSimulationBanner` dan tombol mock switcher peran pada halaman login dan onboarding KYB demi integritas standar produksi.
+   - Penyelarasan label navigasi alokasi pooling.
+3. **Optimalisasi Desain Sistem & Tipografi**:
+   - Perbaikan kontras ikon modal PWA (rasio kontras > 7:1) dan proporsi tombol aksi.
+   - Pencegahan pembungkusan teks 2 baris pada seluruh kartu ringkasan saldo dan metrik finansial dashboard.
+4. **Penguatan SEO Teknis**:
+   - Pendaftaran rute kanonikal lengkap di `sitemap.ts` dan proteksi direktori privat di `robots.ts`.
+   - Integrasi skema Google Rich Results via `EnterpriseJsonLd` (WebSite SearchAction & FAQPage).
+
+---
+
 ## Lisensi dan Hak Cipta
 
 Hak Cipta (c) 2026 PasokMataram. Hak cipta dilindungi undang-undang.
