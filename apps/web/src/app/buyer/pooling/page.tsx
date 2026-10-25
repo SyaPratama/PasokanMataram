@@ -288,7 +288,7 @@ export default function BuyerPoolingPage() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primer text-white hover:bg-primer-hover active:scale-[0.98] font-bold text-sm min-h-[48px] shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/40"
               >
                 <CreditCard className="w-4 h-4 text-aksen-light" />
-                <span>Simulasikan Bayar via Solosmartpay</span>
+                <span>Bayar via Sandbox</span>
               </button>
             </div>
           )}

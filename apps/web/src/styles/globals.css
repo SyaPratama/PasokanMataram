@@ -111,6 +111,30 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/** Universal transparent scrollbar styling across all browsers */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-netral-border);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gelap-muted);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-netral-border) transparent;
+}
+
 /** Utility scrollbar tipis terintegrasi sistem token warna */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;

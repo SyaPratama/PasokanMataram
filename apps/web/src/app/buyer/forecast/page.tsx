@@ -10,6 +10,9 @@ import {
   ArrowRight,
   ShieldCheck,
   RefreshCw,
+  ChevronDown,
+  Search,
+  Check,
 } from 'lucide-react';
 import { MOCK_COMMODITY_FORECASTS } from '../../../lib/mock-forecast-data';
 import type { CommodityForecast, ForecastHorizon } from '../../../types/forecast';
@@ -27,7 +30,30 @@ export default function BuyerForecastPage() {
   );
   const [horizon, setHorizon] = React.useState<ForecastHorizon>(30);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [isPickerOpen, setIsPickerOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const pickerRef = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setIsPickerOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredCommodities = React.useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return MOCK_COMMODITY_FORECASTS;
+    return MOCK_COMMODITY_FORECASTS.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.originRegion.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
   const selectedCommodity: CommodityForecast =
     MOCK_COMMODITY_FORECASTS.find((c) => c.id === selectedCommodityId) ||
     defaultCommodity;
@@ -63,36 +89,119 @@ export default function BuyerForecastPage() {
         <button
           type="button"
           onClick={handleRefresh}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-netral-border text-xs font-semibold text-gelap hover:bg-netral-canvas min-h-[44px] shadow-2xs self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-netral-border text-xs font-semibold text-gelap hover:bg-netral-canvas min-h-[44px] shadow-2xs self-start sm:self-auto whitespace-nowrap shrink-0"
         >
           <RefreshCw className={`w-3.5 h-3.5 text-primer ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>Segarkan Model</span>
+          <span className="whitespace-nowrap">Segarkan</span>
         </button>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {MOCK_COMMODITY_FORECASTS.map((item) => {
-          const isSelected = item.id === selectedCommodityId;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setSelectedCommodityId(item.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all min-h-[44px] flex items-center gap-2 flex-shrink-0 ${
-                isSelected
-                  ? 'bg-primer text-white shadow-xs font-bold'
-                  : 'bg-white border border-netral-border/80 text-gelap hover:border-primer/50'
+      <div className="relative w-full sm:max-w-md" ref={pickerRef}>
+        <label className="block text-xs font-bold text-gelap uppercase tracking-wider mb-1.5">
+          Pilih Komoditas Pangan DIY:
+        </label>
+        <button
+          type="button"
+          onClick={() => setIsPickerOpen((prev) => !prev)}
+          className="w-full p-3.5 rounded-2xl bg-white border-2 border-netral-border flex items-center justify-between text-left text-sm font-semibold text-gelap hover:border-primer/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/30 transition-all shadow-xs min-h-[48px]"
+          aria-haspopup="listbox"
+          aria-expanded={isPickerOpen}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="font-bold text-gelap truncate">{selectedCommodity.name}</span>
+            <span
+              className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold shrink-0 ${
+                selectedCommodity.trend === 'DOWN'
+                  ? 'bg-status-success/15 text-status-success'
+                  : 'bg-status-warning/15 text-status-warning'
               }`}
             >
-              <span>{item.name}</span>
-              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
-                isSelected ? 'bg-white/20 text-white' : 'bg-netral-canvas text-gelap/60'
-              }`}>
-                {item.trend === 'DOWN' ? `-${Math.abs(item.trendPercentage)}%` : `+${item.trendPercentage}%`}
-              </span>
-            </button>
-          );
-        })}
+              {selectedCommodity.trend === 'DOWN'
+                ? `-${Math.abs(selectedCommodity.trendPercentage)}%`
+                : `+${selectedCommodity.trendPercentage}%`}
+            </span>
+          </div>
+          <ChevronDown
+            className={`w-5 h-5 text-gelap/60 shrink-0 transition-transform duration-200 ${
+              isPickerOpen ? 'rotate-180 text-primer' : ''
+            }`}
+            aria-hidden="true"
+          />
+        </button>
+
+        {isPickerOpen && (
+          <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl border-2 border-netral-border shadow-2xl p-3 z-30 space-y-2 animate-in fade-in zoom-in-95">
+            <div className="relative">
+              <Search
+                className="w-4 h-4 text-gelap/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari komoditas atau sentra pangan..."
+                className="w-full pl-9 pr-3 py-2 text-xs font-medium text-gelap bg-netral-canvas rounded-xl border border-netral-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[40px]"
+                autoFocus
+              />
+            </div>
+
+            <div className="max-h-64 overflow-y-auto custom-scrollbar space-y-1 pt-1">
+              {filteredCommodities.length === 0 ? (
+                <div className="p-4 text-center text-xs text-gelap/60">
+                  Tidak ada komoditas pangan yang cocok.
+                </div>
+              ) : (
+                filteredCommodities.map((item) => {
+                  const isSelected = item.id === selectedCommodityId;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCommodityId(item.id);
+                        setIsPickerOpen(false);
+                        setSearchQuery('');
+                      }}
+                      className={`w-full p-2.5 rounded-xl text-left text-xs transition-all flex items-center justify-between min-h-[44px] ${
+                        isSelected
+                          ? 'bg-primer text-white font-bold shadow-xs'
+                          : 'hover:bg-netral-canvas text-gelap'
+                      }`}
+                    >
+                      <div className="min-w-0 pr-2">
+                        <div className="truncate font-semibold">{item.name}</div>
+                        <div
+                          className={`text-[10px] mt-0.5 truncate ${
+                            isSelected ? 'text-white/80' : 'text-gelap/60'
+                          }`}
+                        >
+                          {item.originRegion}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                            isSelected
+                              ? 'bg-white/20 text-white'
+                              : item.trend === 'DOWN'
+                              ? 'bg-status-success/15 text-status-success'
+                              : 'bg-status-warning/15 text-status-warning'
+                          }`}
+                        >
+                          {item.trend === 'DOWN'
+                            ? `-${Math.abs(item.trendPercentage)}%`
+                            : `+${item.trendPercentage}%`}
+                        </span>
+                        {isSelected && <Check className="w-4 h-4 text-white" aria-hidden="true" />}
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
