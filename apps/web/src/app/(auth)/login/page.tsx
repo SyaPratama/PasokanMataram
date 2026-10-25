@@ -226,7 +226,7 @@ function LoginForm() {
         <div className="bg-netral-canvas/60 px-6 py-3.5 border-t border-netral-border/60 text-center">
           <p className="text-[11px] text-gelap/85 font-medium flex items-center justify-center gap-1.5 font-body">
             <ShieldCheck className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
-            Terproteksi Row-Level Security &amp; Argon2id Kriptografi
+            Terproteksi Sistem Enkripsi &amp; Keamanan Data Usaha
           </p>
         </div>
       </div>

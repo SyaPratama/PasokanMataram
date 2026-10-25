@@ -58,6 +58,29 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
+    const isSandbox =
+      request.headers.get('x-pasok-sandbox-mode') === 'true' ||
+      cookieHeader.includes('pasok_sandbox_mode=true');
+
+    if (isSandbox) {
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            reservationId: parseResult.data.reservationId,
+            disputeType: parseResult.data.disputeType,
+            refundAmountRp: parseResult.data.refundAmountRp || 50000,
+            status: 'RESOLVED_REFUNDED',
+            resolvedAt: new Date().toISOString(),
+            isSandbox: true,
+            databaseMutated: false,
+          },
+          message: 'Pengajuan dispute QC berhasil diproses (Mode Sandbox: Zero DB Mutation).',
+        },
+        { status: 200 }
+      );
+    }
+
     const context: SecurityContext = {
       tenantId: session?.tenantId || '00000000-0000-0000-0000-000000000000',
       userId: session?.userId || 'OPERATOR_QC',

@@ -100,7 +100,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="w-full mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] text-gelap/70 font-body">
           <span>Terhubung di 5 Kabupaten/Kota D.I. Yogyakarta</span>
           <span className="w-1 h-1 rounded-full bg-gelap/30 inline-block" aria-hidden="true" />
-          <span>Proteksi PostgreSQL 16 RLS Multi-Tenant</span>
+          <span>Isolasi &amp; Privasi Data Bisnis Terproteksi</span>
         </div>
       </main>
 

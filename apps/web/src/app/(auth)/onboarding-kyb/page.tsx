@@ -41,7 +41,7 @@ export default function OnboardingKybPage() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/15 border border-white/25 text-white shadow-2xs">
             <ShieldCheck className="w-4 h-4 text-white shrink-0" aria-hidden="true" />
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap">
-              Tahap 2 dari 2: Verifikasi Resmi
+              Pusat Verifikasi Legalitas Usaha
             </span>
           </div>
         </div>
@@ -51,6 +51,21 @@ export default function OnboardingKybPage() {
         <p className="text-xs sm:text-sm text-white/90 mt-1.5 max-w-lg mx-auto leading-relaxed font-body">
           Validasi legalitas resmi entitas usaha untuk akses penuh perdagangan grosir dan proteksi rekening bersama (escrow) se-D.I. Yogyakarta.
         </p>
+      </div>
+      <div className="p-4 rounded-2xl bg-primer-light border border-primer/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <CheckCircle2 className="w-5 h-5 text-primer shrink-0" />
+          <span className="font-semibold text-gelap">
+            Verifikasi berkas kini dipusatkan di dalam Dashboard Anda (menu Legalitas &amp; KYB).
+          </span>
+        </div>
+        <Link
+          href="/buyer/legalitas"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primer text-white font-bold hover:bg-primer-hover whitespace-nowrap min-h-[44px]"
+        >
+          <span>Buka di Dashboard</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
 
       <div className="bg-netral-canvas border border-netral-border/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">

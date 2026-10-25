@@ -18,9 +18,51 @@ const poolingService = new PoolingService();
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
+    const cookieHeader = request.headers.get('cookie') || '';
+    const isSandbox =
+      request.headers.get('x-pasok-sandbox-mode') === 'true' ||
+      cookieHeader.includes('pasok_sandbox_mode=true');
+
     const body = await request.json();
 
-    const cookieHeader = request.headers.get('cookie') || '';
+    if (isSandbox) {
+      const quantityKg = Number(body.quantityKg) || 0;
+      const estimatedUnitPrice = 31000;
+      const totalValue = quantityKg * estimatedUnitPrice;
+      if (totalValue < 500000) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Batas pembelian terendah (MTV) adalah minimal Rp 500.000.',
+            },
+          },
+          { status: 400 }
+        );
+      }
+      const mockVa = `988810${Math.floor(10000000 + Math.random() * 90000000)}`;
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            reservationId: `RSV-SBX-${Date.now().toString().slice(-4)}`,
+            campaignId: body.campaignId || 'POOL-BWR-SRI-09',
+            quantityKg,
+            totalAmountRp: totalValue,
+            paymentInstructions: {
+              vaNumber: mockVa,
+              bankName: 'Bank BPD DIY',
+              escrowAccount: 'PASOK MATARAM ESCROW',
+            },
+            isSandbox: true,
+            databaseMutated: false,
+          },
+          message: 'Reservasi kuota pooling berhasil dibuat (Mode Sandbox: Zero DB Mutation).',
+        },
+        { status: 201 }
+      );
+    }
     const sessionCookie = cookieHeader
       .split('; ')
       .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
@@ -70,9 +112,56 @@ export async function POST(request: Request): Promise<NextResponse> {
  */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
-    const sessionCookie = request.headers
-      .get('cookie')
-      ?.split('; ')
+    const cookieHeader = request.headers.get('cookie') || '';
+    const isSandbox =
+      request.headers.get('x-pasok-sandbox-mode') === 'true' ||
+      cookieHeader.includes('pasok_sandbox_mode=true');
+
+    if (isSandbox) {
+      return NextResponse.json({
+        success: true,
+        data: [
+          {
+            id: 'POOL-BWR-SRI-09',
+            commodity: 'Bawang Merah Srikayangan Super A',
+            targetQuotaKg: 1000,
+            currentCollectedKg: 850,
+            participantsCount: 38,
+            closingHoursLeft: 4,
+            normalPricePerKg: 36000,
+            pooledPricePerKg: 31000,
+            savingPercent: 13.8,
+            status: 'OPEN',
+          },
+          {
+            id: 'POOL-CBI-PAN-05',
+            commodity: 'Cabai Rawit Merah Panjatan Segar',
+            targetQuotaKg: 500,
+            currentCollectedKg: 490,
+            participantsCount: 22,
+            closingHoursLeft: 2,
+            normalPricePerKg: 54000,
+            pooledPricePerKg: 46500,
+            savingPercent: 13.9,
+            status: 'NEARING_TARGET',
+          },
+          {
+            id: 'POOL-BRS-SEY-12',
+            commodity: 'Beras Premium Pandan Wangi Seyegan',
+            targetQuotaKg: 2000,
+            currentCollectedKg: 2000,
+            participantsCount: 45,
+            closingHoursLeft: 0,
+            normalPricePerKg: 17000,
+            pooledPricePerKg: 14800,
+            savingPercent: 12.9,
+            status: 'LOCKED',
+          },
+        ],
+      });
+    }
+    const sessionCookie = cookieHeader
+      .split('; ')
       .find((row) => row.startsWith('session_token='))
       ?.split('=')[1];
 

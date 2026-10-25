@@ -5,10 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   Bell,
-  Menu,
   X,
   LogOut,
   ShieldCheck,
+  MoreHorizontal,
 } from 'lucide-react';
 import { StatusBadge } from '../shared/status-badge';
 import type { DashboardShellProps } from './types';
@@ -17,6 +17,7 @@ export function DashboardShell({
   portalBadge,
   contextSlot,
   navGroups,
+  bottomNavItems,
   tenantProfile,
   topBarMeta,
   children,
@@ -34,6 +35,19 @@ export function DashboardShell({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
+  const displayBottomItems = React.useMemo(() => {
+    if (bottomNavItems && bottomNavItems.length > 0) {
+      return bottomNavItems.slice(0, 4);
+    }
+    const allItems = navGroups.flatMap((group) => group.items);
+    return allItems.slice(0, 4);
+  }, [bottomNavItems, navGroups]);
+
+  const isOtherActive = React.useMemo(() => {
+    const bottomHrefs = new Set(displayBottomItems.map((item) => item.href));
+    const allItems = navGroups.flatMap((group) => group.items);
+    return allItems.some((item) => !bottomHrefs.has(item.href) && item.active);
+  }, [displayBottomItems, navGroups]);
   const portalBadgeStyles =
     portalBadge.variant === 'sekunder'
       ? 'bg-sekunder-light text-sekunder'
@@ -177,20 +191,24 @@ export function DashboardShell({
           </div>
         </header>
 
-        <div className="md:hidden bg-white border-b border-netral-border px-3 py-2.5 flex items-center justify-between sticky top-0 z-40 min-h-[56px]">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="p-2 -ml-1 rounded-lg text-gelap hover:text-primer hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
-              aria-label="Buka Menu Navigasi"
-            >
-              <Menu className="w-5 h-5" aria-hidden="true" />
-            </button>
-            <span className="font-heading font-bold text-sm text-primer whitespace-nowrap truncate">
-              Portal {portalBadge.label}
+        <div className="md:hidden bg-white border-b border-netral-border px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 min-h-[56px] shadow-2xs">
+          <Link
+            href="/"
+            className="flex items-center space-x-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer rounded-lg"
+          >
+            <div className="w-7 h-7 rounded-lg bg-primer-light/80 border border-primer/20 flex items-center justify-center p-1 shrink-0 shadow-2xs">
+              <Image
+                src="/icons/icon.svg"
+                alt="Logo PasokMataram"
+                width={20}
+                height={20}
+                className="w-4 h-4 object-contain"
+              />
+            </div>
+            <span className="font-heading font-extrabold text-sm text-primer tracking-tight">
+              Portal <span className="text-sekunder">{portalBadge.label}</span>
             </span>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-primer bg-primer-light/80 px-2.5 py-1 rounded-full border border-primer/20 whitespace-nowrap shrink-0">
               {portalBadge.label}
@@ -312,9 +330,63 @@ export function DashboardShell({
           </div>
         ) : null}
 
-        <main className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 lg:p-8 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto min-h-0 p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8 md:pb-8 custom-scrollbar">
           {children}
         </main>
+
+        <nav
+          aria-label="Navigasi Bawah Mobile"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-netral-border/80 shadow-lg pb-safe"
+        >
+          <div className="grid grid-cols-5 h-16 items-center px-1">
+            {displayBottomItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
+                    item.active
+                      ? 'text-primer font-bold'
+                      : 'text-gelap/60 hover:text-primer'
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 mb-1 shrink-0 ${
+                      item.active ? 'text-primer' : 'text-gelap/60'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span className="text-[10px] leading-tight truncate max-w-full font-medium">
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className={`flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
+                mobileMenuOpen || isOtherActive
+                  ? 'text-primer font-bold'
+                  : 'text-gelap/60 hover:text-primer'
+              }`}
+              aria-label="Buka Menu Lainnya"
+              aria-expanded={mobileMenuOpen}
+            >
+              <MoreHorizontal
+                className={`w-5 h-5 mb-1 shrink-0 ${
+                  mobileMenuOpen || isOtherActive ? 'text-primer' : 'text-gelap/60'
+                }`}
+                aria-hidden="true"
+              />
+              <span className="text-[10px] leading-tight truncate max-w-full font-medium">
+                Lainnya
+              </span>
+            </button>
+          </div>
+        </nav>
       </div>
     </div>
   );
