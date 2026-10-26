@@ -24,6 +24,16 @@ export function HeroSection() {
     [0, 900],
     [0, shouldReduceMotion ? 0 : 90]
   );
+  const handleScrollToKomoditas = (e: React.MouseEvent) => {
+    const el = document.getElementById('komoditas');
+    if (el) {
+      e.preventDefault();
+      el.scrollIntoView({ behavior: 'smooth' });
+      if (typeof window !== 'undefined') {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  };
 
   return (
     <section id="beranda" ref={containerRef} className="px-4 sm:px-6 lg:px-8 pt-3 sm:pt-5 pb-10 sm:pb-12">
@@ -81,7 +91,8 @@ export function HeroSection() {
                 </Link>
 
                 <Link
-                  href="/komoditas"
+                  href="/#komoditas"
+                  onClick={handleScrollToKomoditas}
                   aria-label="Lihat Komoditas Pangan"
                   className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-semibold rounded-full bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all focus-visible:ring-2 focus-visible:ring-white min-h-[48px]"
                 >
