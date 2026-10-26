@@ -167,8 +167,7 @@ export function HeroSection() {
               <ArrowRight className="w-4 h-4 ml-2 text-gelap/60" aria-hidden="true" />
             </Link>
           </div>
-
-          <div className="mt-12 sm:mt-16 pt-8 border-t border-netral-border/60 max-w-3xl mx-auto">
+          <div className="mt-12 sm:mt-16 pt-6 max-w-3xl mx-auto">
             <p className="text-[11px] font-bold uppercase tracking-wider text-gelap/60 mb-4 font-heading">
               Didukung Sinergi Ekosistem Sourcing &amp; Perbankan D.I. Yogyakarta
             </p>
