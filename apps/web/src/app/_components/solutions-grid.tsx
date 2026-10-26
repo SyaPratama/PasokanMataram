@@ -11,7 +11,7 @@ export function SolutionsGridSection() {
   const [selectedFacility, setSelectedFacility] = useState<FacilityDetail | null>(null);
 
   return (
-    <section id="langkah" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-white">
+    <section id="langkah" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold tracking-wider uppercase text-sekunder">

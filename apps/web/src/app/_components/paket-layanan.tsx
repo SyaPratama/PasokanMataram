@@ -121,7 +121,7 @@ export function PaketLayanan() {
   };
 
   return (
-    <section id="biaya" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-canvas overflow-hidden">
+    <section id="biaya" className="py-16 px-4 sm:px-6 lg:px-8 bg-transparent overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
@@ -178,7 +178,7 @@ export function PaketLayanan() {
                       className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                         tier.isFeatured
                           ? 'bg-white/10 text-white/90 border border-white/20'
-                          : 'bg-netral-surface text-gelap-muted border border-netral-border/60'
+                          : 'bg-netral-canvas text-gelap/85 border border-netral-border/60'
                       }`}
                     >
                       {tier.escrowFee}
