@@ -204,7 +204,7 @@ export function PaymentGatewaySimulatorModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="solosmartpay-sim-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/60 backdrop-blur-xs animate-in fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/60 animate-in fade-in"
     >
       <div className="bg-white rounded-3xl max-w-2xl w-full border-2 border-netral-border shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="p-6 sm:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">

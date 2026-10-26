@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           sizes="100vw"
           className="object-cover object-center opacity-10 filter saturate-[1.1] contrast-[1.02]"
         />
-        <div className="absolute inset-0 bg-netral-canvas/90 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-netral-canvas/95" />
         <div
           className="absolute inset-0 opacity-[0.035] bg-[radial-gradient(theme(colors.primer.DEFAULT)_1px,transparent_1px)] [background-size:24px_24px]"
         />

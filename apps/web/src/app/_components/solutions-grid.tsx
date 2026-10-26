@@ -11,7 +11,7 @@ export function SolutionsGridSection() {
   const [selectedFacility, setSelectedFacility] = useState<FacilityDetail | null>(null);
 
   return (
-    <section id="langkah" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-white border-t border-netral-border/60">
+    <section id="langkah" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold tracking-wider uppercase text-sekunder">
@@ -164,7 +164,7 @@ export function SolutionsGridSection() {
                   <span className="text-[10px] sm:text-xs font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
                     {FACILITIES[0]?.badge}
                   </span>
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors shrink-0">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/25 flex items-center justify-center text-white group-hover:bg-sekunder group-hover:text-white transition-colors shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                 </div>
@@ -212,7 +212,7 @@ export function SolutionsGridSection() {
                   <span className="text-[10px] sm:text-[11px] font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
                     {FACILITIES[1]?.badge}
                   </span>
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/25 flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export function SolutionsGridSection() {
                   <span className="text-[10px] sm:text-[11px] font-bold text-aksen-light uppercase tracking-wider line-clamp-1">
                     {FACILITIES[2]?.badge}
                   </span>
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/25 flex items-center justify-center text-white group-hover:bg-sekunder transition-colors shrink-0">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export function SolutionsGridSection() {
                   <span className="text-[10px] sm:text-[11px] font-bold text-white/90 uppercase tracking-wider line-clamp-1">
                     {FACILITIES[3]?.badge}
                   </span>
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-sekunder transition-colors shrink-0">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/25 flex items-center justify-center text-white group-hover:bg-white group-hover:text-sekunder transition-colors shrink-0">
                     <PackageCheck className="w-3.5 h-3.5" />
                   </div>
                 </div>

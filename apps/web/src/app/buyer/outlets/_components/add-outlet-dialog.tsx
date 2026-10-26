@@ -99,7 +99,7 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-netral-border overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="bg-primer-deep p-4 px-6 text-white flex items-center justify-between">
           <div className="flex items-center space-x-2">

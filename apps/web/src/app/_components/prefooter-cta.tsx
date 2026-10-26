@@ -25,11 +25,11 @@ export function PreFooterCtaSection() {
               sizes="(max-width: 1280px) 100vw, 1280px"
               className="object-cover object-center brightness-[0.7] contrast-[1.1]"
             />
-            <div className="absolute inset-0 bg-primer-darkest/80 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-primer-darkest/85" />
           </div>
 
           <div className="relative z-10 max-w-2xl mx-auto">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/15 text-white/90 backdrop-blur-sm border border-white/20 mb-4">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primer-deep text-white border border-white/30 mb-4 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 mr-1 text-aksen" />
               Ekosistem Kuliner &amp; Supplier Pangan D.I. Yogyakarta
             </span>
@@ -53,7 +53,7 @@ export function PreFooterCtaSection() {
 
               <Link
                 href="/buyer/legalitas"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 text-xs sm:text-sm font-semibold rounded-full bg-white/15 text-white hover:bg-white/25 border border-white/25 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-white min-h-[44px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 text-xs sm:text-sm font-bold font-heading rounded-full bg-white text-primer-deep hover:bg-netral-canvas shadow-md transition-all hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-white min-h-[44px]"
               >
                 Lanjutkan Verifikasi Berkas
               </Link>

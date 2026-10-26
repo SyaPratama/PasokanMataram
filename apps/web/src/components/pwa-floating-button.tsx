@@ -73,7 +73,7 @@ export function PwaFloatingButton() {
 
         <div
           role="tooltip"
-          className="absolute bottom-full right-0 mb-2 hidden group-hover:block sm:w-60 p-2.5 bg-gelap/95 text-white text-[11px] rounded-xl shadow-lg border border-white/10 pointer-events-none backdrop-blur-sm transition-opacity"
+          className="absolute bottom-full right-0 mb-2 hidden group-hover:block sm:w-60 p-2.5 bg-gelap text-white text-[11px] rounded-xl shadow-lg border border-white/10 pointer-events-none transition-opacity"
         >
           <div className="font-semibold text-aksen flex items-center gap-1 mb-0.5">
             <Sparkles className="w-3.5 h-3.5" />
@@ -93,7 +93,7 @@ export function PwaFloatingButton() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setModalOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60"
               aria-hidden="true"
             />
 

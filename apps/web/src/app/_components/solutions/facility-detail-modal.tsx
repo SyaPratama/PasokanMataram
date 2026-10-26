@@ -39,7 +39,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
     >
       <div
-        className="fixed inset-0 bg-gelap/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-gelap/60 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -122,8 +122,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
             ))}
           </div>
         </div>
-
-        <div className="mt-8 pt-4 border-t border-netral-border flex justify-end">
+        <div className="mt-8 pt-2 flex justify-end">
           <button
             type="button"
             onClick={onClose}

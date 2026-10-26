@@ -390,7 +390,7 @@ export default function BuyerPoolingPage() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="pooling-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/50 backdrop-blur-xs animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/50 animate-in fade-in"
         >
           <div className="bg-white rounded-2xl max-w-lg w-full border-2 border-netral-border shadow-xl p-6 space-y-5">
             <div className="flex items-center justify-between border-b-2 border-netral-border pb-4">

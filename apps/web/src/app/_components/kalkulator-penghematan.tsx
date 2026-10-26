@@ -20,7 +20,7 @@ export function KalkulatorPenghematan() {
   };
 
   return (
-    <section id="kalkulator" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-surface/60 border-y border-netral-border">
+    <section id="kalkulator" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-surface/60">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
@@ -116,7 +116,7 @@ export function KalkulatorPenghematan() {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-netral-border flex items-center gap-2 text-xs text-gelap/70">
+            <div className="mt-6 pt-4 flex items-center gap-2 text-xs text-gelap/70">
               <ShieldCheck className="w-4 h-4 text-primer shrink-0" />
               <span>Simulasi berdasarkan deviasi harga pasar eceran vs kontrak supplier pangan DIY 2026</span>
             </div>
@@ -139,14 +139,14 @@ export function KalkulatorPenghematan() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/15">
+                <div className="pt-3">
                   <div className="text-xs text-white/70">Potensi Hemat per Tahun</div>
                   <div className="text-xl sm:text-2xl font-extrabold font-heading text-white mt-0.5 font-mono tabular-nums">
                     {formatRupiah(yearlySavings)}
                   </div>
                 </div>
 
-                <ul className="space-y-2 pt-4 border-t border-white/15 text-xs text-white/90">
+                <ul className="space-y-2 pt-3 text-xs text-white/90">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-aksen shrink-0" />
                     <span>Bebas biaya mark-up tengkulak</span>

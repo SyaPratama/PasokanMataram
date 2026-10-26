@@ -71,7 +71,7 @@ describe('Minggu 1.9 - Unified Design System & Layout Harmony Verification', () 
 
     expect(buyerContent).toContain('DashboardShell');
     expect(shellContent).toContain('fixed inset-0 z-50 md:hidden flex');
-    expect(shellContent).toContain('bg-black/50 backdrop-blur-xs');
+    expect(shellContent).toContain('bg-black/50');
     expect(shellContent).toContain('min-h-[44px]');
   });
 
@@ -88,7 +88,7 @@ describe('Minggu 1.9 - Unified Design System & Layout Harmony Verification', () 
     expect(supplierContent).toContain("title: 'PENGATURAN'");
     expect(supplierContent).toContain('DashboardShell');
     expect(shellContent).toContain('fixed inset-0 z-50 md:hidden flex');
-    expect(shellContent).toContain('bg-black/50 backdrop-blur-xs');
+    expect(shellContent).toContain('bg-black/50');
     expect(shellContent).toContain('min-h-[44px]');
   });
 

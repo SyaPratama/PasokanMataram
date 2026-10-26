@@ -219,7 +219,7 @@ export function DashboardShell({
             className="fixed inset-0 z-50 md:hidden flex"
           >
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+              className="fixed inset-0 bg-black/50 transition-opacity"
               onClick={() => setMobileMenuOpen(false)}
               aria-hidden="true"
             />

@@ -31,7 +31,7 @@ export function MekanismePoolingSection() {
                 Supplier pangan dan Gapoktan mitra mengumumkan ketersediaan pasokan dengan batas minimum tonase muatan truk (25 kg hingga 2 ton).
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-primer flex items-center gap-1">
+            <div className="mt-4 pt-2 text-[11px] font-semibold text-primer flex items-center gap-1">
               <CalendarClock className="w-3.5 h-3.5" />
               <span>Jadwal Terbuka Transparan</span>
             </div>
@@ -47,7 +47,7 @@ export function MekanismePoolingSection() {
                 Dapur memesan porsi (25 sampai 100 kg). Saldo pesanan dikunci dengan aman di rekening penampung escrow terproteksi.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-sekunder-dark flex items-center gap-1">
+            <div className="mt-4 pt-2 text-[11px] font-semibold text-sekunder-dark flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Dana Terproteksi 100%</span>
             </div>
@@ -63,7 +63,7 @@ export function MekanismePoolingSection() {
                 Panen tiba sore hari di Hub Transit untuk kalibrasi timbangan digital presisi dan penyortiran fisik grade A.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-aksen-dark flex items-center gap-1">
+            <div className="mt-4 pt-2 text-[11px] font-semibold text-aksen-dark flex items-center gap-1">
               <Scale className="w-3.5 h-3.5" />
               <span>Zero Selisih Timbangan</span>
             </div>
@@ -79,7 +79,7 @@ export function MekanismePoolingSection() {
                 Armada mengantar komoditas pukul 04:30 WIB. Koki memvalidasi kualitas via QC digital sebelum dana escrow dilepas ke supplier.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-netral-border/50 text-[11px] font-semibold text-primer flex items-center gap-1">
+            <div className="mt-4 pt-2 text-[11px] font-semibold text-primer flex items-center gap-1">
               <Truck className="w-3.5 h-3.5" />
               <span>Drop Pukul 04:30 Subuh</span>
             </div>
@@ -87,7 +87,7 @@ export function MekanismePoolingSection() {
         </div>
 
         <div className="bg-white rounded-3xl border border-netral-border p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-netral-border/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primer-light/40 text-primer mb-1.5">
                 <span className="w-2 h-2 rounded-full bg-primer" />
@@ -139,7 +139,7 @@ export function MekanismePoolingSection() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-netral-border/60">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-3">
             <Link
               href="/register"
               className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-xs font-bold rounded-full bg-primer text-white hover:bg-primer-hover shadow-xs transition-all hover:scale-[1.02] min-h-[44px]"

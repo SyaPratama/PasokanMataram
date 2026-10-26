@@ -32,7 +32,7 @@ export function KybBlockerModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="kyb-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
     >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-netral-border relative animate-in fade-in zoom-in-95 duration-200">
         <button

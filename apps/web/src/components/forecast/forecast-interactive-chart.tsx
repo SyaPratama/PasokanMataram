@@ -301,7 +301,7 @@ export function ForecastInteractiveChart({
         </svg>
 
         {hoveredPoint && (
-          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm border border-netral-border rounded-xl p-3 shadow-lg text-xs space-y-1 pointer-events-none transition-all">
+          <div className="absolute top-3 right-3 bg-white border border-netral-border rounded-xl p-3 shadow-lg text-xs space-y-1 pointer-events-none transition-all">
             <div className="text-xs font-bold text-gelap-muted uppercase flex items-center justify-between gap-3">
               <span>{hoveredPoint.date}</span>
               <span className={`px-1.5 py-0.2 rounded text-xs font-semibold ${
