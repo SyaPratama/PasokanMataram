@@ -31,7 +31,7 @@ export default function PrediksiHargaPage() {
       <Navbar />
 
       <main className="flex-1">
-        <div className="bg-white border-b border-netral-border/70 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="bg-transparent pt-6 pb-2 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <nav className="flex items-center text-xs text-gelap/60 mb-3" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primer transition-colors">
