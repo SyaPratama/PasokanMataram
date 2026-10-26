@@ -20,7 +20,7 @@ export function KalkulatorPenghematan() {
   };
 
   return (
-    <section id="kalkulator" className="py-16 px-4 sm:px-6 lg:px-8 bg-netral-surface/60">
+    <section id="kalkulator" className="py-16 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
