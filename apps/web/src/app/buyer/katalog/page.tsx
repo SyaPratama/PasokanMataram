@@ -238,7 +238,7 @@ export default function BuyerKatalogPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
         >
           <div className="bg-white rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-netral-border p-6 space-y-5 animate-in fade-in duration-200">
             <div className="flex items-start justify-between border-b border-netral-border/70 pb-3">

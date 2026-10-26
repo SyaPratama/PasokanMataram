@@ -70,7 +70,7 @@ export function AlurPengadaan() {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Bagaimana PasokMataram Mengamankan Dapur Anda
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
+          <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
             Empat langkah terintegrasi menghubungkan pesanan dapur HoReKa langsung ke ekosistem supplier pangan lokal D.I. Yogyakarta.
           </p>
         </div>
@@ -111,7 +111,7 @@ export function AlurPengadaan() {
                   </ul>
                 </div>
 
-                <div className="mt-6 pt-3 border-t border-netral-border/60 text-[11px] font-bold text-primer flex items-center justify-between">
+                <div className="mt-6 pt-3 text-[11px] font-bold text-primer flex items-center justify-between">
                   <span>Tahap {item.step}</span>
                   <span className="text-gelap/40 font-normal">Selesai Terverifikasi</span>
                 </div>

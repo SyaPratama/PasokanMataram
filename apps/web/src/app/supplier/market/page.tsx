@@ -345,7 +345,7 @@ export default function SupplierMarketPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
         >
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-netral-border space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between border-b border-netral-border/70 pb-3">

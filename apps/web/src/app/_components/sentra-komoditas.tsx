@@ -95,7 +95,7 @@ export function SentraKomoditasSection() {
   };
 
   return (
-    <section id="komoditas" className="py-16 md:py-24 bg-white border-y border-netral-border/50">
+    <section id="komoditas" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
           <div className="max-w-2xl">
@@ -245,7 +245,7 @@ export function SentraKomoditasSection() {
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-3.5 border-t border-netral-border/60 flex items-center justify-between gap-2">
+                    <div className="mt-4 pt-2 flex items-center justify-between gap-2">
                       <span className="text-[11px] text-gelap/85 font-semibold whitespace-nowrap shrink-0">Min. 25 kg</span>
                       <Link
                         href="/register"
@@ -294,7 +294,7 @@ export function SentraKomoditasSection() {
             )}
 
             {totalPages > 1 && (
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-netral-border/70">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
                 <span className="text-xs text-gelap/70 font-body">
                   Menampilkan <span className="font-bold text-primer font-mono tabular-nums">{Math.min(filteredItems.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}–{Math.min(filteredItems.length, currentPage * ITEMS_PER_PAGE)}</span> dari <span className="font-bold text-gelap font-mono tabular-nums">{filteredItems.length}</span> komoditas
                 </span>

@@ -130,7 +130,7 @@ export function PaketLayanan() {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Pilihan Paket Akun Sesuai Skala Bisnis Anda
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
+          <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
             Tanpa biaya tersembunyi. Dapur restoran hanya membayar transaksi yang berhasil, supplier menerima pembayaran penuh terproteksi escrow.
           </p>
         </div>
@@ -200,7 +200,7 @@ export function PaketLayanan() {
                     {tier.target}
                   </p>
 
-                  <div className="my-5 pb-5 border-b border-current/15">
+                  <div className="my-5 pb-3">
                     <span className="text-2xl sm:text-3xl font-extrabold font-heading tracking-tight">
                       {tier.priceMonthly}
                     </span>

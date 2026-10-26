@@ -44,7 +44,7 @@ export function FacilityCard({ facility, index, onSelect }: FacilityCardProps) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm border border-netral-border/80 px-2.5 py-1 rounded-full text-[11px] font-bold text-primer flex items-center gap-1.5 shadow-xs">
+          <div className="absolute top-3 left-3 bg-white border border-netral-border/80 px-2.5 py-1 rounded-full text-[11px] font-bold text-primer flex items-center gap-1.5 shadow-xs">
             {getFacilityIcon(facility.id)}
             <span>{facility.badge}</span>
           </div>
@@ -58,8 +58,7 @@ export function FacilityCard({ facility, index, onSelect }: FacilityCardProps) {
           {facility.summary}
         </p>
       </div>
-
-      <div className="mt-5 pt-3.5 border-t border-netral-border/60 flex items-center justify-between text-xs font-semibold text-primer group-hover:text-primer-hover transition-colors">
+      <div className="mt-5 pt-2 flex items-center justify-between text-xs font-semibold text-primer group-hover:text-primer-hover transition-colors">
         <span>Periksa SOP Inspeksi</span>
         <div className="w-7 h-7 rounded-full bg-primer-light/80 group-hover:bg-primer group-hover:text-white flex items-center justify-center transition-colors">
           <ArrowUpRight className="w-4 h-4" aria-hidden="true" />

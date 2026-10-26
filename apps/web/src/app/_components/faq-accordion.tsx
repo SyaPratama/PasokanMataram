@@ -79,8 +79,7 @@ export function FaqAccordionSection() {
                   </p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-3 pt-3 border-t border-netral-border/60">
+              <div className="flex items-center gap-3 pt-3">
                 <div className="w-10 h-10 rounded-xl bg-aksen-light text-aksen flex items-center justify-center shrink-0">
                   <HelpCircle className="w-5 h-5" aria-hidden="true" />
                 </div>

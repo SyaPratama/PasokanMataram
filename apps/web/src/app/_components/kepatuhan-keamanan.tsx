@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export function KepatuhanKeamananSection() {
   return (
-    <section id="keamanan" className="py-16 md:py-24 bg-white border-y border-netral-border/50">
+    <section id="keamanan" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-12">
           <span className="text-xs font-bold tracking-wider uppercase text-sekunder">

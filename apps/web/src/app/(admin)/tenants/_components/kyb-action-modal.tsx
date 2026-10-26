@@ -52,7 +52,7 @@ export function KybActionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gelap/60"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

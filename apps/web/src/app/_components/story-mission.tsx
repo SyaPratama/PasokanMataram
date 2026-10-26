@@ -30,7 +30,7 @@ export function StoryMissionSection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-gelap/20 via-transparent to-transparent pointer-events-none" />
               </div>
 
-              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 bg-white/95 backdrop-blur-sm border border-netral-border/80 px-3.5 py-2 rounded-2xl shadow-md text-xs font-bold text-primer flex items-center gap-1.5 whitespace-nowrap">
+              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 bg-white border border-netral-border/80 px-3.5 py-2 rounded-2xl shadow-md text-xs font-bold text-primer flex items-center gap-1.5 whitespace-nowrap">
                 <ShieldCheck className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
                 <span>Panen Terkurasi Grade A</span>
               </div>

@@ -271,7 +271,7 @@ export default function BuyerOrdersPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-gelap/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 bg-gelap/60 flex items-center justify-center p-4 animate-fade-in"
         >
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-netral-border space-y-4">
             <div className="flex items-center justify-between border-b border-netral-border/70 pb-3">
