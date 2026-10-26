@@ -47,10 +47,6 @@ export default function HomePage() {
         aria-hidden="true"
       />
 
-      <div className="absolute top-[8%] left-[-8%] w-[500px] h-[500px] bg-primer/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-[28%] right-[-6%] w-[450px] h-[450px] bg-aksen/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-[55%] left-[-5%] w-[480px] h-[480px] bg-sekunder/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-[78%] right-[-7%] w-[520px] h-[520px] bg-primer/10 rounded-full blur-3xl pointer-events-none" />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-primer focus:text-white focus:rounded-full focus:shadow-md"
