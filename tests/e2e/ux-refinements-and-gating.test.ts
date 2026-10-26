@@ -54,7 +54,7 @@ describe('Penyempurnaan UI/UX, Copywriting Humanis, dan Gating Legalitas KYB', (
     expect(content).not.toContain('<span>Verifikasi Usaha</span>');
     expect(content).not.toContain('href="/onboarding-kyb"');
     expect(content).toContain('<span>Lihat Komoditas Pangan</span>');
-    expect(content).toContain('href="/komoditas"');
+    expect(content).toContain('href="/#komoditas"');
   });
 
   it('5. memvalidasi teks keamanan login telah digeneralisasi (anti-jargon)', () => {

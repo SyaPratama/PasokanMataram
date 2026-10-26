@@ -99,7 +99,7 @@ export function SandboxBanner(): React.JSX.Element | null {
 
   if (!isSandboxMode) {
     return (
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40">
         <button
           type="button"
           onClick={() => setSandboxMode(true)}

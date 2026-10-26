@@ -18,8 +18,27 @@ export function PwaFloatingButton() {
   const [modalOpen, setModalOpen] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);
   const [showManualGuide, setShowManualGuide] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(false);
 
-  if (isInstalled) {
+  React.useEffect(() => {
+    const checkBannerState = () => {
+      try {
+        const dismissed = typeof window !== 'undefined' ? localStorage.getItem('pasokmataram_pwa_banner_dismissed') : null;
+        setBannerVisible(dismissed !== 'true');
+      } catch {
+        setBannerVisible(false);
+      }
+    };
+    checkBannerState();
+    window.addEventListener('pwa-banner-dismissed', checkBannerState);
+    window.addEventListener('storage', checkBannerState);
+    return () => {
+      window.removeEventListener('pwa-banner-dismissed', checkBannerState);
+      window.removeEventListener('storage', checkBannerState);
+    };
+  }, []);
+
+  if (isInstalled || bannerVisible) {
     return null;
   }
 

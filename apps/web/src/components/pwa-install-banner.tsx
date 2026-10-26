@@ -34,6 +34,7 @@ export function PwaInstallBanner() {
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem(PWA_DISMISSED_KEY, 'true');
+        window.dispatchEvent(new Event('pwa-banner-dismissed'));
       }
     } catch {}
   };
