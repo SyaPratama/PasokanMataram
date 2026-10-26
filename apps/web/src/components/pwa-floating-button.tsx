@@ -60,7 +60,7 @@ export function PwaFloatingButton() {
           type="button"
           onClick={() => setModalOpen(true)}
           aria-label="Buka opsi instalasi aplikasi dapur PWA"
-          className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-primer text-white shadow-xl hover:bg-primer-hover hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-white/30 focus-visible:ring-4 focus-visible:ring-primer/40 min-h-[48px]"
+          className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-primer text-white shadow-xl hover:bg-primer-hover hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-aksen focus-visible:ring-4 focus-visible:ring-aksen/40 min-h-[48px]"
         >
           <div className="relative">
             <Tablet className="w-5 h-5 text-aksen" aria-hidden="true" />
