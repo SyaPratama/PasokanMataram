@@ -59,22 +59,27 @@ const STEPS: StepItem[] = [
   },
 ];
 
-export function AlurPengadaan() {
-  return (
-    <section id="alur-pengadaan" className="py-16 px-4 sm:px-6 lg:px-8 bg-transparent">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
-            Alur Operasional Dapur ke Supplier
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
-            Bagaimana PasokMataram Mengamankan Dapur Anda
-          </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
-            Empat langkah terintegrasi menghubungkan pesanan dapur HoReKa langsung ke ekosistem supplier pangan lokal D.I. Yogyakarta.
-          </p>
-        </div>
+interface AlurPengadaanProps {
+  hideHeader?: boolean;
+}
 
+export function AlurPengadaan({ hideHeader = false }: AlurPengadaanProps = {}) {
+  return (
+    <section id="alur-pengadaan" className={`${hideHeader ? 'pt-0 pb-12' : 'pt-4 sm:pt-6 pb-16'} px-4 sm:px-6 lg:px-8 bg-transparent`}>
+      <div className="max-w-7xl mx-auto">
+        {!hideHeader && (
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primer-surface/10 text-primer-deep border border-primer-pendukung/30 mb-3">
+              Alur Operasional Dapur ke Supplier
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
+              Bagaimana PasokMataram Mengamankan Dapur Anda
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
+              Empat langkah terintegrasi menghubungkan pesanan dapur HoReKa langsung ke ekosistem supplier pangan lokal D.I. Yogyakarta.
+            </p>
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {STEPS.map((item) => {
             const IconComp = item.icon;

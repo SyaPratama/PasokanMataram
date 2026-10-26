@@ -81,7 +81,7 @@ export function HeroSection() {
     <section
       id="beranda"
       ref={containerRef}
-      className="relative w-full overflow-hidden bg-netral-canvas pt-10 sm:pt-16 pb-20 md:pb-28"
+      className="relative w-full overflow-hidden bg-netral-canvas pt-10 sm:pt-16 pb-8 sm:pb-10"
     >
       <motion.div
         style={{ y: bgY, scale: bgScale }}
