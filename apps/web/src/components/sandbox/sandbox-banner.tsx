@@ -103,7 +103,7 @@ export function SandboxBanner(): React.JSX.Element | null {
         <button
           type="button"
           onClick={() => setSandboxMode(true)}
-          className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-primer text-white hover:bg-primer-hover active:scale-[0.98] shadow-lg border-2 border-primer-light font-bold text-sm min-h-[48px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/40"
+          className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-primer text-white hover:bg-primer-hover active:scale-[0.98] shadow-xl border-2 border-aksen font-bold text-sm min-h-[48px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-aksen/40"
           aria-label="Aktifkan Mode Sandbox Pengujian"
         >
           <Sparkles className="w-5 h-5 text-aksen-light" />
