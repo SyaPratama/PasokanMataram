@@ -112,13 +112,18 @@ export function HeroSection() {
       </motion.div>
 
       <div
-        className="absolute inset-0 z-2 pointer-events-none bg-[radial-gradient(ellipse_85%_60%_at_50%_62%,rgba(247,244,238,0.85)_0%,rgba(247,244,238,0.50)_65%,transparent_100%)]"
+        className="absolute inset-0 z-2 pointer-events-none bg-[radial-gradient(ellipse_75%_65%_at_50%_46%,rgba(247,244,238,0.90)_0%,rgba(247,244,238,0.65)_55%,rgba(247,244,238,0.20)_85%,transparent_100%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute bottom-0 inset-x-0 h-36 z-3 pointer-events-none bg-gradient-to-t from-netral-canvas via-netral-canvas/90 to-transparent"
+        className="absolute top-0 inset-x-0 h-32 z-3 pointer-events-none bg-gradient-to-b from-netral-canvas via-netral-canvas/75 to-transparent"
         aria-hidden="true"
       />
+      <div
+        className="absolute bottom-0 inset-x-0 h-44 z-3 pointer-events-none bg-gradient-to-t from-netral-canvas via-netral-canvas/85 to-transparent"
+        aria-hidden="true"
+      />
+
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           style={{ y: textY }}
@@ -133,12 +138,12 @@ export function HeroSection() {
             <span className="text-gelap/80 font-medium hidden sm:inline">D.I. Yogyakarta</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-gelap-surface tracking-tight leading-[1.12] font-heading max-w-4xl mx-auto text-balance drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-gelap tracking-tight leading-[1.12] font-heading max-w-4xl mx-auto text-balance drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)]">
             Digitalisasi Rantai Pasok Pangan,{' '}
-            <span className="text-primer-deep">One-Stop Supplier Pangan DIY.</span>
+            <span className="text-primer">One-Stop Supplier Pangan DIY.</span>
           </h1>
 
-          <p className="mt-5 sm:mt-6 text-base sm:text-lg md:text-xl text-gelap-surface/90 font-body leading-relaxed max-w-2xl mx-auto text-balance font-medium drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]">
+          <p className="mt-5 sm:mt-6 text-base sm:text-lg md:text-xl text-gelap/90 font-body leading-relaxed max-w-2xl mx-auto text-balance font-medium drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
             Sistem pengadaan bahan baku dapur restoran, kafe, dan hotel langsung dari ekosistem supplier pangan lokal D.I. Yogyakarta. Pangkas 5 titik rantai pasok tradisional dengan jadwal subuh terjamin, proteksi escrow 100%, dan jaminan mutu QC pangan.
           </p>
 
