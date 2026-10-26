@@ -112,15 +112,15 @@ export function HeroSection() {
       </motion.div>
 
       <div
-        className="absolute inset-0 z-2 pointer-events-none bg-[radial-gradient(ellipse_75%_65%_at_50%_46%,rgba(247,244,238,0.90)_0%,rgba(247,244,238,0.65)_55%,rgba(247,244,238,0.20)_85%,transparent_100%)]"
+        className="absolute inset-0 z-2 pointer-events-none bg-[linear-gradient(to_bottom,rgba(0,0,0,0.52)_0%,rgba(0,0,0,0.40)_42%,rgba(0,0,0,0.18)_68%,transparent_82%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute top-0 inset-x-0 h-32 z-3 pointer-events-none bg-gradient-to-b from-netral-canvas via-netral-canvas/75 to-transparent"
+        className="absolute inset-0 z-2 pointer-events-none bg-[radial-gradient(ellipse_80%_60%_at_50%_44%,rgba(0,0,0,0.28)_0%,transparent_75%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute bottom-0 inset-x-0 h-44 z-3 pointer-events-none bg-gradient-to-t from-netral-canvas via-netral-canvas/85 to-transparent"
+        className="absolute bottom-0 inset-x-0 h-64 sm:h-80 z-3 pointer-events-none bg-[linear-gradient(to_top,#F7F4EE_0%,rgba(247,244,238,0.92)_35%,rgba(247,244,238,0.50)_65%,transparent_100%)]"
         aria-hidden="true"
       />
 
@@ -131,19 +131,19 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white/95 text-primer border border-primer/25 mb-5 sm:mb-6 shadow-xs backdrop-blur-xs">
-            <Sprout className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-black/30 text-white border border-white/25 mb-5 sm:mb-6 shadow-sm backdrop-blur-md">
+            <Sprout className="w-4 h-4 text-aksen shrink-0" aria-hidden="true" />
             <span className="font-bold">{'Pengadaan Bahan Pangan Dapur HoReKa & Supplier DIY'}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-primer/40 inline-block shrink-0" aria-hidden="true" />
-            <span className="text-gelap/80 font-medium hidden sm:inline">D.I. Yogyakarta</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-white/60 inline-block shrink-0" aria-hidden="true" />
+            <span className="text-white/90 font-medium hidden sm:inline">D.I. Yogyakarta</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-gelap tracking-tight leading-[1.12] font-heading max-w-4xl mx-auto text-balance drop-shadow-[0_1px_2px_rgba(255,255,255,0.95)]">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.12] font-heading max-w-4xl mx-auto text-balance drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
             Digitalisasi Rantai Pasok Pangan,{' '}
-            <span className="text-primer">One-Stop Supplier Pangan DIY.</span>
+            <span className="text-aksen-light">One-Stop Supplier Pangan DIY.</span>
           </h1>
 
-          <p className="mt-5 sm:mt-6 text-base sm:text-lg md:text-xl text-gelap/90 font-body leading-relaxed max-w-2xl mx-auto text-balance font-medium drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
+          <p className="mt-5 sm:mt-6 text-base sm:text-lg md:text-xl text-white/95 font-body leading-relaxed max-w-2xl mx-auto text-balance font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
             Sistem pengadaan bahan baku dapur restoran, kafe, dan hotel langsung dari ekosistem supplier pangan lokal D.I. Yogyakarta. Pangkas 5 titik rantai pasok tradisional dengan jadwal subuh terjamin, proteksi escrow 100%, dan jaminan mutu QC pangan.
           </p>
 
@@ -151,7 +151,7 @@ export function HeroSection() {
             <Link
               href="/register"
               aria-label="Mulai Pengadaan Dapur"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-sm font-bold font-heading rounded-full bg-gelap hover:bg-primer text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] min-h-[48px]"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-sm font-bold font-heading rounded-full bg-sekunder hover:bg-sekunder-hover text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] min-h-[48px]"
             >
               <span>Mulai Pengadaan</span>
               <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
@@ -161,27 +161,28 @@ export function HeroSection() {
               href="/#komoditas"
               onClick={handleScrollToKomoditas}
               aria-label="Lihat Komoditas Pangan"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-sm font-bold font-heading rounded-full bg-white/95 hover:bg-white text-gelap hover:text-primer border border-netral-border/90 shadow-xs hover:shadow-md transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] min-h-[48px]"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-sm font-bold font-heading rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] min-h-[48px]"
             >
               <span>Lihat Komoditas Pangan</span>
-              <ArrowRight className="w-4 h-4 ml-2 text-gelap/60" aria-hidden="true" />
+              <ArrowRight className="w-4 h-4 ml-2 text-white/80" aria-hidden="true" />
             </Link>
           </div>
+
           <div className="mt-12 sm:mt-16 pt-6 max-w-3xl mx-auto">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gelap/60 mb-4 font-heading">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-white/90 mb-4 font-heading drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
               Didukung Sinergi Ekosistem Sourcing &amp; Perbankan D.I. Yogyakarta
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-gelap/85">
-              <span className="inline-flex items-center gap-2 bg-white/90 px-4 py-2 rounded-full border border-netral-border/60 shadow-2xs backdrop-blur-xs">
-                <ShieldCheck className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-white">
+              <span className="inline-flex items-center gap-2 bg-black/35 px-4 py-2 rounded-full border border-white/20 shadow-md backdrop-blur-md">
+                <ShieldCheck className="w-4 h-4 text-aksen shrink-0" aria-hidden="true" />
                 <span>100% Proteksi Escrow BPD DIY</span>
               </span>
-              <span className="inline-flex items-center gap-2 bg-white/90 px-4 py-2 rounded-full border border-netral-border/60 shadow-2xs backdrop-blur-xs">
-                <Clock className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
+              <span className="inline-flex items-center gap-2 bg-black/35 px-4 py-2 rounded-full border border-white/20 shadow-md backdrop-blur-md">
+                <Clock className="w-4 h-4 text-aksen shrink-0" aria-hidden="true" />
                 <span>Layanan Logistik Dingin 24 Jam</span>
               </span>
-              <span className="inline-flex items-center gap-2 bg-white/90 px-4 py-2 rounded-full border border-netral-border/60 shadow-2xs backdrop-blur-xs">
-                <MapPin className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
+              <span className="inline-flex items-center gap-2 bg-black/35 px-4 py-2 rounded-full border border-white/20 shadow-md backdrop-blur-md">
+                <MapPin className="w-4 h-4 text-aksen shrink-0" aria-hidden="true" />
                 <span>5 Kabupaten/Kota (Kulon Progo, Bantul, Sleman, Gunungkidul)</span>
               </span>
             </div>
