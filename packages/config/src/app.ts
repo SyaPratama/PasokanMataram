@@ -38,5 +38,6 @@ export const appConfig: AppConfig = appConfigSchema.parse({
 });
 
 export const isProduction = appConfig.nodeEnv === 'production';
+export const isSandboxAllowed = appConfig.nodeEnv !== 'production';
 export const isDevelopment = appConfig.nodeEnv === 'development';
 export const isTest = appConfig.nodeEnv === 'test';
