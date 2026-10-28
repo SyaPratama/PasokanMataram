@@ -31,10 +31,10 @@ export function middleware(request: NextRequest): NextResponse {
   const sessionCookie = request.cookies.get('pasok_session')?.value || request.cookies.get('auth_token')?.value;
   let claims = sessionCookie ? decodeSessionClaimsEdge(sessionCookie) : null;
 
-  const isSandboxMode =
-    request.cookies.get('pasok_sandbox_mode')?.value === 'true' ||
-    request.nextUrl.searchParams.get('sandbox') === 'true';
-
+const isSandboxMode =
+  (request.cookies.get('pasok_sandbox_mode')?.value === 'true' ||
+    request.nextUrl.searchParams.get('sandbox') === 'true') &&
+  process.env.NODE_ENV !== 'production';
   if (isSandboxMode) {
     const personaCookie = request.cookies.get('pasok_sandbox_persona')?.value;
     const personaParam = request.nextUrl.searchParams.get('persona');
