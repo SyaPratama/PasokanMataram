@@ -96,34 +96,43 @@ export default function RegisterPage() {
         password: formData.password,
       };
 
-      try {
-        const res = await fetch('/api/v1/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
+      const res = await fetch('/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        setErrorMessage(errorData.message || 'Gagal mendaftar. Silakan coba lagi.');
+        return;
+      }
+
+      const data = await res.json();
+      if (data.success && data.data) {
+        const { tenantId, userId, role, kybStatus } = data.data;
+
+        if (typeof document !== 'undefined') {
+          const mockToken = createMockClientJwt({
+            userId,
+            tenantId,
+            macroRole: intent,
+            microRole: intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON',
+            email: formData.email || 'mitra@pasokmataram.id',
+            isSuperAdmin: false,
+          });
+          document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
+          document.cookie = `pasok_session_role=${intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON'}; path=/; max-age=604800; SameSite=Lax`;
+          document.cookie = `pasok_macro_role=${intent}; path=/; max-age=604800; SameSite=Lax`;
+          document.cookie = `pasok_kyb_status=${kybStatus || 'KYB_PENDING'}; path=/; max-age=604800; SameSite=Lax`;
         }
-      } catch {
+
+        const targetDashboard = intent === 'HOREKA' ? '/buyer/dashboard' : '/supplier/dashboard';
+        router.push(targetDashboard);
+        return;
       }
 
-      if (typeof document !== 'undefined') {
-        const mockToken = createMockClientJwt({
-          userId: `usr_reg_${Date.now()}`,
-          tenantId: `tenant_reg_${Date.now()}`,
-          macroRole: intent,
-          microRole: intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON',
-          email: formData.email || 'mitra@pasokmataram.id',
-          isSuperAdmin: false,
-        });
-        document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `pasok_session_role=${intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON'}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `pasok_macro_role=${intent}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `pasok_kyb_status=KYB_PENDING; path=/; max-age=604800; SameSite=Lax`;
-      }
-
-      const targetDashboard = intent === 'HOREKA' ? '/buyer/dashboard' : '/supplier/dashboard';
-      router.push(targetDashboard);
+      setErrorMessage('Respons server tidak valid.');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem saat mendaftar.';
       setErrorMessage(msg);
@@ -147,87 +156,54 @@ export default function RegisterPage() {
         <h1 className="text-xl sm:text-2xl font-bold font-heading tracking-tight text-balance">
           Pendaftaran Entitas Usaha PasokMataram
         </h1>
-        <p className="text-xs sm:text-sm text-white/90 mt-1.5 max-w-md mx-auto leading-relaxed">
-          Pilih jenis usaha Anda untuk bergabung langsung dalam rantai pasok pangan D.I. Yogyakarta
+        <p className="text-xs text-white/90 mt-1.5 max-w-sm mx-auto leading-relaxed">
+          Daftarkan bisnis Anda untuk bergabung dengan ekosistem pangan D.I. Yogyakarta
         </p>
       </div>
-      <div className="mb-6">
-        <label className="block text-xs sm:text-sm font-bold text-gelap uppercase tracking-wider mb-2.5">
-          Langkah 1: Pilih Kategori Usaha Anda
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setIntent('HOREKA')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between min-h-[96px] ${
-              intent === 'HOREKA'
-                ? 'border-primer bg-primer-light/40 shadow-xs ring-2 ring-primer'
-                : 'border-netral-border/80 bg-white hover:border-primer hover:bg-netral-canvas/40'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-9 h-9 rounded-xl bg-primer-light flex items-center justify-center text-primer">
-                <Utensils className="w-5 h-5" aria-hidden="true" />
-              </div>
-              {intent === 'HOREKA' && (
-                <CheckCircle2 className="w-5 h-5 text-primer" aria-hidden="true" />
-              )}
-            </div>
-            <div>
-              <div className="text-sm font-bold text-gelap">Pembeli HoReKa</div>
-              <div className="text-xs text-gelap/75 mt-0.5 leading-snug">
-                Restoran, Kafe, Hotel, dan Katering yang memerlukan suplai bahan dapur.
-              </div>
-            </div>
-          </button>
 
-          <button
-            type="button"
-            onClick={() => setIntent('GAPOKTAN')}
-            className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between min-h-[96px] ${
-              intent === 'GAPOKTAN'
-                ? 'border-sekunder bg-sekunder/15 shadow-xs ring-2 ring-sekunder'
-                : 'border-netral-border/80 bg-white hover:border-sekunder hover:bg-netral-canvas/40'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-9 h-9 rounded-xl bg-sekunder-light flex items-center justify-center text-sekunder">
-                <Store className="w-5 h-5" aria-hidden="true" />
-              </div>
-              {intent === 'GAPOKTAN' && (
-                <CheckCircle2 className="w-5 h-5 text-sekunder" aria-hidden="true" />
-              )}
-            </div>
-            <div>
-              <div className="text-sm font-bold text-gelap">Pemasok Gapoktan &amp; Supplier Pangan</div>
-              <div className="text-xs text-gelap/75 mt-0.5 leading-snug">
-                Peternakan, RPH daging, koperasi susu, dan produsen lokal yang menyuplai bahan pangan.
-              </div>
-            </div>
-          </button>
-        </div>
+      <div className="flex mb-6 bg-netral-canvas/50 rounded-2xl p-1 border border-netral-border/40">
+        <button
+          type="button"
+          onClick={() => setIntent('HOREKA')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
+            intent === 'HOREKA'
+              ? 'bg-primer text-white shadow-sm'
+              : 'text-gelap/70 hover:text-gelap'
+          }`}
+          aria-pressed={intent === 'HOREKA'}
+        >
+          <Utensils className="w-4 h-4" />
+          Kafe & Restoran
+        </button>
+        <button
+          type="button"
+          onClick={() => setIntent('GAPOKTAN')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
+            intent === 'GAPOKTAN'
+              ? 'bg-sekunder text-white shadow-sm'
+              : 'text-gelap/70 hover:text-gelap'
+          }`}
+          aria-pressed={intent === 'GAPOKTAN'}
+        >
+          <Store className="w-4 h-4" />
+          Kelompok Tani
+        </button>
       </div>
 
-      {errorMessage ? (
+      {errorMessage && (
         <div
           role="alert"
           aria-live="polite"
-          className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-start gap-2.5"
+          className="mb-5 p-3.5 rounded-xl bg-status-danger/10 border border-status-danger/30 text-xs text-status-danger flex items-start gap-2.5"
         >
-          <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
-      ) : null}
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="border-b border-netral-border/60 pb-2">
-          <label className="block text-xs sm:text-sm font-bold text-gelap uppercase tracking-wider">
-            Langkah 2: Data Profil Usaha (PIC Utama)
-          </label>
-        </div>
-
         <div>
-          <label htmlFor="reg-businessName" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
+          <label htmlFor="reg-businessName" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
             {intent === 'HOREKA' ? 'Nama Restoran / Usaha Kuliner' : 'Nama Kelompok Tani / Gapoktan'}
           </label>
           <Input
@@ -242,129 +218,138 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label htmlFor="reg-regency" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
-              Wilayah Operasional DIY
-            </label>
-            <div className="relative">
-              <select
-                id="reg-regency"
-                name="regency"
-                value={formData.regency}
-                onChange={handleChange}
-                className="w-full text-sm min-h-[48px] pl-3.5 pr-10 bg-white border border-netral-border rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium text-gelap appearance-none cursor-pointer"
-              >
-                <option value="KULON_PROGO">Kabupaten Kulon Progo</option>
-                <option value="BANTUL">Kabupaten Bantul</option>
-                <option value="SLEMAN">Kabupaten Sleman</option>
-                <option value="GUNUNGKIDUL">Kabupaten Gunungkidul</option>
-                <option value="YOGYAKARTA">Kota Yogyakarta</option>
-              </select>
-              <ChevronDown
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gelap/60 pointer-events-none"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="reg-ownerName" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
-              Nama Lengkap Pemilik / PIC
-            </label>
-            <Input
-              id="reg-ownerName"
-              name="ownerName"
-              autoComplete="name"
+        <div>
+          <label htmlFor="reg-regency" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
+            Kabupaten / Kota
+          </label>
+          <div className="relative">
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gelap/50 pointer-events-none" aria-hidden="true" />
+            <select
+              id="reg-regency"
+              name="regency"
               required
-              value={formData.ownerName}
+              value={formData.regency}
               onChange={handleChange}
-              placeholder="Contoh: Budi Santoso…"
-              className="w-full text-sm min-h-[48px] rounded-xl"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label htmlFor="reg-phoneNumber" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
-              No. WhatsApp / Telepon
-            </label>
-            <Input
-              id="reg-phoneNumber"
-              name="phoneNumber"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              required
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              placeholder="081234567890…"
-              className="w-full text-sm min-h-[48px] rounded-xl"
-            />
-            <p className="text-[11px] text-gelap/85 mt-1 font-body">
-              Untuk konfirmasi pesanan &amp; jadwal kirim subuh
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="reg-email" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
-              Alamat Surel (Email)
-            </label>
-            <Input
-              id="reg-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              spellCheck={false}
-              required
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="nama@usaha.id…"
-              className="w-full text-sm min-h-[48px] rounded-xl"
-            />
+              className="w-full text-sm min-h-[48px] rounded-xl border-netral-border/40 bg-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primer/20 appearance-none"
+            >
+              <option value="SLEMAN">Sleman</option>
+              <option value="BANTUL">Bantul</option>
+              <option value="GUNUNG KIDUL">Gunung Kidul</option>
+              <option value="KULON PROGO">Kulon Progo</option>
+              <option value="KOTA YOGYA">Kota Yogyakarta</option>
+            </select>
           </div>
         </div>
 
         <div>
-          <label htmlFor="reg-password" className="block text-xs sm:text-sm font-semibold text-gelap mb-1.5">
-            Kata Sandi Akun
+          <label htmlFor="reg-ownerName" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
+            Nama Pemilik / Ketua
+          </label>
+          <Input
+            id="reg-ownerName"
+            name="ownerName"
+            autoComplete="name"
+            required
+            value={formData.ownerName}
+            onChange={handleChange}
+            placeholder="Contoh: Budi Santoso…"
+            className="w-full text-sm min-h-[48px] rounded-xl"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="reg-email" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
+            Alamat Surel
+          </label>
+          <Input
+            id="reg-email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="nama@bisnis-kuliner.id…"
+            className="w-full text-sm min-h-[48px] rounded-xl"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="reg-phoneNumber" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
+            Nomor WhatsApp
+          </label>
+          <Input
+            id="reg-phoneNumber"
+            type="tel"
+            name="phoneNumber"
+            autoComplete="tel"
+            required
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            placeholder="0812-3456-7890"
+            className="w-full text-sm min-h-[48px] rounded-xl"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="reg-password" className="block text-xs sm:text-sm font-semibold text-gelap uppercase tracking-wider mb-1.5">
+            Kata Sandi
           </label>
           <Input
             id="reg-password"
-            name="password"
             type="password"
+            name="password"
             autoComplete="new-password"
             required
             value={formData.password}
             onChange={handleChange}
-            placeholder="Minimal 8 karakter kombinasi…"
+            placeholder="Minimal 8 karakter"
             className="w-full text-sm min-h-[48px] rounded-xl"
           />
+          <p className="mt-1.5 text-[10px] text-gelap/60">
+            Gunakan kombinasi huruf besar, huruf kecil, dan angka untuk keamanan maksimal.
+          </p>
         </div>
 
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full min-h-[48px] text-sm font-bold rounded-xl bg-primer text-white hover:bg-primer-hover transition-all mt-4 shadow-sm"
+          className="w-full min-h-[48px] text-sm font-bold rounded-xl bg-primer text-white hover:bg-primer-hover transition-all shadow-sm"
         >
-          {isLoading ? 'Mendaftarkan Usaha…' : 'Daftar Sekarang'}
-          <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+          {isLoading ? (
+            <>
+              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2 animate-spin" aria-hidden="true"></span>
+              Mendaftarkan…
+            </>
+          ) : (
+            <>
+              Daftar Sekarang
+              <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+            </>
+          )}
         </Button>
       </form>
 
-      <div className="mt-6 pt-4 border-t border-netral-border/60 text-center">
-        <span className="text-xs sm:text-sm text-gelap/85 font-body">Sudah memiliki akun terdaftar? </span>
-        <Link href="/login" className="text-xs sm:text-sm text-sekunder-dark font-bold hover:underline min-h-[44px] inline-flex items-center">
-          Masuk langsung di sini
-        </Link>
+      <div className="mt-6 text-center">
+        <p className="text-xs text-gelap/60">
+          Sudah punya akun?{' '}
+          <Link href="/login" className="text-primer font-bold hover:underline">
+            Masuk di sini
+          </Link>
+        </p>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-netral-border/40 text-center">
-        <p className="text-xs text-gelap/85 font-medium flex items-center justify-center gap-1.5 font-body">
-          <ShieldCheck className="w-4 h-4 text-primer" aria-hidden="true" />
-          Operator Hub &amp; Super Admin Diterbitkan Melalui Closed Provisioning
-        </p>
+      <div className="mt-6 pt-6 border-t border-netral-border/30">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-primer mt-0.5 flex-shrink-0" aria-hidden="true" />
+          <div>
+            <h3 className="text-xs font-bold text-gelap mb-1">Keamanan Terjamin</h3>
+            <p className="text-[10px] text-gelap/65 leading-relaxed">
+              Data usaha Anda dilindungi dengan enkripsi end-to-end dan kebijakan privasi ketat.
+              Tidak ada biaya tersembunyi untuk pendaftaran.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

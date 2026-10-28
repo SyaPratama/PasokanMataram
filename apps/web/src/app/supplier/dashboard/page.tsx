@@ -18,12 +18,40 @@ import { Button } from '../../../components/ui/button';
 import { StatusBadge } from '../../../components/shared/status-badge';
 import { MOCK_HARVEST_COMMITMENTS, type MockHarvestCommitment } from '../../../lib/mock-data';
 
-/**
- * Halaman Meja Kerja Dashboard Gapoktan / Pemasok Hasil Panen.
- * Menampilkan komitmen panen, alokasi pasok ke sentra hub, dan saldo escrow panen.
- */
+interface TenantIdentity {
+  tenantId: string;
+  businessName: string;
+  tenantType: string;
+  regency: string;
+  kybStatus: string;
+  macroRole: string;
+}
+
 export default function SupplierDashboardPage() {
   const [commitments] = React.useState<MockHarvestCommitment[]>(MOCK_HARVEST_COMMITMENTS);
+  const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
+  const [loadingTenant, setLoadingTenant] = React.useState(true);
+
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const fetchTenant = async () => {
+        try {
+          const res = await fetch('/api/v1/tenant/current');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              setTenantIdentity(data.data);
+            }
+          }
+        } catch {
+        } finally {
+          setLoadingTenant(false);
+        }
+      };
+
+      fetchTenant();
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -178,7 +206,6 @@ export default function SupplierDashboardPage() {
                 <th className="py-3 px-4">Estimasi Panen</th>
                 <th className="py-3 px-4 text-right">Hasil Taksasi</th>
                 <th className="py-3 px-4 text-right">Alokasi Pasok</th>
-                <th className="py-3 px-4">Sentra Hub Tujuan</th>
                 <th className="py-3 px-4 text-center">Status Alokasi</th>
               </tr>
             </thead>

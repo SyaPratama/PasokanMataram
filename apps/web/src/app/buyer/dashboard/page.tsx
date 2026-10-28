@@ -23,15 +23,21 @@ import { MOCK_STANDING_ORDERS, type MockStandingOrder } from '../../../lib/mock-
 import { canAccessFinancials } from '@pasok/security/tokens';
 import type { MicroRole } from '@pasok/domain';
 
-/**
- * Halaman Dashboard Role-Adaptive HoReKa.
- * Mematuhi FR-018 dan SC-007: Menyembunyikan total seluruh metrik finansial/escrow untuk peran Head Chef/Purchasing,
- * dan menampilkan kartu stok dapur kritis serta kalkulator resep COGS.
- */
+interface TenantIdentity {
+  tenantId: string;
+  businessName: string;
+  tenantType: string;
+  regency: string;
+  kybStatus: string;
+  macroRole: string;
+}
+
 export default function BuyerDashboardPage() {
   const [orders] = React.useState<MockStandingOrder[]>(MOCK_STANDING_ORDERS);
   const [currentRole, setCurrentRole] = React.useState<MicroRole>('HEAD_CHEF');
   const [kybModalOpen, setKybModalOpen] = React.useState(false);
+  const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
+  const [loadingTenant, setLoadingTenant] = React.useState(true);
 
   React.useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -39,6 +45,23 @@ export default function BuyerDashboardPage() {
       if (match && match[1]) {
         setCurrentRole(match[1] as MicroRole);
       }
+
+      const fetchTenant = async () => {
+        try {
+          const res = await fetch('/api/v1/tenant/current');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              setTenantIdentity(data.data);
+            }
+          }
+        } catch {
+        } finally {
+          setLoadingTenant(false);
+        }
+      };
+
+      fetchTenant();
     }
   }, []);
 
