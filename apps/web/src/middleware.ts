@@ -48,19 +48,15 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   if (isProtectedPath && claims) {
-    const isAllowed = isRouteAllowedForRole({
-      currentPath: pathname,
-      macroRole: claims.macroRole,
-      microRole: claims.microRole,
-    });
+    const isAllowed = isRouteAllowedForRole(pathname, claims.macroRole, claims.microRole);
 
     if (!isAllowed) {
-      const homeRoute = resolveUserHomeRoute(claims.macroRole, claims.microRole);
+      const homeRoute = resolveUserHomeRoute(claims.macroRole);
       return NextResponse.redirect(new URL(homeRoute, request.nextUrl));
     }
 
     if (pathname === '/' || pathname === '/home') {
-      const homeRoute = resolveUserHomeRoute(claims.macroRole, claims.microRole);
+      const homeRoute = resolveUserHomeRoute(claims.macroRole);
       return NextResponse.redirect(new URL(homeRoute, request.nextUrl));
     }
   }
