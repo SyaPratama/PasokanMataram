@@ -40,7 +40,7 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(content).toContain('handleSubmit');
     expect(content).toContain('HOREKA');
     expect(content).toContain('GAPOKTAN');
-    expect(content).toContain('showForgotModal');
+    expect(content).toContain('showPassword');
     expect(content).toContain('isLoading');
   });
 
