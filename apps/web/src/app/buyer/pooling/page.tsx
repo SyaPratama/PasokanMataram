@@ -11,7 +11,7 @@ import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Min
 import { Button } from '../../../components/ui/button';
 import { PoolSpecAccordion } from './_components/pool-spec-accordion';
 import { trackFunnelStep } from '@/lib/telemetry';
-import { useSandbox } from '@/components/sandbox/sandbox-context';
+import { isSandboxMode, openPaymentModal, addPoolingReservation } from "./sandbox-mock";
 import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
 
 interface PoolItem {
@@ -100,7 +100,7 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
-  const { isSandboxMode, openPaymentModal, addPoolingReservation } = useSandbox();
+  const { openPaymentModal, addPoolingReservation } = { openPaymentModal: (params?: { orderId?: string; amountRp?: number; method?: string }) => {}, addPoolingReservation: (campaignId?: string, quantityKg?: number) => {} };
   const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);
   const [selectedPool, setSelectedPool] = React.useState<PoolItem | null>(null);
   const [orderKg, setOrderKg] = React.useState<number>(20);
@@ -171,9 +171,6 @@ export default function BuyerPoolingPage() {
       });
       const resJson = await response.json();
 
-      if (isSandboxMode) {
-        addPoolingReservation(selectedPool.id, orderKg);
-      }
 
       setPools((prev) =>
         prev.map((p) =>
