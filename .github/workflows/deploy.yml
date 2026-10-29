@@ -31,12 +31,14 @@ jobs:
           tar -czf deploy.tar.gz \
             --exclude='node_modules' \
             --exclude='.git' \
+            --exclude='.github' \
             --exclude='tests' \
             --exclude='*.test.ts' \
+            --exclude='coverage' \
             --exclude='.env*' \
             --exclude='.turbo' \
+            --exclude='deploy.tar.gz' \
             .
-      
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
