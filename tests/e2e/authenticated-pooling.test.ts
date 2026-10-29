@@ -7,7 +7,9 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { describe, test, beforeAll, afterAll, expect } from 'vitest';
 
-describe('Authenticated User - Pooling Flow', () => {
+const isCI = process.env.CI === 'true';
+
+describe.skipIf(isCI)('Authenticated User - Pooling Flow', () => {
   let browser: Browser;
   let page: Page;
   const baseUrl = 'http://localhost:3000';

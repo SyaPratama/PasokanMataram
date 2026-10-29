@@ -41,6 +41,8 @@ pnpm-debug.log*
 *.secret
 credentials.json
 service-account*.json
+/creds
+
 # System files
 .DS_Store
 Thumbs.db
