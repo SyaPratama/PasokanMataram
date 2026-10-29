@@ -11,6 +11,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['500', '600', '700', '800'],
   variable: '--font-heading',
   display: 'swap',
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const inter = Inter({
@@ -18,6 +19,7 @@ const inter = Inter({
   weight: ['400', '500', '600'],
   variable: '--font-body',
   display: 'swap',
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -25,6 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ['400', '500'],
   variable: '--font-mono',
   display: 'swap',
+  fallback: ['ui-monospace', 'monospace'],
 });
 
 export const viewport: Viewport = {
