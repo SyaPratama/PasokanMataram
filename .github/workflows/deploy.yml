@@ -212,13 +212,12 @@ jobs:
       
       - name: Create backup on server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            if [ -d "${{ secrets.DEPLOY_PATH }}" ]; then
-              BACKUP_DIR="${{ secrets.DEPLOY_PATH }}_backup_$(date +%Y%m%d_%H%M%S)"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" << 'EOF'
+            if [ -d "$DEPLOY_PATH" ]; then
+              BACKUP_DIR="${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)"
               echo "📦 Creating backup: $BACKUP_DIR"
-              cp -r ${{ secrets.DEPLOY_PATH }} $BACKUP_DIR 2>/dev/null || echo "Backup skipped"
-              # Keep only last 3 backups
-              ls -dt ${{ secrets.DEPLOY_PATH }}_backup_* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+              cp -r $DEPLOY_PATH $BACKUP_DIR 2>/dev/null || echo "Backup skipped"
+              ls -dt ${DEPLOY_PATH}_backup_* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
             fi
           EOF
         continue-on-error: true
@@ -230,17 +229,17 @@ jobs:
       
       - name: Extract and deploy on server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" << 'EOF'
             set -e
             
             echo "📂 Creating deployment directory..."
-            mkdir -p ${{ secrets.DEPLOY_PATH }}
+            mkdir -p $DEPLOY_PATH
             
             echo "📤 Extracting deployment package..."
-            tar -xzf ~/deploy-package.tar.gz -C ${{ secrets.DEPLOY_PATH }}
+            tar -xzf ~/deploy-package.tar.gz -C $DEPLOY_PATH
             rm ~/deploy-package.tar.gz
             
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd $DEPLOY_PATH
             
             echo "📥 Installing production dependencies..."
             npm ci --production --ignore-scripts 2>/dev/null || npm install --production
@@ -328,15 +327,15 @@ jobs:
       
       - name: Restore from latest backup
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            LATEST_BACKUP=$(ls -dt ${{ secrets.DEPLOY_PATH }}_backup_* 2>/dev/null | head -1)
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" << 'EOF'
+            LATEST_BACKUP=$(ls -dt ${DEPLOY_PATH}_backup_* 2>/dev/null | head -1)
             
             if [ -n "$LATEST_BACKUP" ]; then
               echo "🔄 Rolling back to: $LATEST_BACKUP"
-              rm -rf ${{ secrets.DEPLOY_PATH }}
-              mv $LATEST_BACKUP ${{ secrets.DEPLOY_PATH }}
+              rm -rf $DEPLOY_PATH
+              mv $LATEST_BACKUP $DEPLOY_PATH
               
-              cd ${{ secrets.DEPLOY_PATH }}
+              cd $DEPLOY_PATH
               pm2 restart all
               pm2 save
               
