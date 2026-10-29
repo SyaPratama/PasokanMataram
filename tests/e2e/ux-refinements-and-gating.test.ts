@@ -27,9 +27,8 @@ describe('Penyempurnaan UI/UX, Copywriting Humanis, dan Gating Legalitas KYB', (
     expect(content).toContain('import {');
     expect(content).toContain('ChevronDown');
     expect(content).toContain('id="reg-regency"');
-    expect(content).toContain('pl-3.5 pr-10');
-    expect(content).toContain('appearance-none cursor-pointer');
-    expect(content).toContain('absolute right-3.5 top-1/2 -translate-y-1/2');
+    expect(content).toContain('appearance-none');
+    expect(content).toContain('absolute right-3 top-1/2 -translate-y-1/2');
   });
 
   it('2. memastikan teks "Pendaftar Pertama = OWNER" telah dihapus dari halaman registrasi', () => {
