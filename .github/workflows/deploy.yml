@@ -9,8 +9,8 @@ env:
   NODE_VERSION: '20.x'
 
 jobs:
-  build:
-    name: Build & Package
+  build-web:
+    name: Build Web (Next.js)
     runs-on: ubuntu-latest
     
     steps:
@@ -25,79 +25,258 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Build production
-        run: npm run build
+      - name: Build web
+        run: npm run build -- --filter=@pasok/web
         env:
           NODE_ENV: production
           CI: true
       
-      - name: Create deployment package
+      - name: Package web build
         run: |
-          tar -czf deploy.tar.gz \
+          cd apps/web
+          tar -czf ../../web-build.tar.gz \
             --warning=no-file-changed \
-            --exclude='node_modules' \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='tests' \
-            --exclude='*.test.ts' \
-            --exclude='coverage' \
-            --exclude='.turbo' \
-            . || true
+            .next/ \
+            public/ \
+            package.json \
+            next.config.mjs \
+            || true
       
-      - name: Upload artifact
+      - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-package
-          path: deploy.tar.gz
+          name: web-build
+          path: web-build.tar.gz
           retention-days: 7
 
-  deploy:
-    name: Deploy to Server
+  build-api:
+    name: Build API (NestJS)
     runs-on: ubuntu-latest
-    needs: [build]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build API
+        run: npm run build -- --filter=@pasok/api
+        env:
+          NODE_ENV: production
+          CI: true
+      
+      - name: Package API build
+        run: |
+          cd apps/api
+          tar -czf ../../api-build.tar.gz \
+            --warning=no-file-changed \
+            dist/ \
+            package.json \
+            || true
+      
+      - name: Upload API artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build
+          path: api-build.tar.gz
+          retention-days: 7
+
+  build-packages:
+    name: Build Shared Packages
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build packages
+        run: |
+          npm run build -- --filter=@pasok/domain
+          npm run build -- --filter=@pasok/config
+          npm run build -- --filter=@pasok/database
+          npm run build -- --filter=@pasok/security
+        env:
+          NODE_ENV: production
+          CI: true
+      
+      - name: Package shared packages
+        run: |
+          tar -czf packages-build.tar.gz \
+            --warning=no-file-changed \
+            packages/domain/dist \
+            packages/config/dist \
+            packages/database/dist \
+            packages/security/dist \
+            packages/*/package.json \
+            || true
+      
+      - name: Upload packages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-build
+          path: packages-build.tar.gz
+          retention-days: 7
+
+  deploy-web:
+    name: Deploy Web to Server
+    runs-on: ubuntu-latest
+    needs: [build-web, build-packages]
     if: github.ref == 'refs/heads/main'
     
     steps:
-      - name: Download package
+      - name: Download web build
         uses: actions/download-artifact@v4
         with:
-          name: deployment-package
+          name: web-build
+      
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: packages-build
       
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
       
-      - name: Upload to server
+      - name: Upload web to server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no \
+            web-build.tar.gz packages-build.tar.gz \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/
       
-      - name: Deploy on server
+      - name: Deploy web on server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
           set -e
-          DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+          WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           
-          # Backup
-          if [ -d "$DEPLOY_PATH" ]; then
-            cp -r "$DEPLOY_PATH" "${DEPLOY_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+          # Backup existing
+          if [ -d "$WEB_PATH" ]; then
+            cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+            ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
           fi
           
-          # Extract
-          mkdir -p "$DEPLOY_PATH"
-          tar -xzf ~/deploy.tar.gz -C "$DEPLOY_PATH"
-          rm ~/deploy.tar.gz
+          # Create directories
+          mkdir -p "$WEB_PATH"
           
-          # Install & restart
-          cd "$DEPLOY_PATH"
-          npm ci --production 2>/dev/null || npm install --production
+          # Extract builds
+          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
+          tar -xzf ~/packages-build.tar.gz -C "$WEB_PATH/../"
+          rm ~/web-build.tar.gz ~/packages-build.tar.gz
           
+          # Install production dependencies
+          cd "$WEB_PATH"
+          npm ci --production --omit=dev 2>/dev/null || npm install --production
+          
+          # PM2 restart
           command -v pm2 || npm install -g pm2
-          cd apps/web
           pm2 restart pasokmataram-web || pm2 start npm --name pasokmataram-web -- start
           pm2 save
+          
+          echo "✅ Web deployed successfully"
           ENDSSH
       
-      - name: Health check
+      - name: Health check web
         run: |
           sleep 15
-          curl --fail --silent --max-time 10 ${{ secrets.APP_URL }} || echo "Health check skipped"
+          curl --fail --silent --max-time 10 ${{ secrets.WEB_URL }} || echo "Web health check skipped"
         continue-on-error: true
+
+  deploy-api:
+    name: Deploy API to Server
+    runs-on: ubuntu-latest
+    needs: [build-api, build-packages]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Download API build
+        uses: actions/download-artifact@v4
+        with:
+          name: api-build
+      
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: packages-build
+      
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+      
+      - name: Upload API to server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no \
+            api-build.tar.gz packages-build.tar.gz \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/
+      
+      - name: Deploy API on server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash << 'ENDSSH'
+          set -e
+          API_PATH="${{ secrets.API_DEPLOY_PATH }}"
+          
+          # Backup existing
+          if [ -d "$API_PATH" ]; then
+            cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+            ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+          fi
+          
+          # Create directories
+          mkdir -p "$API_PATH"
+          
+          # Extract builds
+          tar -xzf ~/api-build.tar.gz -C "$API_PATH"
+          tar -xzf ~/packages-build.tar.gz -C "$API_PATH/../"
+          rm ~/api-build.tar.gz ~/packages-build.tar.gz
+          
+          # Install production dependencies
+          cd "$API_PATH"
+          npm ci --production --omit=dev 2>/dev/null || npm install --production
+          
+          # PM2 restart
+          command -v pm2 || npm install -g pm2
+          pm2 restart pasokmataram-api || pm2 start node --name pasokmataram-api -- dist/main.js
+          pm2 save
+          
+          echo "✅ API deployed successfully"
+          ENDSSH
+      
+      - name: Health check API
+        run: |
+          sleep 15
+          curl --fail --silent --max-time 10 ${{ secrets.API_URL }}/health || echo "API health check skipped"
+        continue-on-error: true
+
+  summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [deploy-web, deploy-api]
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Web (Next.js) | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API (NestJS) | ${{ needs.deploy-api.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Author: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(date -u)" >> $GITHUB_STEP_SUMMARY
