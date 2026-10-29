@@ -27,11 +27,6 @@ export const pool = mysql.createPool({
   keepAliveInitialDelay: 0,
 });
 
-pool.on('error', (err: Error) => {
-  if (isDevelopment) {
-    console.error(`[DB ERROR] Pool error: ${err.message}`);
-  }
-});
 
 /**
  * Menjalankan kueri SQL di luar transaksi berlingkup tenant (misal: onboarding awal atau pengecekan server).

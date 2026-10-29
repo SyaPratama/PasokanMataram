@@ -32,8 +32,8 @@ export async function bootstrapAuthService(): Promise<{ ready: boolean; latencyM
   }
 
   try {
-    const client = await pool.connect();
-    client.release();
+    const connection = await pool.getConnection();
+    connection.release();
     return { ready: true, latencyMs: Date.now() - start };
   } catch {
     return { ready: false, latencyMs: Date.now() - start };

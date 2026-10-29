@@ -20,7 +20,7 @@ import {
 } from './solosmartpay';
 
 export class SettlementService {
-  private readonly adapter: PostgresEcosystemAdapter;
+  private readonly adapter: InstanceType<typeof PostgresEcosystemAdapter>;
   private readonly gatewayClient: SolosmartpayClient;
 
   public constructor(customConfig?: Partial<SolosmartpayConfig>) {

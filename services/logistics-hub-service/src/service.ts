@@ -42,7 +42,7 @@ export interface QcDisputeResolution {
 }
 
 export class LogisticsHubService {
-  private readonly adapter: PostgresEcosystemAdapter;
+  private readonly adapter: InstanceType<typeof PostgresEcosystemAdapter>;
 
   public constructor() {
     this.adapter = new PostgresEcosystemAdapter();
@@ -87,10 +87,7 @@ export class LogisticsHubService {
     hubId: string
   ): Promise<WeighingVerificationRow> {
     const validated = SubmitWeighingSchema.parse(rawInput);
-    return this.adapter.submitWeighingLog(context, {
-      ...validated,
-      hubId,
-    });
+    return this.adapter.submitWeighing(context, validated);
   }
 
   /**
