@@ -33,12 +33,12 @@ export class BuyerService {
   public async getOutlets(context: SecurityContext) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [rows] = await client.query(
           `SELECT id, tenant_id, outlet_name, address, regency, phone_number, is_active, created_at
            FROM business_outlets
            ORDER BY created_at DESC`
         );
-        return res.rows;
+        return rows;
       });
     } catch {
       return [
@@ -65,13 +65,17 @@ export class BuyerService {
   public async createOutlet(context: SecurityContext, dto: CreateOutletDto) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [result] = await client.query(
           `INSERT INTO business_outlets (tenant_id, outlet_name, address, regency, phone_number)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, tenant_id, outlet_name, address, regency, phone_number, is_active, created_at`,
+           VALUES (?, ?, ?, ?, ?)`,
           [context.tenantId, dto.name, dto.address, dto.regency, dto.phone]
         );
-        return res.rows[0];
+        const [rows] = await client.query(
+          `SELECT id, tenant_id, outlet_name, address, regency, phone_number, is_active, created_at
+           FROM business_outlets WHERE id = ?`,
+          [(result as any).insertId]
+        );
+        return (rows as any[])[0];
       });
     } catch {
       return {
@@ -95,7 +99,7 @@ export class BuyerService {
   public async getOrders(context: SecurityContext) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [rows] = await client.query(
           `SELECT pr.id, pr.campaign_id, pr.quantity_kg, pr.price_per_kg,
                   pr.total_amount_rp, pr.status, pr.delivery_address, pr.va_number,
                   pr.created_at, pc.commodity_name, pc.temperature_zone
@@ -103,7 +107,7 @@ export class BuyerService {
            JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
            ORDER BY pr.created_at DESC`
         );
-        return res.rows;
+        return rows;
       });
     } catch {
       return [];

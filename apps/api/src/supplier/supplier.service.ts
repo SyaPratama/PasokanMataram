@@ -40,14 +40,14 @@ export class SupplierService {
   public async getProducts(context: SecurityContext) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [rows] = await client.query(
           `SELECT id, supplier_tenant_id, name, category, sku_code, unit,
                   price, min_order_qty, stock_available, lead_time_hours,
                   is_ready_stock, fulfillment_type, is_active, created_at
            FROM supplier_products
            ORDER BY created_at DESC`
         );
-        return res.rows;
+        return rows;
       });
     } catch {
       return [
@@ -80,15 +80,11 @@ export class SupplierService {
   public async createProduct(context: SecurityContext, dto: CreateProductDto) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [result] = await client.query(
           `INSERT INTO supplier_products (
-             supplier_tenant_id, name, category, sku_code, unit,
-             price, min_order_qty, stock_available, lead_time_hours,
-             is_ready_stock, fulfillment_type
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-           RETURNING id, supplier_tenant_id, name, category, sku_code, unit,
-                     price, min_order_qty, stock_available, lead_time_hours,
-                     is_ready_stock, fulfillment_type, is_active, created_at`,
+             supplier_tenant_id, name, category, sku_code, unit, price,
+             min_order_qty, stock_available, lead_time_hours, is_ready_stock, fulfillment_type
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             context.tenantId,
             dto.name,
@@ -103,7 +99,14 @@ export class SupplierService {
             dto.fulfillmentType,
           ]
         );
-        return res.rows[0];
+        const [rows] = await client.query(
+          `SELECT id, supplier_tenant_id, name, category, sku_code, unit,
+                  price, min_order_qty, stock_available, lead_time_hours,
+                  is_ready_stock, fulfillment_type, is_active, created_at
+           FROM supplier_products WHERE id = ?`,
+          [(result as any).insertId]
+        );
+        return (rows as any[])[0];
       });
     } catch {
       return {
@@ -124,13 +127,13 @@ export class SupplierService {
   public async getAllocations(context: SecurityContext) {
     try {
       return await withTenantContext(context, async (client) => {
-        const res = await client.query(
+        const [rows] = await client.query(
           `SELECT id, commodity_name, target_quota_kg, allocated_quota_kg,
                   price_per_kg, status, starts_at, ends_at
            FROM pooling_campaigns
            ORDER BY created_at DESC`
         );
-        return res.rows;
+        return rows;
       });
     } catch {
       return [];
