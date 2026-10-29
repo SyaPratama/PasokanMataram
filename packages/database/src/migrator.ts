@@ -1,14 +1,12 @@
 /**
- * Declarative PostgreSQL migration runner using advisory locks and tracking table.
+ * Declarative MySQL migration runner using GET_LOCK and tracking table.
  * Complies with Constitution VII and IX.
  */
 
 import fs from 'fs';
 import path from 'path';
-import pg from 'pg';
+import mysql from 'mysql2/promise';
 import { databaseConfig, migrationsConfig } from '@pasok/config';
-
-const { Pool } = pg;
 
 export interface MigrationResult {
   file: string;
@@ -20,30 +18,30 @@ export interface MigrationResult {
  * Runs pending database migrations idempotently under an advisory lock.
  */
 export async function runMigrations(): Promise<MigrationResult[]> {
-  const pool = new Pool({
-    connectionString: databaseConfig.connectionString,
-    ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : undefined,
-    connectionTimeoutMillis: databaseConfig.pool.connectionTimeoutMillis,
+  const pool = mysql.createPool({
+    uri: databaseConfig.connectionString,
+    waitForConnections: true,
+    connectionLimit: 1,
   });
 
-  const client = await pool.connect();
+  const connection = await pool.getConnection();
   const results: MigrationResult[] = [];
 
   try {
-    await client.query(`SELECT pg_advisory_lock($1)`, [migrationsConfig.lockId]);
+    await connection.query(`SELECT GET_LOCK(?, 10)`, [migrationsConfig.lockId.toString()]);
 
-    await client.query(`
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS ${migrationsConfig.trackingTable} (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         filename VARCHAR(255) UNIQUE NOT NULL,
-        applied_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-      );
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
     `);
 
-    const appliedRows = await client.query<{ filename: string }>(
+    const [appliedRows] = await connection.query<any[]>(
       `SELECT filename FROM ${migrationsConfig.trackingTable}`
     );
-    const appliedFiles = new Set(appliedRows.rows.map((r) => r.filename));
+    const appliedFiles = new Set(appliedRows.map((r: any) => r.filename));
 
     for (const file of migrationsConfig.migrationFiles) {
       if (appliedFiles.has(file)) {
@@ -58,17 +56,17 @@ export async function runMigrations(): Promise<MigrationResult[]> {
 
       const sqlContent = fs.readFileSync(filePath, 'utf-8');
 
-      await client.query('BEGIN');
+      await connection.query('START TRANSACTION');
       try {
-        await client.query(sqlContent);
-        await client.query(
-          `INSERT INTO ${migrationsConfig.trackingTable} (filename) VALUES ($1)`,
+        await connection.query(sqlContent);
+        await connection.query(
+          `INSERT INTO ${migrationsConfig.trackingTable} (filename) VALUES (?)`,
           [file]
         );
-        await client.query('COMMIT');
+        await connection.query('COMMIT');
         results.push({ file, status: 'applied' });
       } catch (err) {
-        await client.query('ROLLBACK');
+        await connection.query('ROLLBACK');
         const errorMessage = err instanceof Error ? err.message : String(err);
         results.push({ file, status: 'failed', error: errorMessage });
         throw new Error(`Gagal mengeksekusi migrasi ${file}: ${errorMessage}`);
@@ -78,10 +76,10 @@ export async function runMigrations(): Promise<MigrationResult[]> {
     return results;
   } finally {
     try {
-      await client.query(`SELECT pg_advisory_unlock($1)`, [migrationsConfig.lockId]);
+      await connection.query(`SELECT RELEASE_LOCK(?)`, [migrationsConfig.lockId.toString()]);
     } catch {
     }
-    client.release();
+    connection.release();
     await pool.end();
   }
 }
