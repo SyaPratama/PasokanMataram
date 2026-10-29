@@ -135,35 +135,34 @@ npm run dev
 
 ### Environment Variables
 
-Copy `.env.example` → `.env` dan sesuaikan:
+**Development environment:**
 
-```env
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=pasokmataram_db
-DB_USER=root
-DB_PASSWORD=Tama123
+```bash
+# Copy template and edit
+cp .env.development.example .env.development
+nano .env.development
 
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# JWT Secret (CRITICAL: ganti di production)
-JWT_SECRET=rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars
-
-# MinIO S3
-MINIO_ENDPOINT=http://localhost:9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_PRIVATE=kyb-documents-private
-
-# Solosmartpay
-SOLOSMARTPAY_API_TOKEN=ssp_test_pasokmataram_demo
-SOLOSMARTPAY_WEBHOOK_SECRET=ssp_secret_default_key
-
-# ML Service
-ML_FORECAST_URL=http://localhost:8765
+# Or use setup script
+chmod +x setup-env.sh
+./setup-env.sh development
 ```
+
+**Production environment:**
+
+```bash
+# Copy template and edit
+cp .env.production.example .env.production
+nano .env.production
+
+# Or use setup script
+./setup-env.sh production
+```
+
+**⚠️ Security:**
+- `.env.development` and `.env.production` are in `.gitignore` (never commit!)
+- Template files (`.env.*.example`) are safe to commit
+- Production `JWT_SECRET` must be 32+ characters and different from dev
+- Change all default passwords in production
 
 ---
 
