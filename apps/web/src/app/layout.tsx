@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
+import { Toaster } from 'sonner';
 import { PwaRegistrar } from '../components/pwa-registrar';
 import { PwaInstallBanner } from '../components/pwa-install-banner';
 import { EnterpriseJsonLd } from '../components/seo/json-ld';
@@ -138,6 +139,7 @@ export default function RootLayout({
       >
         <EnterpriseJsonLd baseUrl={appUrl} />
         {children}
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );
