@@ -25,8 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Create production environment file
+      - name: Create environment files
         run: |
+          echo "${{ secrets.ENV_DEVELOPMENT }}" > apps/web/.env.development
           echo "${{ secrets.ENV_PRODUCTION }}" > apps/web/.env.production
       
       - name: Build web
@@ -44,6 +45,7 @@ jobs:
             public/ \
             package.json \
             next.config.mjs \
+            .env.development \
             .env.production \
             || true
       
@@ -70,8 +72,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Create production environment file
+      - name: Create environment files
         run: |
+          echo "${{ secrets.ENV_DEVELOPMENT }}" > apps/api/.env.development
           echo "${{ secrets.ENV_PRODUCTION }}" > apps/api/.env.production
       
       - name: Build API
@@ -87,6 +90,7 @@ jobs:
             --warning=no-file-changed \
             dist/ \
             package.json \
+            .env.development \
             .env.production \
             || true
       
@@ -197,7 +201,7 @@ jobs:
           pm2 restart pasokmataram-web || pm2 start npm --name pasokmataram-web -- start
           pm2 save
           
-          echo "✅ Web deployed successfully"
+          echo "✅ Web deployed with .env.development and .env.production"
           ENDSSH
       
       - name: Health check web
@@ -262,7 +266,7 @@ jobs:
           pm2 restart pasokmataram-api || pm2 start node --name pasokmataram-api -- dist/main.js
           pm2 save
           
-          echo "✅ API deployed successfully"
+          echo "✅ API deployed with .env.development and .env.production"
           ENDSSH
       
       - name: Health check API
@@ -290,4 +294,4 @@ jobs:
           echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- Author: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- Time: $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: From GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: .env.development + .env.production from GitHub Secrets" >> $GITHUB_STEP_SUMMARY
