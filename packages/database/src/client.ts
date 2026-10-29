@@ -1,8 +1,6 @@
-import pg from 'pg';
+import mysql from 'mysql2/promise';
 import { databaseConfig, isDevelopment } from '@pasok/config';
 import type { SecurityContext } from '@pasok/domain';
-
-const { Pool } = pg;
 
 /**
  * Pengecualian keamanan khusus untuk pelanggaran batas multi-tenant.
@@ -20,12 +18,13 @@ export class SecurityException extends Error {
   }
 }
 
-export const pool = new Pool({
-  connectionString: databaseConfig.connectionString,
-  ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : undefined,
-  max: databaseConfig.pool.maxConnections,
-  idleTimeoutMillis: databaseConfig.pool.idleTimeoutMillis,
-  connectionTimeoutMillis: databaseConfig.pool.connectionTimeoutMillis,
+export const pool = mysql.createPool({
+  uri: databaseConfig.connectionString,
+  waitForConnections: true,
+  connectionLimit: databaseConfig.pool.maxConnections,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 });
 
 pool.on('error', (err: Error) => {
@@ -41,17 +40,17 @@ pool.on('error', (err: Error) => {
  * @param params Parameter kueri.
  * @returns Hasil kueri PostgreSQL.
  */
-export async function query<R extends pg.QueryResultRow = Record<string, unknown>>(
+export async function query<R = any>(
   text: string,
   params?: readonly unknown[]
-): Promise<pg.QueryResult<R>> {
+): Promise<{ rows: R[]; rowCount: number }> {
   const start = Date.now();
-  const res = await pool.query<R>(text, params as unknown[] | undefined);
+  const [rows] = await pool.execute(text, params as any[]);
   const duration = Date.now() - start;
   if (isDevelopment && duration > databaseConfig.slowQueryThresholdMs) {
     console.warn(`[SLOW QUERY] ${duration}ms: ${text.slice(0, 80)}...`);
   }
-  return res;
+  return { rows: rows as R[], rowCount: Array.isArray(rows) ? rows.length : 0 };
 }
 
 /**
@@ -63,19 +62,17 @@ export async function query<R extends pg.QueryResultRow = Record<string, unknown
  */
 export async function withTenantContext<T>(
   context: SecurityContext,
-  callback: (client: pg.PoolClient) => Promise<T>
+  callback: (client: mysql.PoolConnection) => Promise<T>
 ): Promise<T> {
   if (!context || !context.tenantId) {
     throw new SecurityException('Konteks keamanan wajib memiliki tenantId yang valid', 'INVALID_SECURITY_CONTEXT');
   }
 
-  const client = await pool.connect();
+  const client = await pool.getConnection();
   try {
-    await client.query('BEGIN');
-    await client.query("SELECT set_config('app.current_tenant_id', $1::text, true)", [context.tenantId]);
-    await client.query("SELECT set_config('app.is_super_admin', $1::text, true)", [
-      context.isSuperAdmin ? 'true' : 'false',
-    ]);
+    await client.query('START TRANSACTION');
+    await client.query('SET @current_tenant_id = ?', [context.tenantId]);
+    await client.query('SET @is_super_admin = ?', [context.isSuperAdmin ? '1' : '0']);
 
     const result = await callback(client);
     await client.query('COMMIT');
@@ -84,10 +81,6 @@ export async function withTenantContext<T>(
     await client.query('ROLLBACK');
     if (error instanceof SecurityException) {
       throw error;
-    }
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    if (errorMessage.toLowerCase().includes('rls') || errorMessage.toLowerCase().includes('security')) {
-      throw new SecurityException(`Pelanggaran isolasi tenant: ${errorMessage}`, 'RLS_SECURITY_VIOLATION', context.tenantId);
     }
     throw error;
   } finally {
@@ -101,11 +94,11 @@ export async function withTenantContext<T>(
  * @returns Nilai kembalian callback.
  */
 export async function withTransaction<T>(
-  callback: (client: pg.PoolClient) => Promise<T>
+  callback: (client: mysql.PoolConnection) => Promise<T>
 ): Promise<T> {
-  const client = await pool.connect();
+  const client = await pool.getConnection();
   try {
-    await client.query('BEGIN');
+    await client.query('START TRANSACTION');
     const result = await callback(client);
     await client.query('COMMIT');
     return result;
