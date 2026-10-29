@@ -2,6 +2,10 @@
 const nextConfig = {
   optimizeFonts: process.env.CI ? false : true,
   transpilePackages: ['@pasok/config', '@pasok/domain', '@pasok/database', '@pasok/queue', '@pasok/auth-kyb-service', '@pasok/repository-contracts', '@pasok/security'],
+  publicRuntimeConfig: {
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    webUrl: process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000',
+  },
   images: {
     remotePatterns: [
       {
