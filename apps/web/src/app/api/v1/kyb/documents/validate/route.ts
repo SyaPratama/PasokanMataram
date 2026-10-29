@@ -51,30 +51,27 @@ export async function POST(request: Request) {
       );
     }
 
-    const s3Client = getStorageClient();
-    const bucket = process.env.MINIO_BUCKET_PRIVATE || 'kyb-documents-private';
+    const cloudinary = getStorageClient();
 
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: fileStorageKey,
-      Range: 'bytes=0-4095',
+    const imageUrl = cloudinary.url(fileStorageKey, {
+      secure: true,
+      sign_url: true,
+      type: 'authenticated',
     });
 
-    const response = await s3Client.send(command);
-    const bodyStream = response.Body;
+    const response = await fetch(imageUrl, {
+      headers: { Range: 'bytes=0-4095' }
+    });
     
-    if (!bodyStream) {
+    if (!response.ok) {
       return NextResponse.json(
         { success: false, error: { code: 'STORAGE_ERROR', message: 'File tidak ditemukan.' } },
         { status: 404 }
       );
     }
 
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of bodyStream as any) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     const fileTypeResult = await fileTypeFromBuffer(buffer);
 

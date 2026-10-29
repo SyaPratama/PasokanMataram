@@ -1,27 +1,29 @@
 /**
  * @file src/lib/storage.ts
- * @description Klien integrasi MinIO Object Storage (S3-compatible) untuk pembuatan Presigned Upload & Download URLs.
+ * @description Klien integrasi Cloudinary Object Storage untuk pembuatan Presigned Upload URLs.
  * Memvalidasi batas ukuran 5 MB dan tipe berkas aman (PDF & WebP) berbasis konfigurasi.
  * Mematuhi Prinsip VIII.2 dan IX Konstitusi PasokMataram v1.5.0.
  */
 
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { storageConfig, kybRulesConfig } from '../config';
+import { v2 as cloudinary } from 'cloudinary';
+import { kybRulesConfig } from '../config';
 import crypto from 'crypto';
 import path from 'path';
 
-export const s3Client = new S3Client({
-  endpoint: storageConfig.endpoint,
-  region: 'us-east-1',
-  credentials: {
-    accessKeyId: storageConfig.accessKey,
-    secretAccessKey: storageConfig.secretKey,
-  },
-  forcePathStyle: true,
-});
+let cloudinaryInitialized = false;
 
-export const getStorageClient = () => s3Client;
+export const getStorageClient = () => {
+  if (!cloudinaryInitialized) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo-cloud',
+      api_key: process.env.CLOUDINARY_API_KEY || 'demo-key',
+      api_secret: process.env.CLOUDINARY_API_SECRET || 'demo-secret',
+      secure: true,
+    });
+    cloudinaryInitialized = true;
+  }
+  return cloudinary;
+};
 
 const ALLOWED_MIME_TYPES = new Set<string>(kybRulesConfig.allowedMimeTypes);
 const MAX_FILE_SIZE_BYTES = kybRulesConfig.maxFileSizeBytes;
@@ -33,7 +35,7 @@ export interface PresignedUploadResult {
 }
 
 /**
- * Menghasilkan presigned URL untuk pengunggahan berkas KYB langsung ke MinIO oleh browser klien.
+ * Menghasilkan presigned URL untuk pengunggahan berkas KYB langsung ke Cloudinary oleh browser klien.
  */
 export async function generatePresignedUploadUrl(
   tenantId: string,
@@ -54,15 +56,21 @@ export async function generatePresignedUploadUrl(
   const safeRandomId = crypto.randomBytes(8).toString('hex');
   const fileStorageKey = `kyb/${tenantId}/${documentType}_${safeRandomId}${fileExt}`;
 
-  const command = new PutObjectCommand({
-    Bucket: storageConfig.bucketPrivate,
-    Key: fileStorageKey,
-    ContentType: mimeType,
-    ContentLength: fileSizeBytes,
-  });
+  const timestamp = Math.round(Date.now() / 1000);
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'demo-cloud';
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || 'demo-secret';
+  
+  const signature = cloudinary.utils.api_sign_request(
+    {
+      timestamp,
+      folder: `kyb/${tenantId}`,
+      public_id: fileStorageKey,
+    },
+    apiSecret
+  );
 
-  const expiresInSeconds = storageConfig.presignedUrlExpirySeconds;
-  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
+  const expiresInSeconds = 300;
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload?timestamp=${timestamp}&signature=${signature}&folder=kyb/${tenantId}&public_id=${fileStorageKey}`;
 
   return {
     uploadUrl,
@@ -78,10 +86,9 @@ export async function generatePresignedDownloadUrl(
   fileStorageKey: string,
   expiresInSeconds = 1800
 ): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: storageConfig.bucketPrivate,
-    Key: fileStorageKey,
+  return cloudinary.url(fileStorageKey, {
+    sign_url: true,
+    secure: true,
+    type: 'authenticated',
   });
-
-  return await getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds });
 }

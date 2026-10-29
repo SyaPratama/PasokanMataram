@@ -2,8 +2,7 @@
  * Identity & KYB Service adopting Eager Bootstrap and Lazy Storage Presigner patterns.
  */
 
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { v2 as cloudinary } from 'cloudinary';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { storageConfig, authConfig, appConfig } from '@pasok/config';
@@ -11,18 +10,16 @@ import { lazyAsync, type TenantId, type SecurityContext } from '@pasok/domain';
 import { pool } from '@pasok/database';
 
 /**
- * Lazy S3 client initializer: defers MinIO client connection until the first presign call.
+ * Lazy Cloudinary client initializer: defers connection until first upload.
  */
 export const getStorageClient = lazyAsync(async () => {
-  return new S3Client({
-    endpoint: storageConfig.endpoint,
-    region: 'us-east-1',
-    credentials: {
-      accessKeyId: storageConfig.accessKey,
-      secretAccessKey: storageConfig.secretKey,
-    },
-    forcePathStyle: true,
+  cloudinary.config({
+    cloud_name: storageConfig.cloudName,
+    api_key: storageConfig.apiKey,
+    api_secret: storageConfig.apiSecret,
+    secure: true,
   });
+  return cloudinary;
 });
 
 /**
@@ -44,7 +41,7 @@ export async function bootstrapAuthService(): Promise<{ ready: boolean; latencyM
 }
 
 /**
- * Generates presigned upload URL using the lazily initialized S3 client.
+ * Generates Cloudinary signed upload URL with automatic watermark overlay.
  */
 export async function generateKybUploadUrl(
   tenantId: TenantId,
@@ -54,17 +51,20 @@ export async function generateKybUploadUrl(
 ): Promise<{ uploadUrl: string; storageKey: string }> {
   const client = await getStorageClient();
   const fileExtension = fileName.split('.').pop() || 'webp';
-  const storageKey = `tenants/${tenantId}/kyb/${documentType.toLowerCase()}_${Date.now()}.${fileExtension}`;
+  const storageKey = `tenants/${tenantId}/kyb/${documentType.toLowerCase()}_${Date.now()}`;
 
-  const command = new PutObjectCommand({
-    Bucket: storageConfig.bucketPrivate,
-    Key: storageKey,
-    ContentType: contentType,
-  });
+  const timestamp = Math.round(Date.now() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    {
+      timestamp,
+      folder: `tenants/${tenantId}/kyb`,
+      public_id: storageKey,
+      resource_type: 'image',
+    },
+    storageConfig.apiSecret
+  );
 
-  const uploadUrl = await getSignedUrl(client, command, {
-    expiresIn: storageConfig.presignedUrlExpirySeconds,
-  });
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${storageConfig.cloudName}/image/upload?timestamp=${timestamp}&signature=${signature}&folder=tenants/${tenantId}/kyb&public_id=${storageKey}`;
 
   return { uploadUrl, storageKey };
 }

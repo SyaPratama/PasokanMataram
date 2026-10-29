@@ -21,6 +21,7 @@
     "@pasok/domain": "*",
     "@pasok/queue": "*",
     "argon2": "^0.41.1",
+    "cloudinary": "^2.11.0",
     "jsonwebtoken": "^9.0.2"
   }
 }
