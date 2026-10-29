@@ -10,6 +10,7 @@ import {
   type EscrowSettlementRow,
   query,
 } from '@pasok/database';
+import { createClient } from 'redis';
 import {
   SolosmartpayClient,
   type SolosmartpayConfig,
@@ -73,6 +74,33 @@ export class SettlementService {
 
     const payload = JSON.parse(rawBody) as WebhookEventPayload;
 
+    const webhookId = payload.webhookId || payload.orderId;
+    if (!webhookId) {
+      throw new Error('Webhook tidak memiliki identifier unik.');
+    }
+
+    const redisKey = `webhook:processed:${webhookId}`;
+    const redisClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+    await redisClient.connect();
+    const alreadyProcessed = await redisClient.get(redisKey);
+    
+    if (alreadyProcessed) {
+      await redisClient.quit();
+      return {
+        success: true,
+        orderId: payload.orderId,
+        event: payload.event,
+      };
+    }
+
+    const timestamp = payload.timestamp || Date.now();
+    const now = Date.now();
+    const maxAge = 5 * 60 * 1000;
+    
+    if (Math.abs(now - timestamp) > maxAge) {
+      await redisClient.quit();
+    }
+
     if (payload.event === 'payment.success') {
       await query(
         `UPDATE pool_reservations
@@ -90,6 +118,9 @@ export class SettlementService {
         [payload.orderId]
       );
     }
+
+    await redisClient.setEx(redisKey, 600, 'processed');
+    await redisClient.quit();
 
     return {
       success: true,

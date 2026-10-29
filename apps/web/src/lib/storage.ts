@@ -21,6 +21,8 @@ export const s3Client = new S3Client({
   forcePathStyle: true,
 });
 
+export const getStorageClient = () => s3Client;
+
 const ALLOWED_MIME_TYPES = new Set<string>(kybRulesConfig.allowedMimeTypes);
 const MAX_FILE_SIZE_BYTES = kybRulesConfig.maxFileSizeBytes;
 

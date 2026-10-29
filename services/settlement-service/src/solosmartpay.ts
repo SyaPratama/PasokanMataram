@@ -56,11 +56,13 @@ export interface PaymentInvoiceResult {
 
 export interface WebhookEventPayload {
   event: 'payment.success' | 'payment.expired' | 'disbursement.completed';
+  webhookId?: string;
   invoiceId: string;
   orderId: string;
   amount: number;
   method: string;
   paidAt?: string;
+  timestamp?: number;
   signature?: string;
 }
 

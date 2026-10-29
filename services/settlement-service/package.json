@@ -18,6 +18,7 @@
     "@pasok/database": "*",
     "@pasok/domain": "*",
     "@pasok/queue": "*",
+    "redis": "^6.3.0",
     "zod": "^3.23.8"
   }
 }

@@ -81,7 +81,7 @@ export function HeroSection() {
     <section
       id="beranda"
       ref={containerRef}
-      className="relative w-full overflow-hidden bg-netral-canvas pt-10 sm:pt-16 pb-8 sm:pb-10"
+      className="relative w-full overflow-hidden bg-netral-canvas pt-24 sm:pt-28 pb-8 sm:pb-10"
     >
       <motion.div
         style={{ y: bgY, scale: bgScale }}
@@ -169,7 +169,7 @@ export function HeroSection() {
           </div>
 
           <div className="mt-12 sm:mt-16 pt-6 max-w-3xl mx-auto">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/90 mb-4 font-heading drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gelap/70 mb-4 font-heading">
               Didukung Sinergi Ekosistem Sourcing &amp; Perbankan D.I. Yogyakarta
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-gelap">

@@ -1,3 +1,4 @@
+import * as jose from 'jose';
 import type { MacroRole, MicroRole, TenantId, UserId, HubId } from '@pasok/domain';
 
 /**
@@ -14,10 +15,28 @@ export interface UserSessionClaims {
 }
 
 /**
- * Mendekode klaim token JWT secara native di Edge Middleware tanpa dependensi eksternal.
- * Mematuhi prinsip Ponytail (Native Web API first).
- * @param token String JWT.
- * @returns UserSessionClaims jika format valid, null jika rusak.
+ * Verifikasi JWT dengan validasi signature HMAC-SHA256.
+ * CRITICAL FIX: Prevents JWT forgery attacks (pentest finding #1).
+ */
+export async function verifySessionToken(token: string, secret: string): Promise<UserSessionClaims | null> {
+  try {
+    const secretKey = new TextEncoder().encode(secret);
+    const { payload } = await jose.jwtVerify(token, secretKey, {
+      algorithms: ['HS256'],
+    });
+    
+    if (typeof payload === 'object' && payload !== null && 'userId' in payload && 'macroRole' in payload) {
+      return payload as unknown as UserSessionClaims;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Mendekode JWT tanpa validasi signature (DEPRECATED - backward compatibility only).
+ * WARNING: Tidak aman - gunakan verifySessionToken() untuk autentikasi.
  */
 export function decodeSessionClaimsEdge(token: string): UserSessionClaims | null {
   try {

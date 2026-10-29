@@ -202,9 +202,8 @@ export function Navbar() {
 
   return (
     <>
-      <div className="h-[76px] sm:h-[84px]" aria-hidden="true" />
 
-      <motion.header
+      <motion.header suppressHydrationWarning
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}

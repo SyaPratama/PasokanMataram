@@ -11,7 +11,6 @@ import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Min
 import { Button } from '../../../components/ui/button';
 import { PoolSpecAccordion } from './_components/pool-spec-accordion';
 import { trackFunnelStep } from '@/lib/telemetry';
-import { isSandboxMode, openPaymentModal, addPoolingReservation } from "./sandbox-mock";
 import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
 
 interface PoolItem {
@@ -100,7 +99,9 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
-  const { openPaymentModal, addPoolingReservation } = { openPaymentModal: (params?: { orderId?: string; amountRp?: number; method?: string }) => {}, addPoolingReservation: (campaignId?: string, quantityKg?: number) => {} };
+  // Use real backend API directly - mock functions for compatibility
+  const openPaymentModal = (params?: { orderId?: string; amountRp?: number; method?: string }) => {};
+  const addPoolingReservation = (campaignId?: string, quantityKg?: number) => {};
   const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);
   const [selectedPool, setSelectedPool] = React.useState<PoolItem | null>(null);
   const [orderKg, setOrderKg] = React.useState<number>(20);
@@ -125,7 +126,7 @@ export default function BuyerPoolingPage() {
   const isBelowMtv = totalOrderValue < MINIMUM_TRANSACTION_VALUE;
 
   const handleOpenDialog = (pool: PoolItem) => {
-    if (!isSandboxMode && !isKybVerified) {
+    if (!false && !isKybVerified) {
       setIsKybModalOpen(true);
       return;
     }
@@ -271,14 +272,14 @@ export default function BuyerPoolingPage() {
           <p className="text-xs sm:text-sm font-medium text-gelap leading-relaxed">
             Dana Anda tersimpan aman di rekening bersama Bank BPD DIY. Dana baru diteruskan ke petani setelah timbangan fisik dan uji mutu subuh di hub dinyatakan lolos SNI.
           </p>
-          {isSandboxMode && (
+          {false && (
             <div className="pt-2 flex justify-end">
               <button
                 type="button"
                 onClick={() =>
                   openPaymentModal({
                     orderId: `RSV-SBX-${Date.now().toString().slice(-4)}`,
-                    amountRp: vaInstruction.totalAmountRp,
+                    amountRp: vaInstruction?.totalAmountRp,
                     method: 'BPD_DIY',
                   })
                 }

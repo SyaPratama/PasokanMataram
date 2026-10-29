@@ -137,6 +137,7 @@ export default function RootLayout({
         className="min-h-screen flex flex-col font-body bg-netral-canvas text-gelap antialiased"
       >
         <EnterpriseJsonLd baseUrl={appUrl} />
+        {children}
       </body>
     </html>
   );
