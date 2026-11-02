@@ -1,0 +1,121 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.x'
+  CI: 'true'
+
+jobs:
+  lint-and-typecheck:
+    name: Code Quality & Typecheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify code comment cleanliness
+        run: node scripts/audit-cleanliness.mjs
+
+      - name: Monorepo lint and typecheck
+        run: npm run lint
+
+  unit-and-contract-tests:
+    name: Unit & Contract Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run vitest test suites
+        run: npx vitest run --exclude='tests/e2e/**'
+
+  build-monorepo:
+    name: Monorepo Build Proof
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, unit-and-contract-tests]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all 14 monorepo packages
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+  ci-gate-summary:
+    name: CI Gate Summary
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, unit-and-contract-tests, build-monorepo]
+    if: always()
+
+    steps:
+      - name: Evaluate gate status
+        run: |
+          echo "## CI Pipeline Status Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Typecheck | ${{ needs.lint-and-typecheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit & Contract Tests | ${{ needs.unit-and-contract-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Monorepo Build Proof | ${{ needs.build-monorepo.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Workflow: \`${{ github.workflow }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Actor: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.lint-and-typecheck.result }}" != "success" ] || \
+             [ "${{ needs.unit-and-contract-tests.result }}" != "success" ] || \
+             [ "${{ needs.build-monorepo.result }}" != "success" ]; then
+            echo "CI pipeline checks did not pass."
+            exit 1
+          fi
+          echo "All CI pipeline checks passed successfully."

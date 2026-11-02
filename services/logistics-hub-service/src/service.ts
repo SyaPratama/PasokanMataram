@@ -109,7 +109,7 @@ export class LogisticsHubService {
       }>(
         `SELECT price_per_kg, total_amount_rp
          FROM pool_reservations
-         WHERE id = $1`,
+         WHERE id = ?`,
         [input.reservationId]
       );
 
@@ -122,19 +122,19 @@ export class LogisticsHubService {
       await query(
         `UPDATE escrow_settlements
          SET status = 'HELD_DISPUTE',
-             dispute_reason = $1,
-             dispute_refund_rp = $2,
-             net_disbursement_rp = GREATEST(0, net_disbursement_rp - $2),
+             dispute_reason = ?,
+             dispute_refund_rp = ?,
+             net_disbursement_rp = GREATEST(0, net_disbursement_rp - ?),
              updated_at = NOW()
-         WHERE reservation_id = $3`,
-        [`[${input.disputeType}] ${input.description}`, computedRefundRp, input.reservationId]
+         WHERE reservation_id = ?`,
+        [`[${input.disputeType}] ${input.description}`, computedRefundRp, computedRefundRp, input.reservationId]
       );
 
       await query(
         `UPDATE pool_reservations
          SET status = 'DISPUTED',
              updated_at = NOW()
-         WHERE id = $1`,
+         WHERE id = ?`,
         [input.reservationId]
       );
     } catch {

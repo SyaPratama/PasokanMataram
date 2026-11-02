@@ -89,7 +89,7 @@ async function persistMarketPrices(items: MarketPriceIngest[]): Promise<number> 
   for (const item of items) {
     try {
       const commRes = await query<{ id: string }>(
-        'SELECT id FROM commodities WHERE code = $1 LIMIT 1',
+        'SELECT id FROM commodities WHERE code = ? LIMIT 1',
         [item.commodityCode]
       );
       const row = commRes.rows[0];
@@ -99,9 +99,8 @@ async function persistMarketPrices(items: MarketPriceIngest[]): Promise<number> 
       await query(
         `INSERT INTO commodity_raw_market_prices (
           commodity_id, source_type, price, market_location, recorded_date, metadata
-        ) VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (commodity_id, source_type, market_location, recorded_date)
-        DO UPDATE SET price = EXCLUDED.price, metadata = EXCLUDED.metadata`,
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE price = VALUES(price), metadata = VALUES(metadata)`,
         [
           commodityId,
           item.sourceType,
@@ -134,14 +133,13 @@ async function persistWeatherObservations(items: WeatherObservation[]): Promise<
       await query(
         `INSERT INTO weather_observations (
           regency, recorded_date, rainfall_mm, humidity_percent, temperature_celsius, weather_condition, bmkg_station_code
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        ON CONFLICT (regency, recorded_date)
-        DO UPDATE SET
-          rainfall_mm = EXCLUDED.rainfall_mm,
-          humidity_percent = EXCLUDED.humidity_percent,
-          temperature_celsius = EXCLUDED.temperature_celsius,
-          weather_condition = EXCLUDED.weather_condition,
-          bmkg_station_code = EXCLUDED.bmkg_station_code`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          rainfall_mm = VALUES(rainfall_mm),
+          humidity_percent = VALUES(humidity_percent),
+          temperature_celsius = VALUES(temperature_celsius),
+          weather_condition = VALUES(weather_condition),
+          bmkg_station_code = VALUES(bmkg_station_code)`,
         [
           item.regency,
           item.recordedDate,

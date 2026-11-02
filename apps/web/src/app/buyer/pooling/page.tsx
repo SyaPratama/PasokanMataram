@@ -99,7 +99,6 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
-  // Use real backend API directly - mock functions for compatibility
   const openPaymentModal = (params?: { orderId?: string; amountRp?: number; method?: string }) => {};
   const addPoolingReservation = (campaignId?: string, quantityKg?: number) => {};
   const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);

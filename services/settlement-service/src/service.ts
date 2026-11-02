@@ -106,15 +106,15 @@ export class SettlementService {
         `UPDATE pool_reservations
          SET status = 'PAID',
              updated_at = NOW()
-         WHERE id = $1 OR payment_reference = $1`,
-        [payload.orderId]
+         WHERE id = ? OR payment_reference = ?`,
+        [payload.orderId, payload.orderId]
       );
 
       await query(
         `UPDATE escrow_settlements
          SET status = 'ESCROW_LOCKED',
              updated_at = NOW()
-         WHERE reservation_id = $1`,
+         WHERE reservation_id = ?`,
         [payload.orderId]
       );
     }
@@ -149,7 +149,8 @@ export class SettlementService {
        WHERE status = 'READY_FOR_DISBURSEMENT'
          AND scheduled_disbursement_at <= NOW()
        FOR UPDATE SKIP LOCKED
-       LIMIT $1`,
+       LIMIT ?`,
+      [limit]
     );
 
     let total = 0;
@@ -161,7 +162,7 @@ export class SettlementService {
          SET status = 'DISBURSED',
              disbursed_at = NOW(),
              updated_at = NOW()
-         WHERE id = $1`,
+         WHERE id = ?`,
         [row.id]
       );
       total += Number(row.net_disbursement_rp);

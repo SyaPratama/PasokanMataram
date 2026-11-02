@@ -46,9 +46,9 @@ export async function executeForecastPublish(
   for (const comm of commRes.rows) {
     try {
       const priceRes = await query<PriceRow>(
-        `SELECT recorded_date, AVG(price)::numeric(14,2) as price
+        `SELECT recorded_date, CAST(AVG(price) AS DECIMAL(14,2)) as price
          FROM commodity_raw_market_prices
-         WHERE commodity_id = $1
+         WHERE commodity_id = ?
          GROUP BY recorded_date
          ORDER BY recorded_date ASC
          LIMIT 60`,
@@ -167,7 +167,7 @@ async function saveCommodityForecast(f: CommodityForecast): Promise<void> {
       target_price, recommended_action, action_explanation, weather_risk_level, weather_risk_description,
       rainfall_forecast_mm, historical_and_projected, algorithm, last_trained_at, created_at, updated_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW(), NOW()
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
     )`,
     [
       f.id,

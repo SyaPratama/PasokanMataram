@@ -94,18 +94,18 @@ export class AdminService {
     try {
       await query(
         `UPDATE kyb_documents
-         SET status = $1,
-             rejection_reason = $2,
+         SET status = ?,
+             rejection_reason = ?,
              updated_at = NOW()
-         WHERE id = $3`,
+         WHERE id = ?`,
         [newStatus, dto.rejectionReason || null, dto.documentId]
       );
 
       await query(
         `UPDATE tenants
-         SET kyb_status = $1,
+         SET kyb_status = ?,
              updated_at = NOW()
-         WHERE id = $2`,
+         WHERE id = ?`,
         [newStatus, dto.tenantId]
       );
     } catch {

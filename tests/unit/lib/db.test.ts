@@ -6,12 +6,12 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
 
   beforeAll(async () => {
     try {
-      const client = await pool.connect();
+      const client = await pool.getConnection();
       client.release();
       isDbConnected = true;
     } catch {
       isDbConnected = false;
-      console.warn('[DB TEST INFO] PostgreSQL offline di localhost:5432. Pengujian live database dilewati secara terisolasi.');
+      console.warn('[DB TEST INFO] MySQL offline. Pengujian live database dilewati secara terisolasi.');
     }
   });
 
@@ -26,7 +26,7 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
       ctx.skip();
       return;
     }
-    const res = await query<{ connected: number; db_name: string }>('SELECT 1 as connected, current_database() as db_name');
+    const res = await query<{ connected: number; db_name: string }>('SELECT 1 as connected, DATABASE() as db_name');
     expect(res.rows.length).toBe(1);
     const firstRow = res.rows[0];
     expect(firstRow?.connected).toBe(1);
@@ -39,7 +39,7 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
       return;
     }
     const res = await query<{ table_name: string }>(
-      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY table_name"
     );
     const tableNames = res.rows.map((r) => r.table_name);
 
@@ -63,8 +63,8 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
     };
 
     const sessionTenantId = await withTenantContext(context, async (client) => {
-      const res = await client.query("SELECT current_setting('app.current_tenant_id', true) as tenant_id");
-      return res.rows[0].tenant_id;
+      const [rows] = await client.query<any[]>('SELECT @current_tenant_id as tenant_id');
+      return (rows as any[])[0]?.tenant_id;
     });
 
     expect(sessionTenantId).toBe(mockTenantId);

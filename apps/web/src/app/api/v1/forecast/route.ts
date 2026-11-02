@@ -214,10 +214,10 @@ export async function POST(request: Request): Promise<NextResponse> {
           target_price, recommended_action, action_explanation, weather_risk_level, weather_risk_description,
           rainfall_forecast_mm, historical_and_projected, algorithm, last_trained_at
         ) VALUES (
-          $1, $2, $3, $4, $5,
-          $6, $7, $8, $9, $10, $11,
-          $12, $13, $14, $15, $16,
-          $17, $18, $19, NOW()
+          ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?,
+          ?, ?, ?, NOW()
         )`,
         [
           commId, curPrice, pred7d, pred30d, pred90d,
