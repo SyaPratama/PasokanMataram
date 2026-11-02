@@ -11,7 +11,7 @@ describe('Multi-Tenant Row-Level Security (RLS) & Isolation (SC-004)', () => {
 
   beforeAll(async () => {
     try {
-      const client = await pool.connect();
+      const client = await pool.getConnection();
       client.release();
       isDbConnected = true;
     } catch {
@@ -61,14 +61,14 @@ describe('Multi-Tenant Row-Level Security (RLS) & Isolation (SC-004)', () => {
     };
 
     await withTenantContext(tenantA, async (clientA) => {
-      const resultA = await clientA.query('SELECT current_setting($1, true) as tenant', ['app.current_tenant_id']);
-      expect(resultA.rows[0]?.tenant).toBe(tenantA.tenantId);
+      const [rowsA] = await clientA.query<any[]>('SELECT @current_tenant_id as tenant');
+      expect((rowsA as any[])[0]?.tenant).toBe(tenantA.tenantId);
     });
 
     await withTenantContext(tenantB, async (clientB) => {
-      const resultB = await clientB.query('SELECT current_setting($1, true) as tenant', ['app.current_tenant_id']);
-      expect(resultB.rows[0]?.tenant).toBe(tenantB.tenantId);
-      expect(resultB.rows[0]?.tenant).not.toBe(tenantA.tenantId);
+      const [rowsB] = await clientB.query<any[]>('SELECT @current_tenant_id as tenant');
+      expect((rowsB as any[])[0]?.tenant).toBe(tenantB.tenantId);
+      expect((rowsB as any[])[0]?.tenant).not.toBe(tenantA.tenantId);
     });
   });
 });

@@ -24,18 +24,18 @@ describe('User Story 2 Integration Flow: Admin KYB Verification Queue & Mutex Lo
 
   beforeAll(async () => {
     try {
-      const client = await pool.connect();
+      const client = await pool.getConnection();
       client.release();
       isDbConnected = true;
     } catch {
       isDbConnected = false;
-      console.warn('[ADMIN TEST INFO] PostgreSQL offline. Pengujian live flow dilewati secara terisolasi.');
+      console.warn('[ADMIN TEST INFO] MySQL offline. Pengujian live flow dilewati secara terisolasi.');
     }
   });
 
   afterAll(async () => {
     if (isDbConnected && testTenantId) {
-      await pool.query('DELETE FROM tenants WHERE id = $1', [testTenantId]);
+      await pool.query('DELETE FROM tenants WHERE id = ?', [testTenantId]);
       await pool.end();
     }
   });

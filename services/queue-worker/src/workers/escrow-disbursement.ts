@@ -40,7 +40,8 @@ export async function processEscrowDisbursements(
        WHERE status = 'READY_FOR_DISBURSEMENT'
          AND scheduled_disbursement_at <= NOW()
        FOR UPDATE SKIP LOCKED
-       LIMIT $1`,
+       LIMIT ?`,
+      [limit]
     );
 
     for (const row of candidateRes.rows) {
@@ -50,7 +51,7 @@ export async function processEscrowDisbursements(
            SET status = 'DISBURSED',
                disbursed_at = NOW(),
                updated_at = NOW()
-           WHERE id = $1`,
+           WHERE id = ?`,
           [row.id]
         );
 

@@ -4,6 +4,7 @@
  * Mematuhi Prinsip II, VI, dan VII Konstitusi PasokMataram v1.4.0 (3NF, RLS, Transaksional).
  */
 
+import crypto from 'crypto';
 import { query, withTransaction, withTenantContext } from '../lib/db';
 import { hashPassword, verifyPassword, issueSessionToken, type TokenPayload } from '../lib/auth';
 import { withLock } from '../lib/redis-lock';
@@ -100,69 +101,64 @@ export class TenantService {
     sessionToken: string;
   }> {
     return await withTransaction(async (client) => {
-      const existingUser = await client.query('SELECT id FROM users WHERE email = $1', [input.email.toLowerCase()]);
-      if (existingUser.rows.length > 0) {
+      const [existingRows] = await client.query<any[]>(
+        'SELECT id FROM users WHERE email = ?',
+        [input.email.toLowerCase()]
+      );
+      if (Array.isArray(existingRows) && existingRows.length > 0) {
         throw new Error('Alamat email sudah terdaftar dalam sistem.');
       }
 
-      const tenantRes = await client.query(
-        `INSERT INTO tenants (business_name, tenant_type, regency, kyb_status)
-         VALUES ($1, $2, $3, 'PENDING_VERIFICATION')
-         RETURNING *`,
-        [input.businessName, input.tenantType, input.regency]
+      const tenantId = asTenantId(crypto.randomUUID());
+      const userId = asUserId(crypto.randomUUID());
+      const now = new Date();
+
+      await client.query(
+        `INSERT INTO tenants (id, business_name, tenant_type, regency, kyb_status)
+         VALUES (?, ?, ?, ?, 'PENDING_VERIFICATION')`,
+        [tenantId, input.businessName, input.tenantType, input.regency]
       );
-      const tenantRow = tenantRes.rows[0];
-      if (!tenantRow) {
-        throw new Error('Gagal membuat entitas bisnis.');
-      }
-      const tenantId = asTenantId(tenantRow.id);
 
       const passwordHash = await hashPassword(input.password);
 
-      const userRes = await client.query(
-        `INSERT INTO users (tenant_id, email, password_hash, full_name, phone_number, role, is_active)
-         VALUES ($1, $2, $3, $4, $5, 'OWNER', true)
-         RETURNING *`,
-        [tenantId, input.email.toLowerCase(), passwordHash, input.ownerName, input.phoneNumber]
+      await client.query(
+        `INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active)
+         VALUES (?, ?, ?, ?, ?, ?, 'OWNER', true)`,
+        [userId, tenantId, input.email.toLowerCase(), passwordHash, input.ownerName, input.phoneNumber]
       );
-      const userRow = userRes.rows[0];
-      if (!userRow) {
-        throw new Error('Gagal membuat akun pemilik.');
-      }
-      const userId = asUserId(userRow.id);
 
       const tokenPayload: TokenPayload = {
         tenantId,
         userId,
         role: 'OWNER',
         isSuperAdmin: false,
-        email: userRow.email,
-        businessName: tenantRow.business_name,
+        email: input.email.toLowerCase(),
+        businessName: input.businessName,
       };
       const sessionToken = issueSessionToken(tokenPayload);
 
       return {
         tenant: {
           id: tenantId,
-          businessName: tenantRow.business_name,
-          tenantType: tenantRow.tenant_type,
-          regency: tenantRow.regency,
-          kybStatus: tenantRow.kyb_status,
-          rejectionReason: tenantRow.rejection_reason,
-          verifiedAt: tenantRow.verified_at,
-          verifiedBy: tenantRow.verified_by ? asUserId(tenantRow.verified_by) : null,
-          createdAt: tenantRow.created_at,
-          updatedAt: tenantRow.updated_at,
+          businessName: input.businessName,
+          tenantType: input.tenantType,
+          regency: input.regency,
+          kybStatus: 'PENDING_VERIFICATION',
+          rejectionReason: null,
+          verifiedAt: null,
+          verifiedBy: null,
+          createdAt: now,
+          updatedAt: now,
         },
         user: {
           id: userId,
           tenantId,
-          email: userRow.email,
-          fullName: userRow.full_name,
-          phoneNumber: userRow.phone_number,
-          role: userRow.role,
-          isActive: userRow.is_active,
-          createdAt: userRow.created_at,
+          email: input.email.toLowerCase(),
+          fullName: input.ownerName,
+          phoneNumber: input.phoneNumber,
+          role: 'OWNER',
+          isActive: true,
+          createdAt: now,
         },
         sessionToken,
       };
@@ -181,7 +177,7 @@ export class TenantService {
       `SELECT u.*, t.business_name, t.tenant_type, t.regency, t.kyb_status, t.rejection_reason, t.verified_at, t.verified_by, t.updated_at
        FROM users u
        JOIN tenants t ON t.id = u.tenant_id
-       WHERE u.email = $1 AND u.is_active = true`,
+       WHERE u.email = ? AND u.is_active = true`,
       [email.toLowerCase()]
     );
 
@@ -245,21 +241,24 @@ export class TenantService {
   ): Promise<KybDocument> {
     return await withTenantContext(context, async (client) => {
       if (input.documentType === 'NIB') {
-        const dupCheck = await client.query<{ id: string }>(
+        const [dupRows] = await client.query<any[]>(
           `SELECT id FROM kyb_documents 
-           WHERE document_type = 'NIB' AND document_number = $1 AND status = 'VERIFIED' AND tenant_id != $2`,
+           WHERE document_type = 'NIB' AND document_number = ? AND status = 'VERIFIED' AND tenant_id != ?`,
           [input.documentNumber, context.tenantId]
         );
-        if (dupCheck.rows.length > 0) {
+        if (Array.isArray(dupRows) && dupRows.length > 0) {
           throw new Error('Nomor NIB tersebut sudah terdaftar dan diverifikasi pada entitas usaha lain.');
         }
       }
 
-      const res = await client.query<KybDocumentDbRow>(
-        `INSERT INTO kyb_documents (tenant_id, document_type, document_number, file_storage_key, file_mime_type, file_size_bytes, status)
-         VALUES ($1, $2, $3, $4, $5, $6, 'PENDING_VERIFICATION')
-         RETURNING *`,
+      const docId = asKybDocumentId(crypto.randomUUID());
+      const now = new Date();
+
+      await client.query(
+        `INSERT INTO kyb_documents (id, tenant_id, document_type, document_number, file_storage_key, file_mime_type, file_size_bytes, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING_VERIFICATION')`,
         [
+          docId,
           context.tenantId,
           input.documentType,
           input.documentNumber,
@@ -269,22 +268,17 @@ export class TenantService {
         ]
       );
 
-      const row = res.rows[0];
-      if (!row) {
-        throw new Error('Gagal menyimpan dokumen legalitas.');
-      }
-
       return {
-        id: asKybDocumentId(row.id),
-        tenantId: asTenantId(row.tenant_id),
-        documentType: row.document_type,
-        documentNumber: row.document_number,
-        fileStorageKey: row.file_storage_key,
-        fileMimeType: row.file_mime_type,
-        fileSizeBytes: row.file_size_bytes,
-        status: row.status,
-        rejectionNote: row.rejection_note,
-        uploadedAt: row.uploaded_at,
+        id: docId,
+        tenantId: asTenantId(context.tenantId),
+        documentType: input.documentType,
+        documentNumber: input.documentNumber,
+        fileStorageKey: input.fileStorageKey,
+        fileMimeType: input.fileMimeType,
+        fileSizeBytes: input.fileSizeBytes,
+        status: 'PENDING_VERIFICATION',
+        rejectionNote: null,
+        uploadedAt: now,
       };
     });
   }
@@ -294,12 +288,13 @@ export class TenantService {
    */
   static async getTenantKybDocuments(context: SecurityContext): Promise<KybDocument[]> {
     return await withTenantContext(context, async (client) => {
-      const res = await client.query<KybDocumentDbRow>(
-        'SELECT * FROM kyb_documents WHERE tenant_id = $1 ORDER BY uploaded_at DESC',
+      const [rows] = await client.query<any[]>(
+        'SELECT * FROM kyb_documents WHERE tenant_id = ? ORDER BY uploaded_at DESC',
         [context.tenantId]
       );
 
-      return res.rows.map((row) => ({
+      const docRows = Array.isArray(rows) ? (rows as KybDocumentDbRow[]) : [];
+      return docRows.map((row) => ({
         id: asKybDocumentId(row.id),
         tenantId: asTenantId(row.tenant_id),
         documentType: row.document_type,
@@ -352,10 +347,10 @@ export class TenantService {
     const offset = (page - 1) * limit;
 
     const countRes = await query<CountRow>(
-      'SELECT COUNT(*)::int as total FROM tenants WHERE kyb_status = $1',
+      'SELECT COUNT(*) as total FROM tenants WHERE kyb_status = ?',
       [status]
     );
-    const totalItems = countRes.rows[0]?.total ?? 0;
+    const totalItems = Number(countRes.rows[0]?.total ?? 0);
     const totalPages = Math.ceil(totalItems / limit);
 
     const itemsRes = await query<PendingKybQueueRow>(
@@ -369,14 +364,14 @@ export class TenantService {
         u.full_name as owner_name,
         u.email as owner_email,
         u.phone_number as owner_phone,
-        COUNT(d.id)::int as documents_count
+        COUNT(d.id) as documents_count
        FROM tenants t
        LEFT JOIN users u ON u.tenant_id = t.id AND u.role = 'OWNER'
        LEFT JOIN kyb_documents d ON d.tenant_id = t.id
-       WHERE t.kyb_status = $1
+       WHERE t.kyb_status = ?
        GROUP BY t.id, u.id
        ORDER BY t.created_at ASC
-       LIMIT $2 OFFSET $3`,
+       LIMIT ? OFFSET ?`,
       [status, limit, offset]
     );
 
@@ -423,11 +418,12 @@ export class TenantService {
 
     return await withLock(`audit:tenant:${input.tenantId}`, async () => {
       return await withTransaction(async (client) => {
-        const tenantRes = await client.query<{ id: string; kyb_status: string }>(
-          'SELECT id, kyb_status FROM tenants WHERE id = $1',
+        const [tenantRows] = await client.query<any[]>(
+          'SELECT id, kyb_status FROM tenants WHERE id = ?',
           [input.tenantId]
         );
-        const tenantRow = tenantRes.rows[0];
+        const rowsList = Array.isArray(tenantRows) ? tenantRows : [];
+        const tenantRow = rowsList[0] as { id: string; kyb_status: string } | undefined;
         if (!tenantRow) {
           throw new Error('Entitas usaha (tenant) tidak ditemukan.');
         }
@@ -439,36 +435,36 @@ export class TenantService {
           await client.query(
             `UPDATE tenants
              SET kyb_status = 'VERIFIED',
-                 verified_at = $2,
-                 verified_by = $3,
+                 verified_at = ?,
+                 verified_by = ?,
                  rejection_reason = NULL,
-                 updated_at = $2
-             WHERE id = $1`,
-            [input.tenantId, now, context.userId]
+                 updated_at = ?
+             WHERE id = ?`,
+            [now, context.userId, now, input.tenantId]
           );
 
           await client.query(
             `UPDATE kyb_documents
              SET status = 'VERIFIED'
-             WHERE tenant_id = $1`,
+             WHERE tenant_id = ?`,
             [input.tenantId]
           );
         } else {
           await client.query(
             `UPDATE tenants
              SET kyb_status = 'REJECTED',
-                 rejection_reason = $2,
-                 updated_at = $3
-             WHERE id = $1`,
-            [input.tenantId, input.rejectionReason, now]
+                 rejection_reason = ?,
+                 updated_at = ?
+             WHERE id = ?`,
+            [input.rejectionReason, now, input.tenantId]
           );
 
           await client.query(
             `UPDATE kyb_documents
              SET status = 'REJECTED',
-                 rejection_note = $2
-             WHERE tenant_id = $1`,
-            [input.tenantId, input.rejectionReason]
+                 rejection_note = ?
+             WHERE tenant_id = ?`,
+            [input.rejectionReason, input.tenantId]
           );
         }
 
@@ -519,7 +515,7 @@ export class TenantService {
       `SELECT t.*, u.full_name as owner_name, u.email as owner_email, u.phone_number as owner_phone
        FROM tenants t
        LEFT JOIN users u ON u.tenant_id = t.id AND u.role = 'OWNER'
-       WHERE t.id = $1`,
+       WHERE t.id = ?`,
       [tenantId]
     );
 
@@ -529,10 +525,9 @@ export class TenantService {
     }
 
     const docsRes = await query<KybDocumentDbRow>(
-      'SELECT * FROM kyb_documents WHERE tenant_id = $1 ORDER BY uploaded_at DESC',
+      'SELECT * FROM kyb_documents WHERE tenant_id = ? ORDER BY uploaded_at DESC',
       [tenantId]
     );
-
     return {
       tenantId: t.id,
       businessName: t.business_name,

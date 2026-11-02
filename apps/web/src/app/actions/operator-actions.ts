@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 import { createHubOperatorSchema, CreateHubOperatorInput } from '../../lib/validations/operator-schemas';
-import { pool } from '@pasok/database';
+import { withTransaction } from '@pasok/database';
 
 /**
  * Representasi hasil operasi Server Action penerbitan operator logistik hub.
@@ -58,26 +58,23 @@ export async function createHubOperatorAction(
   const userId = crypto.randomUUID();
 
   try {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
+    await withTransaction(async (client) => {
       await client.query(
         `INSERT INTO users (id, tenant_id, email, phone, password_hash, micro_role, full_name, is_active)
-         VALUES ($1, $1, $2, $3, $4, $5, $6, $7)
-         ON CONFLICT (email) DO UPDATE SET full_name = EXCLUDED.full_name`,
-        [userId, email, phoneNumber, 'PENDING_SET_PASSWORD', microRole, fullName, true]
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE full_name = VALUES(full_name)`,
+        [userId, userId, email, phoneNumber, 'PENDING_SET_PASSWORD', microRole, fullName, true]
       );
 
       await client.query(
         `INSERT INTO hub_operators (id, user_id, assigned_hub_id, micro_role, activation_token_hash, token_expires_at, status, issued_by_admin_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [operatorId, userId, assignedHubId, microRole, tokenHash, expiresAt, 'PENDING_ACTIVATION', adminId]
       );
 
       await client.query(
         `INSERT INTO audit_logs (actor_user_id, action_name, resource_type, resource_id, payload_json)
-         VALUES ($1, $2, $3, $4, $5)`,
+         VALUES (?, ?, ?, ?, ?)`,
         [
           adminId,
           'PROVISION_HUB_OPERATOR',
@@ -86,14 +83,7 @@ export async function createHubOperatorAction(
           JSON.stringify({ assignedHubId, microRole, email }),
         ]
       );
-
-      await client.query('COMMIT');
-    } catch (dbError: unknown) {
-      await client.query('ROLLBACK');
-      throw dbError;
-    } finally {
-      client.release();
-    }
+    });
   } catch {
   }
 

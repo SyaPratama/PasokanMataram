@@ -11,18 +11,18 @@ describe('User Story 1 Integration Flow (Pendaftaran & Upload KYB - MVP)', () =>
 
   beforeAll(async () => {
     try {
-      const client = await pool.connect();
+      const client = await pool.getConnection();
       client.release();
       isDbConnected = true;
     } catch {
       isDbConnected = false;
-      console.warn('[INTEGRATION TEST INFO] PostgreSQL offline. Pengujian live flow dilewati secara terisolasi.');
+      console.warn('[INTEGRATION TEST INFO] MySQL offline. Pengujian live flow dilewati secara terisolasi.');
     }
   });
 
   afterAll(async () => {
     if (isDbConnected && registeredTenantId) {
-      await pool.query('DELETE FROM tenants WHERE id = $1', [registeredTenantId]);
+      await pool.query('DELETE FROM tenants WHERE id = ?', [registeredTenantId]);
       await pool.end();
     }
   });

@@ -32,7 +32,7 @@ export async function handleKybDocumentUploaded(job: QueueJob<'kyb.document.uplo
   const { tenantId, documentId, storageKey } = job.payload;
   const resolveFullDocument = lazyAsync(async () => {
     const res = await query(
-      'SELECT id, file_storage_key, file_mime_type, status FROM kyb_documents WHERE id = $1',
+      'SELECT id, file_storage_key, file_mime_type, status FROM kyb_documents WHERE id = ?',
       [documentId]
     );
     return res.rows[0] || null;
