@@ -51,10 +51,57 @@ jobs:
           cp -r apps/web/.next/static web-dist/apps/web/.next/
           cp -r apps/web/public web-dist/apps/web/
           cp apps/web/public/.htaccess web-dist/.htaccess
-          cat << 'EOF' > web-dist/server.js
-          process.env.NODE_ENV = 'production';
+          cat << 'SERVER_JS_EOF' > web-dist/server.js
+          import fs from 'fs';
+          import path from 'path';
+
+          const rawAppMode = (
+            process.env.NODE_ENV ||
+            process.env.PASSENGER_APP_ENV ||
+            process.env.APP_ENV ||
+            process.env.APPLICATION_MODE ||
+            'production'
+          ).toLowerCase();
+
+          const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
+          const primaryEnv = isDev ? '.env.development' : '.env.production';
+          const fallbackEnv = isDev ? '.env.production' : '.env.development';
+
+          function parseAndInjectEnv(filename) {
+            const envFilePath = path.resolve(process.cwd(), filename);
+            if (!fs.existsSync(envFilePath)) return false;
+            try {
+              const fileContent = fs.readFileSync(envFilePath, 'utf8');
+              for (const line of fileContent.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('#')) continue;
+                const eqIdx = trimmed.indexOf('=');
+                if (eqIdx === -1) continue;
+                const key = trimmed.slice(0, eqIdx).trim();
+                let val = trimmed.slice(eqIdx + 1).trim();
+                if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                  val = val.slice(1, -1);
+                }
+                if (key && process.env[key] === undefined) {
+                  process.env[key] = val;
+                }
+              }
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          const loaded = parseAndInjectEnv(primaryEnv);
+          if (!loaded) {
+            parseAndInjectEnv(fallbackEnv);
+          }
+
+          process.env.NODE_ENV = isDev ? 'development' : 'production';
+          process.env.NEXT_PUBLIC_APP_MODE = isDev ? 'development' : 'production';
+
           import('./apps/web/server.js');
-          EOF
+          SERVER_JS_EOF
           cp web-dist/server.js web-dist/app.js
           cp apps/web/.env.production web-dist/.env.production 2>/dev/null || true
           cp apps/web/.env.development web-dist/.env.development 2>/dev/null || true
@@ -97,10 +144,56 @@ jobs:
         run: |
           mkdir -p api-dist/dist
           cp apps/api/dist/main.js api-dist/dist/
-          cat << 'EOF' > api-dist/server.js
-          process.env.NODE_ENV = 'production';
+          cat << 'SERVER_JS_EOF' > api-dist/server.js
+          import fs from 'fs';
+          import path from 'path';
+
+          const rawAppMode = (
+            process.env.NODE_ENV ||
+            process.env.PASSENGER_APP_ENV ||
+            process.env.APP_ENV ||
+            process.env.APPLICATION_MODE ||
+            'production'
+          ).toLowerCase();
+
+          const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
+          const primaryEnv = isDev ? '.env.development' : '.env.production';
+          const fallbackEnv = isDev ? '.env.production' : '.env.development';
+
+          function parseAndInjectEnv(filename) {
+            const envFilePath = path.resolve(process.cwd(), filename);
+            if (!fs.existsSync(envFilePath)) return false;
+            try {
+              const fileContent = fs.readFileSync(envFilePath, 'utf8');
+              for (const line of fileContent.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('#')) continue;
+                const eqIdx = trimmed.indexOf('=');
+                if (eqIdx === -1) continue;
+                const key = trimmed.slice(0, eqIdx).trim();
+                let val = trimmed.slice(eqIdx + 1).trim();
+                if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                  val = val.slice(1, -1);
+                }
+                if (key && process.env[key] === undefined) {
+                  process.env[key] = val;
+                }
+              }
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          const loaded = parseAndInjectEnv(primaryEnv);
+          if (!loaded) {
+            parseAndInjectEnv(fallbackEnv);
+          }
+
+          process.env.NODE_ENV = isDev ? 'development' : 'production';
+
           import('./dist/main.js');
-          EOF
+          SERVER_JS_EOF
           cp api-dist/server.js api-dist/app.js
           cp apps/api/package.json api-dist/
           cp -r node_modules api-dist/
