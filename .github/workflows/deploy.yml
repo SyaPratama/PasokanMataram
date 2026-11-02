@@ -155,14 +155,38 @@ jobs:
           set -e
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           
+          mkdir -p "$WEB_PATH"
+          if [ -f "$WEB_PATH/.htaccess" ]; then
+            cp "$WEB_PATH/.htaccess" /tmp/preserved_web_htaccess 2>/dev/null || true
+          fi
+          
           if [ -d "$WEB_PATH" ]; then
             cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
             ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
           
-          mkdir -p "$WEB_PATH"
-          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
+          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH" 2>/dev/null || true
           rm -f ~/web-build.tar.gz
+          
+          if [ -f /tmp/preserved_web_htaccess ]; then
+            cp /tmp/preserved_web_htaccess "$WEB_PATH/.htaccess" 2>/dev/null || true
+            rm -f /tmp/preserved_web_htaccess
+          fi
+          
+          if [ ! -f "$WEB_PATH/.htaccess" ]; then
+            BACKUP_HTACCESS=$(ls -dt ${WEB_PATH}_backup_* 2>/dev/null | while read b; do [ -f "$b/.htaccess" ] && echo "$b/.htaccess" && break; done)
+            if [ -n "$BACKUP_HTACCESS" ] && [ -f "$BACKUP_HTACCESS" ]; then
+              cp "$BACKUP_HTACCESS" "$WEB_PATH/.htaccess" 2>/dev/null || true
+            else
+              echo "Options -Indexes" > "$WEB_PATH/.htaccess"
+              echo "DirectoryIndex disabled" >> "$WEB_PATH/.htaccess"
+              echo "" >> "$WEB_PATH/.htaccess"
+              echo "<IfModule mod_passenger.c>" >> "$WEB_PATH/.htaccess"
+              echo "    PassengerAppType node" >> "$WEB_PATH/.htaccess"
+              echo "    PassengerStartupFile server.js" >> "$WEB_PATH/.htaccess"
+              echo "</IfModule>" >> "$WEB_PATH/.htaccess"
+            fi
+          fi
           
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
           if command -v pm2 >/dev/null 2>&1; then
@@ -170,7 +194,7 @@ jobs:
             pm2 save 2>/dev/null || true
           fi
           
-          echo "Web deployed successfully with pure build artifacts"
+          echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
           SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
@@ -235,14 +259,38 @@ jobs:
           set -e
           API_PATH="${{ secrets.API_DEPLOY_PATH }}"
           
+          mkdir -p "$API_PATH"
+          if [ -f "$API_PATH/.htaccess" ]; then
+            cp "$API_PATH/.htaccess" /tmp/preserved_api_htaccess 2>/dev/null || true
+          fi
+          
           if [ -d "$API_PATH" ]; then
             cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
             ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
           
-          mkdir -p "$API_PATH"
-          tar -xzf ~/api-build.tar.gz -C "$API_PATH"
+          tar -xzf ~/api-build.tar.gz -C "$API_PATH" 2>/dev/null || true
           rm -f ~/api-build.tar.gz
+          
+          if [ -f /tmp/preserved_api_htaccess ]; then
+            cp /tmp/preserved_api_htaccess "$API_PATH/.htaccess" 2>/dev/null || true
+            rm -f /tmp/preserved_api_htaccess
+          fi
+          
+          if [ ! -f "$API_PATH/.htaccess" ]; then
+            BACKUP_API_HTACCESS=$(ls -dt ${API_PATH}_backup_* 2>/dev/null | while read b; do [ -f "$b/.htaccess" ] && echo "$b/.htaccess" && break; done)
+            if [ -n "$BACKUP_API_HTACCESS" ] && [ -f "$BACKUP_API_HTACCESS" ]; then
+              cp "$BACKUP_API_HTACCESS" "$API_PATH/.htaccess" 2>/dev/null || true
+            else
+              echo "Options -Indexes" > "$API_PATH/.htaccess"
+              echo "DirectoryIndex disabled" >> "$API_PATH/.htaccess"
+              echo "" >> "$API_PATH/.htaccess"
+              echo "<IfModule mod_passenger.c>" >> "$API_PATH/.htaccess"
+              echo "    PassengerAppType node" >> "$API_PATH/.htaccess"
+              echo "    PassengerStartupFile server.js" >> "$API_PATH/.htaccess"
+              echo "</IfModule>" >> "$API_PATH/.htaccess"
+            fi
+          fi
           
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
           if command -v pm2 >/dev/null 2>&1; then
@@ -250,7 +298,7 @@ jobs:
             pm2 save 2>/dev/null || true
           fi
           
-          echo "API deployed successfully with pure build artifacts"
+          echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
           SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
@@ -284,14 +332,14 @@ jobs:
     steps:
       - name: Generate summary
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Web (Next.js) | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| API (NestJS) | ${{ needs.deploy-api.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Author: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Time: $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: .env.development + .env.production from GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Component | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Web (Next.js) | ${{ needs.deploy-web.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| API (NestJS) | ${{ needs.deploy-api.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Author: @${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Time: $(date -u)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: .env.development + .env.production from GitHub Secrets" >> "$GITHUB_STEP_SUMMARY"
