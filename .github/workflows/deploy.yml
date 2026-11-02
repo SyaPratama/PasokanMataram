@@ -151,38 +151,41 @@ jobs:
       
       - name: Extract web build on server
         run: |
+          cat << 'REMOTE_SCRIPT' > deploy-web-remote.sh
+          set -e
+          WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
+          
+          if [ -d "$WEB_PATH" ]; then
+            cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+            ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
+          fi
+          
+          mkdir -p "$WEB_PATH"
+          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
+          rm -f ~/web-build.tar.gz
+          
+          mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
+          if command -v pm2 >/dev/null 2>&1; then
+            pm2 restart pasokmataram-web 2>/dev/null || pm2 start "$WEB_PATH/server.js" --name pasokmataram-web || true
+            pm2 save 2>/dev/null || true
+          fi
+          
+          echo "Web deployed successfully with pure build artifacts"
+          REMOTE_SCRIPT
+
           SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash -l << 'ENDSSH'
-            set -e
-            WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
-            
-            if [ -d "$WEB_PATH" ]; then
-              cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
-              ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
-            fi
-            
-            mkdir -p "$WEB_PATH"
-            tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
-            rm -f ~/web-build.tar.gz
-            
-            mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 restart pasokmataram-web 2>/dev/null || pm2 start "$WEB_PATH/server.js" --name pasokmataram-web || true
-              pm2 save 2>/dev/null || true
-            fi
-            
-            echo "Web deployed successfully with pure build artifacts"
-            ENDSSH
-            then
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
               echo "Deploy succeeded."
+              rm -f deploy-web-remote.sh
               exit 0
             fi
             echo "Deploy attempt $i failed. Retrying in 5 seconds..."
             sleep 5
           done
+          rm -f deploy-web-remote.sh
           echo "Deploy failed after 3 attempts."
           exit 255
       
@@ -228,38 +231,41 @@ jobs:
       
       - name: Extract API build on server
         run: |
+          cat << 'REMOTE_SCRIPT' > deploy-api-remote.sh
+          set -e
+          API_PATH="${{ secrets.API_DEPLOY_PATH }}"
+          
+          if [ -d "$API_PATH" ]; then
+            cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+            ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
+          fi
+          
+          mkdir -p "$API_PATH"
+          tar -xzf ~/api-build.tar.gz -C "$API_PATH"
+          rm -f ~/api-build.tar.gz
+          
+          mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
+          if command -v pm2 >/dev/null 2>&1; then
+            pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api || true
+            pm2 save 2>/dev/null || true
+          fi
+          
+          echo "API deployed successfully with pure build artifacts"
+          REMOTE_SCRIPT
+
           SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash -l << 'ENDSSH'
-            set -e
-            API_PATH="${{ secrets.API_DEPLOY_PATH }}"
-            
-            if [ -d "$API_PATH" ]; then
-              cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
-              ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
-            fi
-            
-            mkdir -p "$API_PATH"
-            tar -xzf ~/api-build.tar.gz -C "$API_PATH"
-            rm -f ~/api-build.tar.gz
-            
-            mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api || true
-              pm2 save 2>/dev/null || true
-            fi
-            
-            echo "API deployed successfully with pure build artifacts"
-            ENDSSH
-            then
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
               echo "Deploy succeeded."
+              rm -f deploy-api-remote.sh
               exit 0
             fi
             echo "Deploy attempt $i failed. Retrying in 5 seconds..."
             sleep 5
           done
+          rm -f deploy-api-remote.sh
           echo "Deploy failed after 3 attempts."
           exit 255
       
