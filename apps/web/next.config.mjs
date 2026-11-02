@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: process.env.NEXT_OUTPUT_STANDALONE === 'false' ? undefined : 'standalone',
   optimizeFonts: process.env.CI ? false : true,
   transpilePackages: ['@pasok/config', '@pasok/domain', '@pasok/database', '@pasok/queue', '@pasok/auth-kyb-service', '@pasok/repository-contracts', '@pasok/security'],
   publicRuntimeConfig: {

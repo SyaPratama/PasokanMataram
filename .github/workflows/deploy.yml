@@ -5,6 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 env:
   NODE_VERSION: '20.x'
 
@@ -131,10 +138,7 @@ jobs:
         run: |
           tar -czf packages-build.tar.gz \
             --warning=no-file-changed \
-            packages/domain/dist \
-            packages/config/dist \
-            packages/database/dist \
-            packages/security/dist \
+            packages/*/src \
             packages/*/package.json \
             || true
       
@@ -201,7 +205,7 @@ jobs:
           pm2 restart pasokmataram-web || pm2 start npm --name pasokmataram-web -- start
           pm2 save
           
-          echo "✅ Web deployed with .env.development and .env.production"
+          echo "Web deployed successfully with environment files"
           ENDSSH
       
       - name: Health check web
@@ -266,7 +270,7 @@ jobs:
           pm2 restart pasokmataram-api || pm2 start node --name pasokmataram-api -- dist/main.js
           pm2 save
           
-          echo "✅ API deployed with .env.development and .env.production"
+          echo "API deployed successfully with environment files"
           ENDSSH
       
       - name: Health check API
@@ -284,7 +288,7 @@ jobs:
     steps:
       - name: Generate summary
         run: |
-          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
