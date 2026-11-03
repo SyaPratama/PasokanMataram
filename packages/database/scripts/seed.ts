@@ -21,7 +21,7 @@ const config: SeedConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3306', 10),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Rast16808312#',
+  password: process.env.DB_PASSWORD || 'your_password_here',
   database: process.env.DB_NAME || 'pasokmataram_local',
 };
 

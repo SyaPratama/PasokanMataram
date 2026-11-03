@@ -6,10 +6,10 @@ services:
     container_name: pasokmataram-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
       MYSQL_DATABASE: ${DB_NAME:-pasokmataram_local}
       MYSQL_USER: ${DB_USER:-pasok_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
     ports:
       - "${DB_PORT:-3306}:3306"
     volumes:
@@ -17,7 +17,7 @@ services:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-Rast16808312#}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-secure_password_change_me}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -78,7 +78,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: ${DB_USER:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      DB_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
       DB_NAME: ${DB_NAME:-pasokmataram_local}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
@@ -120,7 +120,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: ${DB_USER:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      DB_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
       DB_NAME: ${DB_NAME:-pasokmataram_local}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
