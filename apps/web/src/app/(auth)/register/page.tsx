@@ -39,7 +39,7 @@ export default function RegisterPage() {
     phoneNumber: '',
     password: '',
     acceptedTerms: false,
-
+  });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((prev) => ({
       ...prev,
