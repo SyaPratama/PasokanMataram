@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseWebhook } from '@/lib/settlement';
+import { parseWebhook } from '@/lib/webhook';
 import { query } from '@pasok/database';
 
 export const runtime = 'nodejs';

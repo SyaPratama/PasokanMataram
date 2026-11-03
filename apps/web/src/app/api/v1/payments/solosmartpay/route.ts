@@ -1,44 +1,16 @@
 /**
  * @file apps/web/src/app/api/v1/payments/solosmartpay/route.ts
- * @description BFF API endpoint for generating Solosmartpay multi-channel payment invoices (QRIS & VA).
- * Implements dual-rail fee models (0.3% buyer system fee, 0.5% merchant platform fee).
+ * @description BFF proxy endpoint untuk settlement API.
+ * Forwards requests ke apps/api settlement service.
  */
 
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { SettlementService, type PaymentMethod } from '@/lib/settlement';
 import { verifySessionToken } from '@/lib/auth';
 
-const settlementService = new SettlementService();
-
-const CreatePaymentSchema = z.object({
-  orderId: z.string().min(1),
-  amountRp: z.number().positive(),
-  customerName: z.string().min(2),
-  customerEmail: z.string().email(),
-  customerPhone: z.string().optional(),
-  method: z.enum([
-    'QRIS',
-    'M2',
-    'I1',
-    'BR',
-    'BT',
-    'B1',
-    'A1',
-    'BV',
-    'BPD_DIY',
-    'OV',
-    'DA',
-    'SA',
-    'LA',
-  ]),
-  returnUrl: z.string().url().optional(),
-});
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 /**
- * Menerbitkan tagihan pembayaran baru via gateway Solosmartpay.
- * @param request HTTP POST Request.
- * @returns Respon JSON invoice pembayaran dengan VA number atau QRIS payload.
+ * Proxy payment invoice creation ke apps/api settlement endpoint.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -51,52 +23,36 @@ export async function POST(request: Request): Promise<NextResponse> {
     const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
     const body = await request.json();
 
-    const parseResult = CreatePaymentSchema.safeParse(body);
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Parameter tagihan Solosmartpay tidak valid.',
-            details: parseResult.error.flatten().fieldErrors,
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    const invoice = await settlementService.createPaymentInvoice({
-      amount: parseResult.data.amountRp,
-      reference: parseResult.data.orderId,
-      description: `Payment for ${parseResult.data.customerName}`,
-      customerName: parseResult.data.customerName,
-      customerEmail: parseResult.data.customerEmail,
-      customerPhone: parseResult.data.customerPhone,
-      paymentMethod: parseResult.data.method as PaymentMethod,
+    const response = await fetch(`${API_BASE_URL}/api/settlement/invoice`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': sessionCookie ? `Bearer ${sessionCookie}` : '',
+      },
+      body: JSON.stringify({
+        amount: body.amountRp,
+        reference: body.orderId,
+        description: `Payment for ${body.customerName}`,
+        customerName: body.customerName,
+        customerEmail: body.customerEmail,
+        customerPhone: body.customerPhone,
+        paymentMethod: body.method,
+      }),
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: {
-          invoice,
-          requesterTenantId: session?.tenantId,
-        },
-        message: 'Faktur pembayaran Solosmartpay berhasil diterbitkan.',
-      },
-      { status: 201 }
-    );
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`API error: ${response.status} ${error}`);
+    }
+
+    const result = await response.json();
+    return NextResponse.json(result, { status: response.status });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Gagal menerbitkan tagihan Solosmartpay.';
+    const message = error instanceof Error ? error.message : 'Gagal membuat invoice';
     return NextResponse.json(
       {
         success: false,
-        error: {
-          code: 'PAYMENT_CREATION_FAILED',
-          message,
-        },
+        error: { code: 'PAYMENT_CREATION_FAILED', message },
       },
       { status: 500 }
     );
