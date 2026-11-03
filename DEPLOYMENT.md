@@ -82,6 +82,83 @@ APPWRITE_API_KEY=your_production_api_key
 APPWRITE_BUCKET_ID=kyb-documents-prod
 ```
 
+## Solosmartpay Payment Gateway Setup
+
+PasokMataram uses Solosmartpay for multi-channel payment processing (QRIS, Virtual Accounts).
+
+### 1. Obtain API Credentials
+
+Contact Solosmartpay merchant support to receive:
+- API Token (format: `ssp_live_xxxxx` for production, `ssp_test_xxxxx` for sandbox)
+- Webhook Secret (HMAC-SHA256 signing key)
+
+### 2. Configure Environment Variables
+
+Add to `.env.production`:
+```bash
+SOLOSMARTPAY_API_TOKEN=ssp_live_your_token_here
+SOLOSMARTPAY_WEBHOOK_SECRET=your_webhook_secret_here
+SOLOSMARTPAY_SANDBOX=false
+```
+
+For development/testing, use sandbox mode:
+```bash
+SOLOSMARTPAY_API_TOKEN=ssp_test_sandbox_token
+SOLOSMARTPAY_WEBHOOK_SECRET=test_webhook_secret
+SOLOSMARTPAY_SANDBOX=true
+```
+
+### 3. Register Webhook Endpoint
+
+In Solosmartpay merchant dashboard, configure webhook URL:
+```
+https://pasok.syapratama.tech/api/v1/webhooks/solosmartpay
+```
+
+Webhook events subscribed:
+- `payment.success` - Payment completed successfully
+- `payment.failed` - Payment failed or rejected
+- `payment.expired` - Payment invoice expired (default 24h)
+
+### 4. Apply Database Migrations
+
+Run payment gateway migrations:
+```bash
+mysql -u pasokmataram_user -p pasokmataram_prod < packages/database/migrations/003_add_payment_invoices_table.sql
+mysql -u pasokmataram_user -p pasokmataram_prod < packages/database/migrations/004_add_webhook_events_table.sql
+mysql -u pasokmataram_user -p pasokmataram_prod < packages/database/migrations/005_add_terms_acceptances_table.sql
+mysql -u pasokmataram_user -p pasokmataram_prod < packages/database/migrations/006_deprecate_escrow_settlements.sql
+```
+
+### 5. Verification
+
+Test payment invoice creation:
+```bash
+curl -X POST https://pasok.syapratama.tech/api/settlement/invoice \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 500000,
+    "reference": "TEST001",
+    "description": "Test payment",
+    "customerName": "Test User",
+    "customerEmail": "test@example.com",
+    "paymentMethod": "QRIS"
+  }'
+```
+
+Expected response: Invoice with `invoiceId`, `qrCode`, and `paymentUrl`.
+
+### Fee Structure
+
+Solosmartpay dual-rail fee model (PayFac compliant):
+- Buyer service fee: 0.3% (charged to buyer)
+- Merchant platform fee: 0.5% (deducted from seller payout)
+
+Example: Rp 500.000 transaction
+- Buyer pays: Rp 501.500 (base + 0.3%)
+- Seller receives: Rp 497.500 (base - 0.5%)
+
+
 
 ## Appwrite Storage Setup
 
