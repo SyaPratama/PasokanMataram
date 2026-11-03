@@ -12,11 +12,8 @@ COPY packages/database/package.json ./packages/database/
 COPY packages/queue/package.json ./packages/queue/
 COPY packages/repository-contracts/package.json ./packages/repository-contracts/
 COPY packages/security/package.json ./packages/security/
-COPY services/auth-kyb-service/package.json ./services/auth-kyb-service/
 COPY services/pooling-service/package.json ./services/pooling-service/
 COPY services/logistics-hub-service/package.json ./services/logistics-hub-service/
-COPY services/settlement-service/package.json ./services/settlement-service/
-COPY services/queue-worker/package.json ./services/queue-worker/
 COPY services/ml-forecasting-service/package.json ./services/ml-forecasting-service/
 RUN npm ci
 
