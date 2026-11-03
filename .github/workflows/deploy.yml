@@ -50,10 +50,58 @@ jobs:
           mkdir -p web-dist/apps/web/.next
           cp -r apps/web/.next/static web-dist/apps/web/.next/
           cp -r apps/web/public web-dist/apps/web/
-          cat << 'EOF' > web-dist/server.js
-          process.env.NODE_ENV = 'production';
+          cp apps/web/public/.htaccess web-dist/.htaccess
+          cat << 'SERVER_JS_EOF' > web-dist/server.js
+          import fs from 'fs';
+          import path from 'path';
+
+          const rawAppMode = (
+            process.env.NODE_ENV ||
+            process.env.PASSENGER_APP_ENV ||
+            process.env.APP_ENV ||
+            process.env.APPLICATION_MODE ||
+            'production'
+          ).toLowerCase();
+
+          const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
+          const primaryEnv = isDev ? '.env.development' : '.env.production';
+          const fallbackEnv = isDev ? '.env.production' : '.env.development';
+
+          function parseAndInjectEnv(filename) {
+            const envFilePath = path.resolve(process.cwd(), filename);
+            if (!fs.existsSync(envFilePath)) return false;
+            try {
+              const fileContent = fs.readFileSync(envFilePath, 'utf8');
+              for (const line of fileContent.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('#')) continue;
+                const eqIdx = trimmed.indexOf('=');
+                if (eqIdx === -1) continue;
+                const key = trimmed.slice(0, eqIdx).trim();
+                let val = trimmed.slice(eqIdx + 1).trim();
+                if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                  val = val.slice(1, -1);
+                }
+                if (key && process.env[key] === undefined) {
+                  process.env[key] = val;
+                }
+              }
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          const loaded = parseAndInjectEnv(primaryEnv);
+          if (!loaded) {
+            parseAndInjectEnv(fallbackEnv);
+          }
+
+          process.env.NODE_ENV = isDev ? 'development' : 'production';
+          process.env.NEXT_PUBLIC_APP_MODE = isDev ? 'development' : 'production';
+
           import('./apps/web/server.js');
-          EOF
+          SERVER_JS_EOF
           cp web-dist/server.js web-dist/app.js
           cp apps/web/.env.production web-dist/.env.production 2>/dev/null || true
           cp apps/web/.env.development web-dist/.env.development 2>/dev/null || true
@@ -96,10 +144,56 @@ jobs:
         run: |
           mkdir -p api-dist/dist
           cp apps/api/dist/main.js api-dist/dist/
-          cat << 'EOF' > api-dist/server.js
-          process.env.NODE_ENV = 'production';
+          cat << 'SERVER_JS_EOF' > api-dist/server.js
+          import fs from 'fs';
+          import path from 'path';
+
+          const rawAppMode = (
+            process.env.NODE_ENV ||
+            process.env.PASSENGER_APP_ENV ||
+            process.env.APP_ENV ||
+            process.env.APPLICATION_MODE ||
+            'production'
+          ).toLowerCase();
+
+          const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
+          const primaryEnv = isDev ? '.env.development' : '.env.production';
+          const fallbackEnv = isDev ? '.env.production' : '.env.development';
+
+          function parseAndInjectEnv(filename) {
+            const envFilePath = path.resolve(process.cwd(), filename);
+            if (!fs.existsSync(envFilePath)) return false;
+            try {
+              const fileContent = fs.readFileSync(envFilePath, 'utf8');
+              for (const line of fileContent.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('#')) continue;
+                const eqIdx = trimmed.indexOf('=');
+                if (eqIdx === -1) continue;
+                const key = trimmed.slice(0, eqIdx).trim();
+                let val = trimmed.slice(eqIdx + 1).trim();
+                if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                  val = val.slice(1, -1);
+                }
+                if (key && process.env[key] === undefined) {
+                  process.env[key] = val;
+                }
+              }
+              return true;
+            } catch {
+              return false;
+            }
+          }
+
+          const loaded = parseAndInjectEnv(primaryEnv);
+          if (!loaded) {
+            parseAndInjectEnv(fallbackEnv);
+          }
+
+          process.env.NODE_ENV = isDev ? 'development' : 'production';
+
           import('./dist/main.js');
-          EOF
+          SERVER_JS_EOF
           cp api-dist/server.js api-dist/app.js
           cp apps/api/package.json api-dist/
           cp -r node_modules api-dist/
@@ -167,25 +261,24 @@ jobs:
           
           tar -xzf ~/web-build.tar.gz -C "$WEB_PATH" 2>/dev/null || true
           rm -f ~/web-build.tar.gz
-          
           if [ -f /tmp/preserved_web_htaccess ]; then
-            cp /tmp/preserved_web_htaccess "$WEB_PATH/.htaccess" 2>/dev/null || true
+            if grep -q "CLOUDLINUX" /tmp/preserved_web_htaccess 2>/dev/null; then
+              cat /tmp/preserved_web_htaccess > "$WEB_PATH/.htaccess"
+            fi
             rm -f /tmp/preserved_web_htaccess
           fi
           
-          if [ ! -f "$WEB_PATH/.htaccess" ]; then
-            BACKUP_HTACCESS=$(ls -dt ${WEB_PATH}_backup_* 2>/dev/null | while read b; do [ -f "$b/.htaccess" ] && echo "$b/.htaccess" && break; done)
-            if [ -n "$BACKUP_HTACCESS" ] && [ -f "$BACKUP_HTACCESS" ]; then
-              cp "$BACKUP_HTACCESS" "$WEB_PATH/.htaccess" 2>/dev/null || true
-            else
-              echo "Options -Indexes" > "$WEB_PATH/.htaccess"
-              echo "DirectoryIndex disabled" >> "$WEB_PATH/.htaccess"
-              echo "" >> "$WEB_PATH/.htaccess"
-              echo "<IfModule mod_passenger.c>" >> "$WEB_PATH/.htaccess"
-              echo "    PassengerAppType node" >> "$WEB_PATH/.htaccess"
-              echo "    PassengerStartupFile server.js" >> "$WEB_PATH/.htaccess"
-              echo "</IfModule>" >> "$WEB_PATH/.htaccess"
-            fi
+          if ! grep -q "ErrorDocument 404" "$WEB_PATH/.htaccess" 2>/dev/null; then
+            echo "" >> "$WEB_PATH/.htaccess"
+            echo "Options -Indexes" >> "$WEB_PATH/.htaccess"
+            echo "DirectoryIndex disabled" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 400 /" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 401 /" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 403 /403" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 404 /404" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 500 /" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 502 /" >> "$WEB_PATH/.htaccess"
+            echo "ErrorDocument 503 /" >> "$WEB_PATH/.htaccess"
           fi
           
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
@@ -273,23 +366,23 @@ jobs:
           rm -f ~/api-build.tar.gz
           
           if [ -f /tmp/preserved_api_htaccess ]; then
-            cp /tmp/preserved_api_htaccess "$API_PATH/.htaccess" 2>/dev/null || true
+            if grep -q "CLOUDLINUX" /tmp/preserved_api_htaccess 2>/dev/null; then
+              cat /tmp/preserved_api_htaccess > "$API_PATH/.htaccess"
+            fi
             rm -f /tmp/preserved_api_htaccess
           fi
           
-          if [ ! -f "$API_PATH/.htaccess" ]; then
-            BACKUP_API_HTACCESS=$(ls -dt ${API_PATH}_backup_* 2>/dev/null | while read b; do [ -f "$b/.htaccess" ] && echo "$b/.htaccess" && break; done)
-            if [ -n "$BACKUP_API_HTACCESS" ] && [ -f "$BACKUP_API_HTACCESS" ]; then
-              cp "$BACKUP_API_HTACCESS" "$API_PATH/.htaccess" 2>/dev/null || true
-            else
-              echo "Options -Indexes" > "$API_PATH/.htaccess"
-              echo "DirectoryIndex disabled" >> "$API_PATH/.htaccess"
-              echo "" >> "$API_PATH/.htaccess"
-              echo "<IfModule mod_passenger.c>" >> "$API_PATH/.htaccess"
-              echo "    PassengerAppType node" >> "$API_PATH/.htaccess"
-              echo "    PassengerStartupFile server.js" >> "$API_PATH/.htaccess"
-              echo "</IfModule>" >> "$API_PATH/.htaccess"
-            fi
+          if ! grep -q "ErrorDocument 404" "$API_PATH/.htaccess" 2>/dev/null; then
+            echo "" >> "$API_PATH/.htaccess"
+            echo "Options -Indexes" >> "$API_PATH/.htaccess"
+            echo "DirectoryIndex disabled" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 400 /" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 401 /" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 403 /403" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 404 /404" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 500 /" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 502 /" >> "$API_PATH/.htaccess"
+            echo "ErrorDocument 503 /" >> "$API_PATH/.htaccess"
           fi
           
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"

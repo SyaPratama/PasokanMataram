@@ -1,0 +1,48 @@
+# ==============================================================================
+# PasokMataram - LiteSpeed Web Server & cPanel Apache Configuration
+# ==============================================================================
+
+# 1. Matikan Directory Browsing (Mencegah tampilan "Index of /")
+Options -Indexes
+DirectoryIndex disabled
+
+# 2. Redirect Galat Server LiteSpeed ke Router Next.js
+ErrorDocument 400 /
+ErrorDocument 401 /
+ErrorDocument 403 /403
+ErrorDocument 404 /404
+ErrorDocument 500 /
+ErrorDocument 502 /
+ErrorDocument 503 /
+
+# 3. Phusion Passenger / LiteSpeed Node.js Application Directives
+<IfModule mod_passenger.c>
+    PassengerAppType node
+    PassengerStartupFile server.js
+    PassengerAppRoot .
+    PassengerFriendlyErrorPages off
+</IfModule>
+
+# 4. LiteSpeed Rewrite Engine untuk Berkas Statis & Routing Bersih
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Lewatkan berkas statis publik dan Next.js chunks secara langsung
+    RewriteCond %{REQUEST_URI} ^/(_next|icons|images|favicon\.ico|icon\.svg|robots\.txt|sitemap\.xml|sw\.js|manifest\.webmanifest) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Alihkan seluruh rute halaman dan error ke handler utama Next.js
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ / [QSA,L]
+</IfModule>
+
+# 5. Header Keamanan Baku
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
