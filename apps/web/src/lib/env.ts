@@ -51,7 +51,7 @@ try {
   }
   parsedEnv = envSchema.parse({
     ...process.env,
-    DATABASE_URL: process.env.DATABASE_URL || 'postgresql://root:Tama123@localhost:5432/pasokmataram_db',
+    DATABASE_URL: process.env.DATABASE_URL || 'mysql://root:Tama123@localhost:3306/pasokmataram_db',
     JWT_SECRET: process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars',
   });
 }

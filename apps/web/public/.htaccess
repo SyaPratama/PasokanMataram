@@ -9,8 +9,8 @@ DirectoryIndex disabled
 # 2. Redirect Galat Server LiteSpeed ke Router Next.js
 ErrorDocument 400 /
 ErrorDocument 401 /
-ErrorDocument 403 /
-ErrorDocument 404 /
+ErrorDocument 403 /403
+ErrorDocument 404 /404
 ErrorDocument 500 /
 ErrorDocument 502 /
 ErrorDocument 503 /
