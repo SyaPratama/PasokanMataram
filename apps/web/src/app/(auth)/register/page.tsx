@@ -38,7 +38,7 @@ export default function RegisterPage() {
     email: '',
     phoneNumber: '',
     password: '',
-  });
+    acceptedTerms: false,
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((prev) => ({
@@ -311,6 +311,28 @@ export default function RegisterPage() {
           </p>
         </div>
 
+        <div className="flex items-start gap-3 p-4 bg-netral-canvas rounded-xl border border-netral-border/60">
+          <input
+            type="checkbox"
+            id="acceptedTerms"
+            name="acceptedTerms"
+            required
+            checked={formData.acceptedTerms}
+            onChange={(e) => setFormData((prev) => ({ ...prev, acceptedTerms: e.target.checked }))}
+            className="mt-1 w-4 h-4 text-primer border-netral-border rounded focus:ring-primer/20"
+          />
+          <label htmlFor="acceptedTerms" className="text-xs text-gelap/85 leading-relaxed">
+            Saya menyetujui{' '}
+            <a href="/terms" target="_blank" className="text-primer hover:text-primer-hover font-semibold underline">
+              Syarat dan Ketentuan
+            </a>
+            {' '}serta{' '}
+            <a href="/privacy-policy" target="_blank" className="text-primer hover:text-primer-hover font-semibold underline">
+              Kebijakan Privasi
+            </a>
+            {' '}PasokMataram
+          </label>
+        </div>
         <Button
           type="submit"
           disabled={isLoading}
