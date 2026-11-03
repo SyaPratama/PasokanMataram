@@ -33,7 +33,7 @@ export class SettlementController {
    * Mengambil status rekening escrow untuk pesanan pooling tertentu.
    * @param reservationId Identifier reservasi kuota.
    * @param tenantId Header organisasi penyewa.
-   * @returns Rincian saldo penampung escrow BPD DIY.
+   * @returns Rincian saldo penampung escrow terpadu.
    */
   @Get('escrow/:reservationId')
   public async getEscrow(

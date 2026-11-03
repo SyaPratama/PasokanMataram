@@ -50,7 +50,7 @@ const MOCK_ESCROW: EscrowTransaction[] = [
 ];
 
 /**
- * Halaman Pengawasan Rekening Bersama Escrow Terproteksi Bank Indonesia & BPD DIY.
+ * Halaman Pengawasan Rekening Bersama Escrow Terproteksi.
  * Memantau pelepasan dana otomatis saat koki restoran mengonfirmasi penerimaan bahan baku.
  */
 export default function AdminEscrowPage() {
@@ -59,7 +59,7 @@ export default function AdminEscrowPage() {
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Badge variant="success">Kemitraan Perbankan BPD DIY &amp; BI</Badge>
+            <Badge variant="success">Rekening Bersama Escrow Terproteksi</Badge>
             <span className="text-xs text-gelap/60">Perlindungan Pembeli &amp; Pemasok 100%</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
@@ -75,7 +75,7 @@ export default function AdminEscrowPage() {
         <div className="bg-white p-5 rounded-2xl border border-netral-border/80 shadow-2xs">
           <span className="text-xs font-semibold text-gelap/70">Total Dana Tertampung Saat Ini</span>
           <div className="text-2xl font-bold font-mono text-primer mt-2">Rp 482.500.000</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Rekening Operasional BPD DIY Escrow</p>
+          <p className="text-[11px] text-gelap/60 mt-1">Rekening Operasional Escrow Vault</p>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-netral-border/80 shadow-2xs">
@@ -98,7 +98,7 @@ export default function AdminEscrowPage() {
               Mutasi Rekening Escrow Terkini
             </h2>
             <p className="text-[11px] text-gelap/65 mt-0.5">
-              Sinkronisasi realtime dari gateway perbankan BPD DIY.
+              Sinkronisasi realtime dari gateway perbankan terpadu.
             </p>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primer-light text-primer whitespace-nowrap shrink-0">

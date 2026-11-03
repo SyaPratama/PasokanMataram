@@ -175,7 +175,7 @@ export function HeroSection() {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-gelap">
               <span className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-netral-border/60 shadow-xs">
                 <ShieldCheck className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
-                <span>100% Proteksi Escrow BPD DIY</span>
+                <span>100% Proteksi Rekening Escrow</span>
               </span>
               <span className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-netral-border/60 shadow-xs">
                 <Clock className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />

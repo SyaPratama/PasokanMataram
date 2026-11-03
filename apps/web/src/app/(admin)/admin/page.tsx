@@ -67,7 +67,7 @@ export default function AdminOverviewPage() {
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-bold font-heading text-gelap mt-2 whitespace-nowrap tracking-tight tabular-nums">Rp 482.500.000</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Terproteksi Bank Indonesia &amp; BPD DIY</p>
+          <p className="text-[11px] text-gelap/60 mt-1">Terproteksi Rekening Escrow Terpadu</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">

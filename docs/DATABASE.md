@@ -206,7 +206,7 @@ erDiagram
 
 ### Payment & Settlement
 
-**escrow_settlements** - Escrow vault records with BPD DIY (dual-rail fees: 0.3% buyer, 0.5% merchant)  
+**escrow_settlements** - Escrow vault holding and dispute records (dual-rail fees: 0.3% buyer, 0.5% merchant)  
 **weighing_verifications** - QC hub digital scale verification with photo proof
 
 ### KYB & Compliance

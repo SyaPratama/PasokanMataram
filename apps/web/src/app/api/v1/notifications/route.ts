@@ -34,7 +34,7 @@ const MOCK_NOTIFICATIONS: NotificationItem[] = [
     tenantId: 'tnt_sandbox_tenant',
     category: 'PAYMENT',
     priority: 'NORMAL',
-    title: 'Pembayaran Escrow BPD DIY Berhasil',
+    title: 'Pembayaran Rekening Escrow Berhasil',
     body: 'Faktur INV-RSV-SBX-001 sebesar Rp 621.860 berhasil terverifikasi gateway Solosmartpay.',
     actionUrl: '/buyer/pooling',
     isRead: true,

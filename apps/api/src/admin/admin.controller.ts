@@ -42,7 +42,7 @@ export class AdminController {
   }
 
   /**
-   * Mengambil ringkasan rekonsiliasi rekening penampung escrow Bank BPD DIY.
+   * Mengambil ringkasan rekonsiliasi rekening penampung escrow terpadu.
    * @returns Data saldo escrow platform.
    */
   @Get('escrow')

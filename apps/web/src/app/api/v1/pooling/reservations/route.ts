@@ -14,7 +14,7 @@ const poolingService = new PoolingService();
 /**
  * Endpoint BFF untuk reservasi kuota pooling horeka.
  * @param request HTTP POST Request.
- * @returns Respon JSON rincian reservasi dan instruksi pembayaran VA Bank BPD DIY.
+ * @returns Respon JSON rincian reservasi dan instruksi pembayaran VA Escrow.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -83,7 +83,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         success: true,
         data: result,
         message:
-          'Reservasi kuota pooling berhasil dibuat. Sila selesaikan transfer ke rekening escrow Bank BPD DIY.',
+          'Reservasi kuota pooling berhasil dibuat. Sila selesaikan transfer ke rekening escrow terproteksi.',
       },
       { status: 201 }
     );
