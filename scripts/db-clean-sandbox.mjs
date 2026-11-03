@@ -20,10 +20,12 @@ if (fs.existsSync(envDefault)) {
   dotenv.config({ path: envDefault });
 }
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  `postgresql://${process.env.DB_USER || 'root'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'pasokmataram_db'}`;
-
+const dbHost = process.env.DB_HOST || 'localhost';
+const dbPort = Number(process.env.DB_PORT) || 5432;
+const dbUser = process.env.DB_USER || 'root';
+const dbPassword = process.env.DB_PASSWORD || 'Tama123';
+const dbName = process.env.DB_NAME || 'pasokmataram_db';
+const connectionString = `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`;
 const ssl = process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined;
 const migrationsDir = path.resolve(process.cwd(), 'docker/postgres/migrations');
 const advisoryLockId = 987654;

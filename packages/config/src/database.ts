@@ -7,7 +7,7 @@
 import { z } from 'zod';
 
 const databaseConfigSchema = z.object({
-  connectionString: z.string().min(10),
+  connectionString: z.string().optional(),
   host: z.string().default('localhost'),
   port: z.coerce.number().int().default(3306),
   user: z.string().default('root'),
@@ -24,9 +24,7 @@ const databaseConfigSchema = z.object({
 
 export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 
-const rawDatabaseUrl =
-  process.env.DATABASE_URL ||
-  `mysql://${process.env.DB_USER || 'root'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'pasokmataram_db'}`;
+const rawDatabaseUrl = `mysql://${process.env.DB_USER || 'root'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'pasokmataram_db'}`;
 
 const sslEnabled =
   process.env.DB_SSL === 'true' ||

@@ -19,7 +19,12 @@ export class SecurityException extends Error {
 }
 
 export const pool = mysql.createPool({
-  uri: databaseConfig.connectionString,
+  host: databaseConfig.host,
+  port: databaseConfig.port,
+  user: databaseConfig.user,
+  password: databaseConfig.password,
+  database: databaseConfig.database,
+  ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : undefined,
   waitForConnections: true,
   connectionLimit: databaseConfig.pool.maxConnections,
   queueLimit: 0,
