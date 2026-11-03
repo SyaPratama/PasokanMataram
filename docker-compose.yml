@@ -1,22 +1,24 @@
 # PasokMataram local infrastructure stack
 
 services:
-  postgres:
-    image: postgres:18
-    container_name: pasokmataram-postgres
+  mysql:
+    image: mysql:8.0
+    container_name: pasokmataram-mysql
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DB_USER:-root}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Tama123}
-      POSTGRES_DB: ${DB_NAME:-pasokmataram_db}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      MYSQL_DATABASE: ${DB_NAME:-pasokmataram_local}
+      MYSQL_USER: ${DB_USER:-pasok_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT:-3306}:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql
-      - ./docker/postgres/migrations:/docker-entrypoint-initdb.d:ro
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-root} -d ${DB_NAME:-pasokmataram_db}"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-Rast16808312#}"]
+      interval: 10s
       timeout: 5s
       retries: 5
     networks:
@@ -61,7 +63,7 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      - postgres
+      - mysql
     networks:
       - pasokmataram-net
 
@@ -73,11 +75,11 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3001
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_HOST: mysql
+      DB_PORT: 3306
       DB_USER: ${DB_USER:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Tama123}
-      DB_NAME: ${DB_NAME:-pasokmataram_db}
+      DB_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      DB_NAME: ${DB_NAME:-pasokmataram_local}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
       ML_SERVICE_URL: http://ml-service:8000
@@ -86,7 +88,7 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - postgres
+      - mysql
       - redis
     networks:
       - pasokmataram-net
@@ -115,11 +117,15 @@ services:
     container_name: pasokmataram-queue-worker
     restart: unless-stopped
     environment:
-      DB_HOST: postgres
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Rast16808312#}
+      DB_NAME: ${DB_NAME:-pasokmataram_local}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
     depends_on:
-      - postgres
+      - mysql
       - redis
     networks:
       - pasokmataram-net
@@ -136,7 +142,7 @@ services:
       - pasokmataram-net
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
   minio_data:
 

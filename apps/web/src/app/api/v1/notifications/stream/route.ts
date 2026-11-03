@@ -5,45 +5,10 @@
  */
 
 import type { NotificationItem } from '@pasok/domain';
+import { verifySessionToken } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-const SEED_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'ntf-init-01',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'ORDER',
-    priority: 'HIGH',
-    title: 'Pesanan Dapur Terverifikasi',
-    body: 'Alokasi 60 kg Bawang Merah Srikayangan Super A telah dikonfirmasi untuk jadwal antar subuh.',
-    actionUrl: '/buyer/orders',
-    isRead: false,
-    createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'ntf-init-02',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'POOLING',
-    priority: 'NORMAL',
-    title: 'Progres Kuota Pooling 87%',
-    body: 'Kampanye Bawang Merah Srikayangan Super A telah mencapai 870 kg dari target 1.000 kg.',
-    actionUrl: '/buyer/pooling',
-    isRead: false,
-    createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'ntf-init-03',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'PAYMENT',
-    priority: 'NORMAL',
-    title: 'Pembayaran Berhasil Diverifikasi',
-    body: 'Faktur INV-RSV-SBX-001 sebesar Rp 621.860 berhasil terverifikasi gateway Solosmartpay.',
-    actionUrl: '/buyer/pooling',
-    isRead: true,
-    readAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
-  },
-];
 
 /**
  * Endpoint streaming Server-Sent Events (SSE) untuk pembaruan realtime peramban.
@@ -52,32 +17,59 @@ const SEED_NOTIFICATIONS: NotificationItem[] = [
  */
 export async function GET(request: Request): Promise<Response> {
   const encoder = new TextEncoder();
-  const cookies = request.headers.get('cookie') || '';
-  const matchPersona = cookies.match(/pasok_sandbox_persona=([^;]+)/);
-  const persona = matchPersona ? matchPersona[1] : 'BUYER';
+  
+  // Extract session for tenant context
+  const cookieHeader = request.headers.get('cookie') || '';
+  const sessionCookie = cookieHeader
+    .split('; ')
+    .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
+    ?.split('=')[1];
+
+  const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
+  const tenantId = session?.tenantId || null;
 
   const customStream = new ReadableStream({
-    start(controller) {
+    async start(controller) {
+      // Send connection event
       controller.enqueue(
         encoder.encode(
           `event: connection\ndata: ${JSON.stringify({
             status: 'CONNECTED',
-            persona,
+            tenantId,
             connectedAt: new Date().toISOString(),
           })}\n\n`
         )
       );
 
-      SEED_NOTIFICATIONS.forEach((item) => {
-        controller.enqueue(
-          encoder.encode(
-            `id: ${item.id}\nevent: ${item.category.toLowerCase()}\ndata: ${JSON.stringify(
-              item
-            )}\n\n`
-          )
-        );
-      });
+      // Fetch notifications from database
+      if (tenantId) {
+        try {
+          const result = await query(
+            `SELECT id, tenant_id as tenantId, category, priority, title, body, action_url as actionUrl, is_read as isRead, read_at as readAt, created_at as createdAt
+             FROM notifications
+             WHERE tenant_id = ?
+             ORDER BY created_at DESC
+             LIMIT 50`,
+            [tenantId]
+          );
 
+          const notifications = result.rows as NotificationItem[];
+
+          notifications.forEach((item) => {
+            controller.enqueue(
+              encoder.encode(
+                `id: ${item.id}\nevent: ${item.category.toLowerCase()}\ndata: ${JSON.stringify(
+                  item
+                )}\n\n`
+              )
+            );
+          });
+        } catch (error) {
+          console.error('Failed to fetch notifications:', error);
+        }
+      }
+
+      // Send periodic ping to keep connection alive
       const pingInterval = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(`: ping\n\n`));
@@ -86,6 +78,7 @@ export async function GET(request: Request): Promise<Response> {
         }
       }, 15000);
 
+      // Clean up on client disconnect
       request.signal.addEventListener('abort', () => {
         clearInterval(pingInterval);
         try {

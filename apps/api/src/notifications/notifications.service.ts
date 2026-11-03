@@ -13,52 +13,11 @@ import type {
 } from '@pasok/domain';
 import { NotificationAdapter } from '@pasok/database';
 
-type MutableNotification = {
-  -readonly [K in keyof NotificationItem]: NotificationItem[K];
-};
-
-const INITIAL_MOCK_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'notif-001',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'ORDER',
-    priority: 'HIGH',
-    title: 'Pesanan Dapur Dikonfirmasi',
-    body: 'Pesanan Bawang Merah 60 kg dari Bale Raos telah diverifikasi untuk pengiriman subuh.',
-    actionUrl: '/buyer/orders',
-    isRead: false,
-    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'notif-002',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'POOLING',
-    priority: 'NORMAL',
-    title: 'Target Kuota Pooling 87% Tercapai',
-    body: 'Kampanye Bawang Merah Srikayangan Super A telah terkumpul 870 kg dari target 1.000 kg.',
-    actionUrl: '/buyer/pooling',
-    isRead: false,
-    createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'notif-003',
-    tenantId: 'tnt_sandbox_tenant',
-    category: 'PAYMENT',
-    priority: 'NORMAL',
-    title: 'Pembayaran Berhasil Diverifikasi',
-    body: 'Faktur INV-RSV-SBX-001 sebesar Rp 621.860 berhasil diverifikasi gateway Solosmartpay.',
-    actionUrl: '/buyer/pooling',
-    isRead: true,
-    readAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-  },
-];
 
 @Injectable()
 export class NotificationsService {
   private readonly adapter: NotificationAdapter;
   private readonly eventStream$: Subject<{ tenantId: string; item: NotificationItem }>;
-  private inMemoryNotifications: MutableNotification[] = INITIAL_MOCK_NOTIFICATIONS.map((n) => ({ ...n }));
   private inMemorySubscriptions: Map<string, WebPushSubscriptionDto> = new Map();
 
   public constructor() {
@@ -102,14 +61,9 @@ export class NotificationsService {
         isSuperAdmin: false,
       };
       return await this.adapter.listNotifications(context, query);
-    } catch {
-      let filtered = this.inMemoryNotifications.filter(
-        (n) => n.tenantId === targetTenant || n.tenantId === 'tnt_sandbox_tenant'
-      );
-      if (query?.unreadOnly) {
-        filtered = filtered.filter((n) => !n.isRead);
-      }
-      return filtered.slice(0, query?.limit || 30);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      return [];
     }
   }
 
@@ -128,10 +82,9 @@ export class NotificationsService {
         isSuperAdmin: false,
       };
       return await this.adapter.getUnreadCount(context);
-    } catch {
-      return this.inMemoryNotifications.filter(
-        (n) => (n.tenantId === targetTenant || n.tenantId === 'tnt_sandbox_tenant') && !n.isRead
-      ).length;
+    } catch (error) {
+      console.error('Failed to get unread count:', error);
+      return 0;
     }
   }
 
