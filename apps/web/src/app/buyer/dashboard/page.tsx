@@ -87,7 +87,7 @@ export default function BuyerDashboardPage() {
             </div>
             <p className="text-[11px] text-gelap/85 mt-0.5">
               {hasFinancialAccess
-                ? 'Akses penuh saldo escrow, mutasi perbankan, dan pengadaan multi-outlet aktif.'
+                ? 'Akses penuh saldo pembayaran, mutasi perbankan, dan pengadaan multi-outlet aktif.'
                 : 'Metrik saldo & transaksi keuangan disembunyikan total demi privasi bisnis.'}
             </p>
           </div>
@@ -119,7 +119,7 @@ export default function BuyerDashboardPage() {
           </h1>
           <p className="text-xs text-gelap/85 mt-1">
             {hasFinancialAccess
-              ? 'Pantau perputaran dana komoditas, standing orders gerai, dan garansi escrow.'
+              ? 'Pantau perputaran dana komoditas, standing orders gerai, dan status pembayaran.'
               : 'Pantau ketersediaan stok bahan segar, jadwal subuh 04:30 WIB, dan alokasi pool kuota.'}
           </p>
         </div>
@@ -146,7 +146,7 @@ export default function BuyerDashboardPage() {
         {hasFinancialAccess ? (
           <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
             <div className="flex items-center justify-between text-gelap/80">
-              <span className="text-xs font-semibold uppercase tracking-wider">Saldo Escrow Aman</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Saldo Tersedia</span>
               <div className="p-2 bg-primer-light rounded-xl text-primer">
                 <Wallet className="w-4 h-4" />
               </div>
@@ -155,7 +155,7 @@ export default function BuyerDashboardPage() {
               Rp 24.500.000
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
-              Rekening Escrow Terproteksi
+              Rekening Pembayaran Aktif
             </div>
           </div>
         ) : (

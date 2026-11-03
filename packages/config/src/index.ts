@@ -9,6 +9,7 @@ export * from './database';
 export * from './storage';
 export * from './cache';
 export * from './auth';
+export * from './payment';
 export * from './business';
 export * from './migrations';
 export * from './theme';

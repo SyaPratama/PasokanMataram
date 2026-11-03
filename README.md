@@ -23,14 +23,14 @@ PasokMataram mengintegrasikan tiga pilar operasional utama:
 - Mengurangi harga pokok pengadaan bahan hingga **20% - 40%** langsung dari sentra produksi pangan Sleman, Bantul, dan Kulon Progo.
 - Petani memperoleh kepastian serapan hasil panen dengan pesanan terkonfirmasi di muka.
 
-### B. Rekening Bersama Escrow Terpadu & Solosmartpay Gateway
-- Pembayaran pembeli ditampung secara aman pada **Rekening Bersama Escrow Terproteksi (Escrow Vault)** hingga verifikasi timbangan dan mutu selesai dilakukan.
+### B. Solosmartpay Payment Gateway
+- Pembayaran pembeli diproses langsung melalui **Solosmartpay Payment Gateway** dengan verifikasi multi-channel (QRIS, Virtual Account).
 - **Model Biaya Transaksi Berimbang (Dual-Rail Fee)**: Biaya layanan sistem 0.3% sisi pembeli dan biaya platform 0.5% sisi merchant/pemasok.
 - **Pencairan Otomatis H+1**: Dana dicairkan langsung ke rekening kelompok tani setelah barang lolos uji tera dan diterima di dapur pembeli.
 
 ### C. Stasiun Timbangan Tera Digital Hub Logistik
 - Validasi fisik berat menggunakan stasiun timbangan **Metrologi Legal SNI** di hub logistik transit.
-- Toleransi susut alami standar industri (maksimal 5%); defisit melebihi toleransi langsung memicu penahanan dana escrow dan penerbitan pengembalian dana prorata ke pembeli.
+- Toleransi susut alami standar industri (maksimal 5%); defisit melebihi toleransi langsung memicu pengembalian dana prorata ke pembeli.
 
 ### D. Prakiraan Harga Komoditas (Machine Learning Forecasting)
 - Integrasi layanan mandiri FastAPI dan model LightGBM Direct Multi-Horizon (H+1 s/d H+7) untuk memproyeksikan tren harga 10 komoditas pangan DIY dengan akurasi terverifikasi (MAPE < 2.6%).
@@ -50,7 +50,7 @@ PasokMataram/
 │   ├── auth-kyb-service/       # Identitas, verifikasi legalitas KYB, & token sesi
 │   ├── pooling-service/        # Agregasi kuota panen, validasi MTV, & distributed lock
 │   ├── logistics-hub-service/  # Stasiun timbangan tera, SNI cold chain, & QC dispute
-│   ├── settlement-service/     # Rekening bersama escrow & gateway Solosmartpay
+│   ├── settlement-service/     # Payment gateway Solosmartpay & invoice management
 │   └── queue-worker/           # Background event listener & auto-disbursement H+1
 ├── packages/
 │   ├── domain/                 # Entitas murni domain, Branded Types, & validasi Zod
@@ -82,7 +82,7 @@ PasokMataram/
 
 ### Payment Gateway & Perbankan
 - **Gateway**: Solosmartpay (QRIS dinamis EMVCo & Virtual Account multi-bank: Mandiri, BRI, BCA, BNI, BSI, dan perbankan daerah)
-- **Penampungan Dana**: Rekening Bersama Escrow Terpadu (Holding & Dispute Escrow Vault)
+- **Payment Processing**: Direct payment via Solosmartpay gateway (no escrow holding)
 
 ### Deployment & Runtime
 - **Shared Hosting / Production**: LiteSpeed Web Server, Phusion Passenger, Node.js 20 LTS

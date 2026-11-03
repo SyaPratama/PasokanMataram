@@ -144,7 +144,7 @@ export function HeroSection() {
           </h1>
 
           <p className="mt-5 sm:mt-6 text-base sm:text-lg md:text-xl text-white/95 font-body leading-relaxed max-w-2xl mx-auto text-balance font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
-            Sistem pengadaan bahan baku dapur restoran, kafe, dan hotel langsung dari ekosistem supplier pangan lokal D.I. Yogyakarta. Pangkas 5 titik rantai pasok tradisional dengan jadwal subuh terjamin, proteksi escrow 100%, dan jaminan mutu QC pangan.
+            Sistem pengadaan bahan baku dapur restoran, kafe, dan hotel langsung dari ekosistem supplier pangan lokal D.I. Yogyakarta. Pangkas 5 titik rantai pasok tradisional dengan jadwal subuh terjamin, pembayaran aman 100%, dan jaminan mutu QC pangan.
           </p>
 
           <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -175,7 +175,7 @@ export function HeroSection() {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-gelap">
               <span className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-netral-border/60 shadow-xs">
                 <ShieldCheck className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
-                <span>100% Proteksi Rekening Escrow</span>
+                <span>100% Pembayaran Terverifikasi</span>
               </span>
               <span className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-netral-border/60 shadow-xs">
                 <Clock className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
