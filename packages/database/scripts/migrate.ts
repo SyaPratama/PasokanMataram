@@ -21,7 +21,7 @@ interface MigrationFile {
 }
 
 async function runMigrations() {
-  console.log('🚀 Starting database migration...\n');
+  console.log('Starting database migration...\n');
 
   const config = {
     host: process.env.DB_HOST || 'localhost',
@@ -32,7 +32,7 @@ async function runMigrations() {
     multipleStatements: true,
   };
 
-  console.log(`📍 Connecting to MySQL at ${config.host}:${config.port}...`);
+  console.log(`Connecting to MySQL at ${config.host}:${config.port}...`);
 
   let connection: mysql.Connection | null = null;
 

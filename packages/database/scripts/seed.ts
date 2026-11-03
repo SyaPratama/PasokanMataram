@@ -44,14 +44,14 @@ function generateUUID(): string {
 }
 
 async function seedDatabase() {
-  console.log('🌱 Starting database seeding...\n');
-  console.log(`📍 Target: ${config.host}:${config.port}/${config.database}\n`);
+  console.log('Starting database seeding...\n');
+  console.log(`Target: ${config.host}:${config.port}/${config.database}\n`);
 
   let connection: mysql.Connection | null = null;
 
   try {
     connection = await mysql.createConnection(config);
-    console.log('✓ Connected to MySQL\n');
+    console.log('Connected to MySQL\n');
 
     // Clear existing test data (optional)
     console.log('🧹 Clearing existing test data...');
@@ -64,7 +64,7 @@ async function seedDatabase() {
     await connection.query('TRUNCATE TABLE pooling_campaigns');
     await connection.query('TRUNCATE TABLE notifications');
     await connection.query('SET FOREIGN_KEY_CHECKS = 1');
-    console.log('✓ Test data cleared\n');
+    console.log('Test data cleared\n');
 
     // Seed Super Admin
     console.log('👤 Seeding Super Admin...');
@@ -91,7 +91,7 @@ async function seedDatabase() {
         true,
       ]
     );
-    console.log('  ✓ admin@pasokmataram.com / Admin123!\n');
+    console.log(`  admin@pasokmataram.com / Admin123!\n`);
 
     // Seed Suppliers (3)
     console.log('🌾 Seeding Suppliers...');
@@ -153,7 +153,7 @@ async function seedDatabase() {
         [generateUUID(), tenantId, supplier.businessName, supplier.commodity, supplier.regency, 'VERIFIED']
       );
 
-      console.log(`  ✓ ${supplier.email} / Supplier123!`);
+      console.log(`  ${supplier.email} / Supplier123!`);
     }
     console.log();
 
@@ -209,7 +209,7 @@ async function seedDatabase() {
         [generateUUID(), tenantId, buyer.businessName, buyer.type, buyer.regency, 'VERIFIED']
       );
 
-      console.log(`  ✓ ${buyer.email} / Buyer123!`);
+      console.log(`  ${buyer.email} / Buyer123!`);
     }
     console.log();
 
@@ -255,7 +255,7 @@ async function seedDatabase() {
         [operatorId, userId, operator.assignedHubId, 'HUB_OPERATOR', 'ACTIVE', adminId]
       );
 
-      console.log(`  ✓ ${operator.email} / Operator123!`);
+      console.log(`  ${operator.email} / Operator123!`);
     }
     console.log();
 
@@ -296,7 +296,7 @@ async function seedDatabase() {
           'ACTIVE',
         ]
       );
-      console.log(`  ✓ ${campaign.commodity} (${campaign.reservedKg}/${campaign.targetKg} kg)`);
+      console.log(`  ${campaign.commodity} (${campaign.reservedKg}/${campaign.targetKg} kg)`);
     }
     console.log();
 
@@ -332,12 +332,12 @@ async function seedDatabase() {
          VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
         [generateUUID(), notif.tenantId, notif.category, notif.priority, notif.title, notif.body, false]
       );
-      console.log(`  ✓ ${notif.title}`);
+      console.log(`  ${notif.title}`);
     }
     console.log();
 
-    console.log('✅ Database seeding completed successfully!\n');
-    console.log('📋 Seeded:');
+    console.log('Database seeding completed successfully!\n');
+    console.log('Seeded:');
     console.log('   - 1 Super Admin');
     console.log('   - 3 Suppliers');
     console.log('   - 2 Buyers');

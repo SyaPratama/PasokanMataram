@@ -18,7 +18,6 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request): Promise<Response> {
   const encoder = new TextEncoder();
   
-  // Extract session for tenant context
   const cookieHeader = request.headers.get('cookie') || '';
   const sessionCookie = cookieHeader
     .split('; ')
@@ -30,7 +29,6 @@ export async function GET(request: Request): Promise<Response> {
 
   const customStream = new ReadableStream({
     async start(controller) {
-      // Send connection event
       controller.enqueue(
         encoder.encode(
           `event: connection\ndata: ${JSON.stringify({
