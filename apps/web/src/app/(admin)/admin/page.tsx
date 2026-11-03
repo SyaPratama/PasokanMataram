@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 
 /**
  * Halaman Utama Kontrol Konsorsium Platform PasokMataram (SUPER_ADMIN).
- * Menampilkan ringkasan audit tenant KYB, proteksi escrow, kuota pangan DIY, dan status sistem.
+ * Menampilkan ringkasan audit tenant KYB, kuota pangan DIY, dan status sistem.
  */
 export default function AdminOverviewPage() {
   return (
@@ -34,7 +34,7 @@ export default function AdminOverviewPage() {
             Pusat Komando &amp; Pengawasan Platform PasokMataram
           </h1>
           <p className="text-xs text-gelap/65 mt-1">
-            Audit legalitas mitra usaha, pengawasan saldo escrow bersama, kuota komoditas, dan integritas multi-tenant RLS.
+            Audit legalitas mitra usaha, kuota komoditas, dan integritas multi-tenant RLS.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gelap/70">Tenant Terverifikasi</span>
@@ -59,16 +59,6 @@ export default function AdminOverviewPage() {
           <p className="text-[11px] text-gelap/60 mt-1">84 Restoran HoReKa, 58 Supplier &amp; Gapoktan</p>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Saldo Rekening Escrow</span>
-            <div className="w-8 h-8 rounded-lg bg-aksen-light flex items-center justify-center text-aksen-dark">
-              <Banknote className="w-4 h-4" aria-hidden="true" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold font-heading text-gelap mt-2 whitespace-nowrap tracking-tight tabular-nums">Rp 482.500.000</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Terproteksi Rekening Escrow Terpadu</p>
-        </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
@@ -136,26 +126,6 @@ export default function AdminOverviewPage() {
           </div>
         </Link>
 
-        <Link
-          href="/admin/escrow"
-          className="p-5 rounded-2xl bg-white border border-netral-border/80 hover:border-primer hover:shadow-sm transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-pendukung-light text-primer flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Scale className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
-                Pengawasan Escrow
-              </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Audit mutasi rekening bersama dan rilis pencairan dana</p>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-xs font-semibold text-primer">
-            <span>Periksa Rekening</span>
-            <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-          </div>
-        </Link>
 
         <Link
           href="/admin/quotas"
