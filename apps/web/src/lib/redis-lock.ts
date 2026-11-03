@@ -9,12 +9,16 @@ import Redis from 'ioredis';
 import { cacheConfig } from '../config';
 import crypto from 'crypto';
 
-export const redis = new Redis(cacheConfig.url, {
+const redisOptions = {
   maxRetriesPerRequest: 1,
   retryStrategy: () => null,
   lazyConnect: true,
   enableOfflineQueue: false,
-});
+};
+
+export const redis = cacheConfig.socketPath
+  ? new Redis({ path: cacheConfig.socketPath, ...redisOptions })
+  : new Redis(cacheConfig.url, redisOptions);
 
 redis.on('error', () => {});
 async function getRedisClient(): Promise<Redis | null> {

@@ -281,6 +281,10 @@ jobs:
             echo "ErrorDocument 500 /" >> "$WEB_PATH/.htaccess"
             echo "ErrorDocument 502 /" >> "$WEB_PATH/.htaccess"
             echo "ErrorDocument 503 /" >> "$WEB_PATH/.htaccess"
+            echo '<FilesMatch "^\.env|^\.git">' >> "$WEB_PATH/.htaccess"
+            echo "    Order allow,deny" >> "$WEB_PATH/.htaccess"
+            echo "    Deny from all" >> "$WEB_PATH/.htaccess"
+            echo "</FilesMatch>" >> "$WEB_PATH/.htaccess"
           fi
           
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
@@ -385,6 +389,10 @@ jobs:
             echo "ErrorDocument 500 /" >> "$API_PATH/.htaccess"
             echo "ErrorDocument 502 /" >> "$API_PATH/.htaccess"
             echo "ErrorDocument 503 /" >> "$API_PATH/.htaccess"
+            echo '<FilesMatch "^\.env|^\.git">' >> "$API_PATH/.htaccess"
+            echo "    Order allow,deny" >> "$API_PATH/.htaccess"
+            echo "    Deny from all" >> "$API_PATH/.htaccess"
+            echo "</FilesMatch>" >> "$API_PATH/.htaccess"
           fi
           
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"

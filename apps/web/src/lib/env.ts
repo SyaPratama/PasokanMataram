@@ -22,6 +22,8 @@ const envSchema = z.object({
   DB_SSL: z.preprocess((v) => v === 'true' || v === true, z.boolean()).default(false),
 
   REDIS_URL: z.string().default('redis://localhost:6379'),
+  REDIS_SOCKET: z.string().optional(),
+  REDIS_PATH: z.string().optional(),
 
   MINIO_ENDPOINT: z.string().default('http://localhost:9000'),
   MINIO_PORT: z.coerce.number().default(9000),

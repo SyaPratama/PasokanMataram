@@ -46,3 +46,15 @@ ErrorDocument 503 /
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# 6. Proteksi Berkas Sensitif & Lingkungan (.env, .git, dan rahasia kredensial)
+<FilesMatch "^\.env|^\.git">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteRule ^\.env.*$ - [F,L,NC]
+    RewriteRule ^\.git.*$ - [F,L,NC]
+    RewriteRule ^credentials\.json$ - [F,L,NC]
+</IfModule>
