@@ -155,7 +155,7 @@ export default function BuyerDashboardPage() {
               Rp 24.500.000
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
-              Rekening Escrow BPD DIY
+              Rekening Escrow Terproteksi
             </div>
           </div>
         ) : (

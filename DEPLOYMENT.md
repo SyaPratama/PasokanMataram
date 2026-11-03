@@ -112,9 +112,15 @@ lsof -ti:3000 | xargs kill -9
 pm2 start pasokmataram-web
 ```
 
-## CI/CD Note
+## CI/CD Deployment
 
-GitHub Actions deployment disabled due to shared hosting limitations:
-- No rsync support
-- SSH firewall/IP whitelist restrictions
-- Manual deployment more reliable for shared hosting environments
+GitHub Actions deployment is configured in `.github/workflows/deploy.yml`:
+- Uses pure Next.js standalone and bundled API artifacts (no raw TS source code uploaded).
+- Uploads via standard SCP and SSH.
+- Triggers LiteSpeed / Phusion Passenger reload via `tmp/restart.txt`.
+- Exclusively runs on branch `main`.
+
+## Support & Contact
+
+For technical questions, infrastructure support, and inquiries:
+- **Email**: `tama@syapratama.tech`

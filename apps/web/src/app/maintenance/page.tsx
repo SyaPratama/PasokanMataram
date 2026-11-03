@@ -111,7 +111,7 @@ export default function MaintenancePage() {
                 Escrow Terlindungi
               </h2>
               <p className="text-xs text-gelap/70 leading-relaxed font-body">
-                Rekening penampung Bank BPD DIY dan pencatatan komitmen alokasi panen tetap aman terenkripsi.
+                Rekening penampung escrow dan pencatatan komitmen alokasi panen tetap aman terenkripsi.
               </p>
             </div>
 
@@ -144,7 +144,7 @@ export default function MaintenancePage() {
             <CheckStatusButton />
 
             <Link
-              href="mailto:bantuan@pasokmataram.id"
+              href="mailto:tama@syapratama.tech"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-netral-light text-gelap font-semibold text-sm hover:bg-netral-border/50 border border-netral-border transition-colors min-h-[48px]"
             >
               <PhoneCall className="w-4 h-4 text-primer" aria-hidden="true" />

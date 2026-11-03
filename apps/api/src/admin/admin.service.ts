@@ -35,7 +35,7 @@ export class AdminService {
   }
 
   /**
-   * Mengambil rekapitulasi saldo penampung rekening escrow Bank BPD DIY secara menyeluruh.
+   * Mengambil rekapitulasi saldo penampung rekening escrow terpadu secara menyeluruh.
    * @returns Ringkasan saldo escrow dan volume transaksi.
    */
   public async getEscrowReconciliation() {

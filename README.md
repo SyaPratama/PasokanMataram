@@ -23,8 +23,8 @@ PasokMataram mengintegrasikan tiga pilar operasional utama:
 - Mengurangi harga pokok pengadaan bahan hingga **20% - 40%** langsung dari sentra produksi pangan Sleman, Bantul, dan Kulon Progo.
 - Petani memperoleh kepastian serapan hasil panen dengan pesanan terkonfirmasi di muka.
 
-### B. Rekening Escrow Bank BPD DIY & Solosmartpay Gateway
-- Pembayaran pembeli ditampung secara aman pada **Rekening Escrow Bank BPD DIY** hingga verifikasi timbangan dan mutu selesai dilakukan.
+### B. Rekening Bersama Escrow Terpadu & Solosmartpay Gateway
+- Pembayaran pembeli ditampung secara aman pada **Rekening Bersama Escrow Terproteksi (Escrow Vault)** hingga verifikasi timbangan dan mutu selesai dilakukan.
 - **Model Biaya Transaksi Berimbang (Dual-Rail Fee)**: Biaya layanan sistem 0.3% sisi pembeli dan biaya platform 0.5% sisi merchant/pemasok.
 - **Pencairan Otomatis H+1**: Dana dicairkan langsung ke rekening kelompok tani setelah barang lolos uji tera dan diterima di dapur pembeli.
 
@@ -50,7 +50,7 @@ PasokMataram/
 │   ├── auth-kyb-service/       # Identitas, verifikasi legalitas KYB, & token sesi
 │   ├── pooling-service/        # Agregasi kuota panen, validasi MTV, & distributed lock
 │   ├── logistics-hub-service/  # Stasiun timbangan tera, SNI cold chain, & QC dispute
-│   ├── settlement-service/     # Rekening escrow BPD DIY & gateway Solosmartpay
+│   ├── settlement-service/     # Rekening bersama escrow & gateway Solosmartpay
 │   └── queue-worker/           # Background event listener & auto-disbursement H+1
 ├── packages/
 │   ├── domain/                 # Entitas murni domain, Branded Types, & validasi Zod
@@ -81,8 +81,8 @@ PasokMataram/
 - **Penyimpanan Berkas Legalitas**: MinIO / S3 Object Storage API dengan presigned URL
 
 ### Payment Gateway & Perbankan
-- **Gateway**: Solosmartpay (QRIS dinamis EMVCo, Virtual Account BPD DIY, Mandiri, BRI, BCA, BNI, BSI)
-- **Penampungan Dana**: Rekening Escrow Terpadu Bank BPD DIY
+- **Gateway**: Solosmartpay (QRIS dinamis EMVCo & Virtual Account multi-bank: Mandiri, BRI, BCA, BNI, BSI, dan perbankan daerah)
+- **Penampungan Dana**: Rekening Bersama Escrow Terpadu (Holding & Dispute Escrow Vault)
 
 ### Deployment & Runtime
 - **Shared Hosting / Production**: LiteSpeed Web Server, Phusion Passenger, Node.js 20 LTS
@@ -209,8 +209,16 @@ npm run build
 ```
 
 ---
+## 10. Informasi Kontak & Pengembang
 
-## 10. Lisensi & Hak Cipta
+Untuk pertanyaan teknis, pelaporan kendala infrastruktur, dan informasi pengembangan:
+- **Email Resmi**: `tama@syapratama.tech`
+- **Repositori Utama**: `https://github.com/SyaPratama/PasokanMataram`
+- **Layanan Machine Learning**: `https://github.com/SyaPratama/MLPasokanMataram`
+
+---
+
+## 11. Lisensi & Hak Cipta
 
 Hak Cipta (c) 2026 Tim Pengembang PasokMataram. Seluruh hak cipta dilindungi undang-undang.
 Platform ini dikembangkan untuk digitalisasi dan efisiensi pengadaan pangan usaha kuliner D.I. Yogyakarta.

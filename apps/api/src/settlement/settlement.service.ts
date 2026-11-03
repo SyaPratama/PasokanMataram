@@ -16,7 +16,7 @@ export class SettlementService {
   private readonly core = new CoreSettlementService();
 
   /**
-   * Mengambil saldo rekening escrow penampung BPD DIY untuk pesanan tertentu.
+   * Mengambil saldo rekening escrow penampung terpadu untuk pesanan tertentu.
    * @param context Konteks keamanan pihak terkait.
    * @param reservationId Identifier unik reservasi kuota.
    * @returns Entitas saldo rekening bersama.
