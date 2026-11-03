@@ -13,7 +13,6 @@ import { verifySessionToken } from '@/lib/auth';
  */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
-    // Extract session for tenant context
     const cookieHeader = request.headers.get('cookie') || '';
     const sessionCookie = cookieHeader
       .split('; ')
@@ -61,7 +60,6 @@ export async function GET(request: Request): Promise<NextResponse> {
  */
 export async function PATCH(request: Request): Promise<NextResponse> {
   try {
-    // Extract session for tenant context
     const cookieHeader = request.headers.get('cookie') || '';
     const sessionCookie = cookieHeader
       .split('; ')
