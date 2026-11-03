@@ -68,11 +68,12 @@ Create `.env.production` on server:
 NODE_ENV=production
 PORT=3000
 DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=pasokmataram_db
+DB_PORT=3306
+DB_NAME=pasokmataram_prod
 DB_USER=pasokmataram_user
 DB_PASSWORD=your_secure_password
-REDIS_URL=redis://localhost:6379
+REDIS_SOCKET=/home/syaprata/redis/redis.sock
+REDIS_URL=unix:///home/syaprata/redis/redis.sock
 JWT_SECRET=your_secure_jwt_secret_minimum_32_chars
 ```
 

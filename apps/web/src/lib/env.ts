@@ -13,9 +13,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
 
-  DATABASE_URL: z.string().min(10, 'DATABASE_URL wajib diisi'),
   DB_HOST: z.string().default('localhost'),
-  DB_PORT: z.coerce.number().default(5432),
+  DB_PORT: z.coerce.number().default(3306),
   DB_USER: z.string().default('root'),
   DB_PASSWORD: z.string().default('Tama123'),
   DB_NAME: z.string().default('pasokmataram_db'),
@@ -53,7 +52,7 @@ try {
   }
   parsedEnv = envSchema.parse({
     ...process.env,
-    DATABASE_URL: process.env.DATABASE_URL || 'mysql://root:Tama123@localhost:3306/pasokmataram_db',
+    DB_PORT: process.env.DB_PORT || 3306,
     JWT_SECRET: process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars',
   });
 }
