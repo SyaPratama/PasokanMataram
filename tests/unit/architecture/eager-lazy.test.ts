@@ -120,10 +120,10 @@ describe('Pola Eager vs Lazy Architecture', () => {
       expect(result.latencyMs).toBeGreaterThanOrEqual(0);
     });
 
-    it('getStorageClient() menginisialisasi S3 client secara lazy', async () => {
+    it('getStorageClient() menginisialisasi Appwrite Storage client secara lazy', async () => {
       const client = await getStorageClient();
       expect(client).toBeDefined();
-      expect(client.config).toBeDefined();
+      expect(typeof client.listFiles).toBe('function');
     });
 
     it('createSessionToken() menerbitkan JWT valid berbasis SecurityContext', () => {

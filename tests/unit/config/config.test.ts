@@ -28,10 +28,11 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
     expect(databaseConfig.slowQueryThresholdMs).toBe(200);
   });
 
-  it('memvalidasi storage configuration (Cloudinary)', () => {
-    expect(storageConfig.cloudName).toBeDefined();
+  it('memvalidasi storage configuration (Appwrite)', () => {
+    expect(storageConfig.endpoint).toBeDefined();
+    expect(storageConfig.projectId).toBeDefined();
     expect(storageConfig.apiKey).toBeDefined();
-    expect(storageConfig.apiSecret).toBeDefined();
+    expect(storageConfig.bucketId).toBeDefined();
     expect(storageConfig.maxFileSizeBytes).toBe(5242880);
     expect(storageConfig.allowedMimeTypes).toContain('application/pdf');
     expect(storageConfig.allowedMimeTypes).toContain('image/webp');

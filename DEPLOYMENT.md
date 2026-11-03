@@ -2,8 +2,9 @@
 
 ## Prerequisites
 - Node.js 20.x installed on server
-- PostgreSQL 16 running
+- MySQL 8.0 running
 - Redis 7 running
+- Appwrite project configured (Cloud or self-hosted)
 - PM2 installed globally: `npm install -g pm2`
 
 ## Deployment Methods
@@ -75,8 +76,69 @@ DB_PASSWORD=your_secure_password
 REDIS_SOCKET=/home/syaprata/redis/redis.sock
 REDIS_URL=unix:///home/syaprata/redis/redis.sock
 JWT_SECRET=your_secure_jwt_secret_minimum_32_chars
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+APPWRITE_PROJECT_ID=your_production_project_id
+APPWRITE_API_KEY=your_production_api_key
+APPWRITE_BUCKET_ID=kyb-documents-prod
 ```
 
+
+## Appwrite Storage Setup
+
+KYB document storage uses Appwrite Storage with tenant isolation.
+
+### Cloud Setup (Recommended)
+
+1. **Create Appwrite Project:**
+   - Visit https://cloud.appwrite.io
+   - Create new project
+   - Copy Project ID
+
+2. **Generate API Key:**
+   - Go to Project Settings → API Keys
+   - Create new key with Storage permissions (read, write, create, delete)
+   - Copy API Key (starts with `standard_...`)
+
+3. **Create Storage Bucket:**
+   - Navigate to Storage → Create Bucket
+   - Bucket ID: `kyb-documents-prod` (or `kyb-documents-dev`)
+   - Max file size: 5 MB
+   - Allowed file extensions: `pdf,webp,jpeg,jpg,png`
+   - Compression: Disabled
+   - Encryption: Enabled
+
+4. **Set Bucket Permissions:**
+   - Read: API Key (server-side only, no public access)
+   - Write: API Key
+   - Delete: API Key
+   - Update: API Key
+
+### Self-Hosted Setup (Advanced)
+
+If using self-hosted Appwrite instance:
+
+```bash
+docker run -d \
+  --name appwrite \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  --volume appwrite-data:/storage \
+  -p 80:80 -p 443:443 \
+  appwrite/appwrite:latest
+```
+
+Update `APPWRITE_ENDPOINT` to your self-hosted URL (e.g., `https://appwrite.yourdomain.com/v1`).
+
+### Verification
+
+Test Appwrite connectivity:
+```bash
+curl -X GET \
+  https://cloud.appwrite.io/v1/storage/buckets/kyb-documents-prod \
+  -H "X-Appwrite-Project: YOUR_PROJECT_ID" \
+  -H "X-Appwrite-Key: YOUR_API_KEY"
+```
+
+Expected response: Bucket metadata JSON.
 ## Post-Deployment
 
 1. **Health check:**
