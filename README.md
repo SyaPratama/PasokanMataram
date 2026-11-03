@@ -1,384 +1,216 @@
 # PasokMataram
 
-**Platform Pooling Purchasing Pangan B2B untuk Restoran & Supplier UMKM DIY**
-
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black)](https://nextjs.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-10-red)](https://nestjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-Proprietary-red)]()
+Platform Pooling Purchasing Pangan B2B untuk Restoran, Kafe, Katering, dan Supplier UMKM D.I. Yogyakarta.
 
 ---
 
-## 🎯 Problem Statement
+## 1. Ringkasan Eksekutif & Pernyataan Masalah
 
-Rantai pasok pangan di DIY menghadapi 3 masalah kritis:
+Rantai pasok bahan baku pangan komersial di Daerah Istimewa Yogyakarta menghadapi tiga kendala struktural:
 
-1. **Harga tinggi dengan markup 40-60%** - Restoran/katering membeli dengan kuota kecil, tidak bisa negosiasi harga grosir
-2. **Transaksi tidak aman** - Bayar dimuka tanpa jaminan, risiko fraud tinggi, cash flow tidak terprediksi
-3. **Kualitas tidak konsisten** - Tidak ada standar QC, dispute sulit diselesaikan
-
----
-
-## 💡 Solution: Pooling + Escrow + QC Hub
-
-**PasokMataram** menghadirkan platform B2B yang menggabungkan 3 inovasi:
-
-### 1. Pooling Purchasing (Group Buying)
-- Agregasi pesanan multi-restoran untuk capai **Minimum Transaction Value (MTV) Rp 500.000**
-- Harga turun **20-40%** karena volume grosir langsung dari produsen
-- Supplier dapat planning produksi lebih baik dengan order terkonfirmasi
-
-### 2. Escrow Bank BPD DIY
-- Pembayaran ditahan di rekening escrow bank sampai QC lolos
-- **Dual-rail fee model**: 0.3% buyer service fee + 0.5% merchant platform fee
-- Auto-disbursement **H+1** setelah verifikasi kualitas
-
-### 3. QC Hub dengan Timbangan Tera Digital
-- Stasiun timbangan **tera SNI** di hub logistik
-- Foto timestamp dengan **watermark otomatis** (metadata + geotag)
-- Toleransi defisit ≤5% (standar industri), excess → dispute investigation
-
-**Bonus: ML Price Forecasting** - Prediksi harga komoditas minggu depan (LightGBM multivariat)
+1. **Disparitas Harga & Tingginya Markup Perantara (40% - 60%)**: Pelaku usaha kuliner (HoReKa) membeli dalam skala kecil secara sporadis tanpa akses ke harga grosir langsung dari petani atau gabungan kelompok tani (Gapoktan).
+2. **Ketiadaan Jaminan Transaksi Finansial**: Pola bayar di muka rawan wanprestasi dan fraud, sedangkan sistem pembayaran tempo berisiko kredit macet bagi petani kecil.
+3. **Fluktuasi Kualitas & Ketiadaan Kalibrasi Fisik**: Tidak adanya standar inspeksi kualitas (QC) terpusat, pengujian rantai dingin (cold chain), dan stasiun tera digital legal menyebabkan tingginya sengketa susut timbangan.
 
 ---
 
-## 🏗️ Architecture
+## 2. Solusi Terintegrasi PasokMataram
 
-### Microservices Monorepo (Turborepo)
+PasokMataram mengintegrasikan tiga pilar operasional utama:
 
-```
+### A. Pooling Purchasing (Group Buying Agregatif)
+- Agregasi pesanan harian multi-restoran untuk memenuhi **Minimum Transaction Value (MTV) Rp 500.000**.
+- Mengurangi harga pokok pengadaan bahan hingga **20% - 40%** langsung dari sentra produksi pangan Sleman, Bantul, dan Kulon Progo.
+- Petani memperoleh kepastian serapan hasil panen dengan pesanan terkonfirmasi di muka.
+
+### B. Rekening Escrow Bank BPD DIY & Solosmartpay Gateway
+- Pembayaran pembeli ditampung secara aman pada **Rekening Escrow Bank BPD DIY** hingga verifikasi timbangan dan mutu selesai dilakukan.
+- **Model Biaya Transaksi Berimbang (Dual-Rail Fee)**: Biaya layanan sistem 0.3% sisi pembeli dan biaya platform 0.5% sisi merchant/pemasok.
+- **Pencairan Otomatis H+1**: Dana dicairkan langsung ke rekening kelompok tani setelah barang lolos uji tera dan diterima di dapur pembeli.
+
+### C. Stasiun Timbangan Tera Digital Hub Logistik
+- Validasi fisik berat menggunakan stasiun timbangan **Metrologi Legal SNI** di hub logistik transit.
+- Toleransi susut alami standar industri (maksimal 5%); defisit melebihi toleransi langsung memicu penahanan dana escrow dan penerbitan pengembalian dana prorata ke pembeli.
+
+### D. Prakiraan Harga Komoditas (Machine Learning Forecasting)
+- Integrasi layanan mandiri FastAPI dan model LightGBM Direct Multi-Horizon (H+1 s/d H+7) untuk memproyeksikan tren harga 10 komoditas pangan DIY dengan akurasi terverifikasi (MAPE < 2.6%).
+
+---
+
+## 3. Arsitektur Monorepo & Struktur Direktori
+
+Repositori dikelola menggunakan **Turborepo** dengan pemisahan domain bisnis yang ketat:
+
+```text
 PasokMataram/
 ├── apps/
-│   ├── web/                    # Next.js 14 App Router (BFF + Presentasi)
-│   └── api/                    # NestJS Gateway (Router ke services)
+│   ├── web/                    # Next.js 14 App Router (BFF, PWA, Presentasi Dapur Basah)
+│   └── api/                    # NestJS 10 Gateway Microservices
 ├── services/
-│   ├── auth-kyb-service/       # Identity, KYB verification, MinIO S3 presigner
-│   ├── pooling-service/        # Reservasi kuota, MTV validation, Redlock
-│   ├── logistics-hub-service/  # Timbangan tera, QC dispute, SNI cold chain
-│   ├── settlement-service/     # Escrow BPD DIY, Solosmartpay gateway
-│   ├── queue-worker/           # Background jobs (fail-fast events)
-│   └── ml-forecasting-service/ # FastAPI + LightGBM (price prediction)
+│   ├── auth-kyb-service/       # Identitas, verifikasi legalitas KYB, & token sesi
+│   ├── pooling-service/        # Agregasi kuota panen, validasi MTV, & distributed lock
+│   ├── logistics-hub-service/  # Stasiun timbangan tera, SNI cold chain, & QC dispute
+│   ├── settlement-service/     # Rekening escrow BPD DIY & gateway Solosmartpay
+│   └── queue-worker/           # Background event listener & auto-disbursement H+1
 ├── packages/
-│   ├── domain/                 # Pure domain entities (Branded Types + Zod)
-│   ├── database/               # PostgreSQL pool + RLS tenant context
-│   ├── config/                 # Centralized config (Zod validated)
-│   └── queue/                  # Message broker contracts (fail-fast)
-└── docs/
-    ├── DATABASE.md             # ER diagram + schema docs
-    └── API.md                  # Swagger/OpenAPI spec (generated)
+│   ├── domain/                 # Entitas murni domain, Branded Types, & validasi Zod
+│   ├── database/               # MySQL 8.0 pool, RLS tenant context, & migrator
+│   ├── config/                 # Konfigurasi terpusat terikat skema Zod
+│   ├── queue/                  # Kontrak antrean pesan fail-fast
+│   └── security/               # Argon2id, JWT HS256 (jose), & Edge claims
+├── docker/                     # Konfigurasi container image (web, api, worker)
+├── docs/                       # Dokumentasi arsitektur, basis data, & API
+└── scripts/                    # Skrip migrasi, sandbox reset, & audit kebersihan
 ```
 
-### Tech Stack
+---
 
-**Frontend:**
-- **Next.js 14** (App Router, React Server Components)
-- **Tailwind CSS** + Design system tokens (Daun Tropis, Baru Mataram)
-- **Lucide Icons** (no emoji mentah)
-- **Plus Jakarta Sans** + Inter + JetBrains Mono
+## 4. Tumpukan Teknologi (Technology Stack)
 
-**Backend:**
-- **NestJS 10** (Microservices gateway)
-- **PostgreSQL 16** (RLS multi-tenant, Branded Type UUIDs)
-- **Redis 7** (Cache + rate limiting + distributed lock)
-- **MinIO** (S3-compatible object storage)
+### Antarmuka & Frontend
+- **Framework**: Next.js 14.2 (App Router, React Server Components, Server Actions)
+- **Styling**: Tailwind CSS dengan token desain resmi Daun Tropis & Baru Mataram
+- **Ikonografi**: Lucide Icons (Nol emotikon / karakter emoji mentah pada kode produksi)
+- **Tipografi**: Plus Jakarta Sans (heading), Inter (body/tabel), JetBrains Mono (kode)
+- **Aset & PWA**: Service Worker mandiri, manifest web, kompresi format WebP
 
-**Payment:**
-- **Solosmartpay** (QRIS EMVCo + VA multi-bank)
-- **Escrow BPD DIY** (rekening penampungan resmi)
+### Layanan Backend & Basis Data
+- **API Gateway**: NestJS 10 dengan Express engine dan TypeScript ketat (strict mode, zero `any`)
+- **Basis Data Utama**: MySQL 8.0 (Normalisasi 3NF, connection pool `mysql2`, isolasi multi-tenant)
+- **Cache & Mutex Lock**: Redis 7 (Mendukung TCP port `6379` dan Unix Domain Socket `unix:///...` cPanel)
+- **Penyimpanan Berkas Legalitas**: MinIO / S3 Object Storage API dengan presigned URL
 
-**ML/AI:**
-- **FastAPI** + **LightGBM** (price forecasting)
-- **Python 3.11** (scikit-learn, pandas)
+### Payment Gateway & Perbankan
+- **Gateway**: Solosmartpay (QRIS dinamis EMVCo, Virtual Account BPD DIY, Mandiri, BRI, BCA, BNI, BSI)
+- **Penampungan Dana**: Rekening Escrow Terpadu Bank BPD DIY
 
-**DevOps:**
-- **Docker Compose** (local development)
-- **Turborepo** (monorepo build orchestration)
-- **GitHub Actions** (CI/CD pipeline)
+### Deployment & Runtime
+- **Shared Hosting / Production**: LiteSpeed Web Server, Phusion Passenger, Node.js 20 LTS
+- **Build Mode**: Next.js Standalone Output (artefak produksi murni tanpa kode sumber mentah)
+- **Kontainerisasi**: Docker & Docker Compose untuk orkestrasi lingkungan pengembang
 
 ---
 
-## 🚀 Quick Start
+## 5. Menjalankan Proyek Secara Lokal
 
-### Prerequisites
+### Prasyarat Sistem
+- Node.js 20.x LTS
+- npm 10+ atau npm 11+
+- Git
+- MySQL 8.0 (lokal atau Docker)
+- Redis 7 (lokal atau Docker)
 
-- **Node.js** 20+ LTS
-- **Docker** + Docker Compose
-- **Git**
+### Langkah Instalasi
 
-### Local Development
+1. **Klon Repositori**:
+   ```bash
+   git clone https://github.com/SyaPratama/PasokanMataram.git
+   cd PasokanMataram
+   ```
+
+2. **Pasang Dependensi Monorepo**:
+   ```bash
+   npm install
+   ```
+
+3. **Inisialisasi Berkas Lingkungan**:
+   ```bash
+   chmod +x setup-env.sh
+   ./setup-env.sh development
+   ```
+   Salin nilai dari `.env.development.example` ke `.env.development` atau `.env.local`.
+
+4. **Jalankan Migrasi Basis Data**:
+   ```bash
+   npm run db:migrate
+   ```
+
+5. **Jalankan Server Pengembangan**:
+   ```bash
+   npm run dev
+   ```
+
+6. **Akses Layanan**:
+   - Web Portal: `http://localhost:3000`
+   - API Gateway: `http://localhost:3001`
+   - Dokumentasi API (Swagger): `http://localhost:3001/api`
+
+---
+
+## 6. Standar Desain Sistem & Kepatuhan Kode
+
+Seluruh kontribusi kode pada repositori PasokMataram wajib mematuhi aturan ketat dalam `AGENTS.md`:
+
+1. **Nol Toleransi Emoji & Karakter Unicode Dekoratif**:
+   - Dilarang keras menggunakan emotikon, smiley, karakter checklist unicode, atau simbol grafis mentah di antarmuka, kode sumber, label tombol, dan dokumentasi aturan. Seluruh elemen visual wajib menggunakan pustaka resmi `lucide-react`.
+2. **Kepatuhan Token Desain Heritage Mataram**:
+   - Primer (Daun Tropis): `primer` (`#2E5339`), `primer-hover` (`#24422D`), `primer-light` (`#EAF0EB`), `primer-deep` (`#1B3622`).
+   - Sekunder (Baru Mataram): `sekunder` (`#B85324`), `sekunder-hover` (`#9E451D`), `sekunder-light` (`#F8EDE7`).
+   - Aksen (Sinar Senja): `aksen` (`#D48028`), `aksen-hover` (`#BA6E1E`), `aksen-light` (`#FAF2E8`).
+   - Status Semantik: `status-success` (`#2E5339`), `status-warning` (`#9A5814`), `status-danger` (`#B91C1C`).
+   - Dilarang menyisipkan arbitrary hex (`bg-[#...]`, `text-[#...]`) di dalam kode antarmuka.
+3. **Higienitas Komentar Kode**:
+   - Dilarang menggunakan komentar baris tunggal (`//`) atau blok bebas (`/* */`) di kode produksi.
+   - Seluruh simbol publik wajib didokumentasikan menggunakan blok JSDoc standar (`/** ... */`).
+   - Skrip verifikasi: `node scripts/audit-cleanliness.mjs`.
+4. **Aksesibilitas WCAG 2.1 AA**:
+   - Rasio kontras teks minimal 4.5:1 untuk teks normal dan 3:1 untuk elemen grafis.
+   - Ukuran target sentuh interaktif minimal 44x44px (direkomendasikan 48x48px).
+
+---
+
+## 7. Mode Pemeliharaan (Maintenance Mode)
+
+Sistem dilengkapi kontrol mode pemeliharaan terpadu yang dapat diaktifkan melalui berkas konfigurasi lingkungan (`.env.production` atau `.env.development`):
+
+- **Aktivasi**: Set `MAINTENANCE_MODE=true` di lingkungan server.
+- **Kustomisasi**:
+  - `MAINTENANCE_TITLE`: Judul pemeliharaan.
+  - `MAINTENANCE_MESSAGE`: Deskripsi pekerjaan infrastruktur.
+  - `MAINTENANCE_ESTIMATED_END`: Estimasi waktu penyelesaian.
+  - `MAINTENANCE_BYPASS_TOKEN`: Token rahasia bagi pengembang untuk tetap dapat mengakses dasbor operasional saat pemeliharaan berlangsung (`/?bypass=<token>`).
+- **Respon Otomatis**:
+  - Akses halaman web publik dialihkan (*redirect*) ke `/maintenance` dengan badge dinamis mode hosting.
+  - Endpoint API (`/api/*`) mengembalikan respons HTTP `503 Service Unavailable` berstandar `Retry-After: 3600`.
+
+---
+
+## 8. Alur Deployment Shared Hosting (cPanel & LiteSpeed)
+
+Deployment produksi ke server shared hosting diotomatisasi melalui GitHub Actions (`.github/workflows/deploy.yml`):
+
+1. **Pure Build Artifacts Only**:
+   - Runner GitHub Actions mengompilasi bundel mandiri Next.js (`apps/web/.next/standalone`) dan bundling API NestJS (`apps/api/dist/main.js`).
+   - Tidak ada kode sumber TypeScript mentah (`.ts`, `.tsx`, `src/`) yang dikirim ke server hosting.
+2. **Eliminasi Eksekusi Paket di Remote**:
+   - Server hosting tidak perlu mengeksekusi `npm install` atau `npm ci`, menghilangkan risiko kesalahan `npm: command not found` (exit code 127).
+3. **Preservasi `.htaccess` & Proteksi Berkas Sensitif**:
+   - Konfigurasi LiteSpeed Phusion Passenger otomatis dipertahankan.
+   - Aturan keamanan memblokir seluruh akses web publik ke berkas `.env`, `.env.*`, dan `.git`.
+4. **Pemicu Reload Otomatis**:
+   - Eksekusi sentuhan berkas `touch "$WEB_PATH/tmp/restart.txt"` memicu LiteSpeed memuat ulang runtime aplikasi seketika tanpa perlu merestart server.
+
+---
+
+## 9. Pengujian & Verifikasi Kualitas
 
 ```bash
-# Clone repository
-git clone https://github.com/SyaPratama/PasokanMataram.git
-cd PasokanMataram
+# Menjalankan seluruh pengujian unit & kontrak terisolasi
+npm test -- --exclude='tests/e2e/**'
 
-# Install dependencies
-npm install
+# Menjalankan audit kebersihan komentar dan ketiadaan emoji
+node scripts/audit-cleanliness.mjs
 
-# Start Docker services (PostgreSQL, Redis, MinIO, ML service)
-docker-compose up -d
+# Menjalankan pemeriksaan kompilasi TypeScript ketat
+npm run lint
 
-# Run database migrations
-npm run db:migrate
-
-# Start development servers
-npm run dev
-
-# Open browser
-# - Web: http://localhost:3000
-# - API: http://localhost:3001
-# - Swagger: http://localhost:3001/api
-# - Adminer: http://localhost:8080
-# - MinIO Console: http://localhost:9001
-```
-
-### Environment Variables
-
-**Development environment:**
-
-```bash
-# Copy template and edit
-cp .env.development.example .env.development
-nano .env.development
-
-# Or use setup script
-chmod +x setup-env.sh
-./setup-env.sh development
-```
-
-**Production environment:**
-
-```bash
-# Copy template and edit
-cp .env.production.example .env.production
-nano .env.production
-
-# Or use setup script
-./setup-env.sh production
-```
-
-**⚠️ Security:**
-- `.env.development` and `.env.production` are in `.gitignore` (never commit!)
-- Template files (`.env.*.example`) are safe to commit
-- Production `JWT_SECRET` must be 32+ characters and different from dev
-- Change all default passwords in production
-
----
-
-## 📚 Documentation
-
-- **[Database Schema (ER Diagram)](docs/DATABASE.md)** - Struktur tabel, relasi, indexes
-- **[API Documentation](http://localhost:3001/api)** - Swagger UI (auto-generated)
-- **[Architecture Decision Records](docs/ADR/)** - Design decisions & rationale
-- **[Security Audit Report](C:/Users/inira/security-audit-skill/PasokMataram/run-1/REPORT.md)** - Penetration test findings
-
----
-
-## 🔐 Security
-
-**Production-ready security posture:**
-
-✅ **Authentication & Authorization**
-- JWT HS256 dengan signature validation (`jose` library)
-- Argon2id password hashing (memory-hard, GPU-resistant)
-- Multi-tenant RLS (Row-Level Security) enforcement
-
-✅ **Input Validation**
-- Zod schema validation (client + server)
-- Parameterized SQL queries (no SQL injection)
-- React auto-escape (XSS prevention)
-
-✅ **File Upload Security**
-- Magic byte validation (`file-type` library)
-- MIME type whitelist (PDF, JPEG, PNG, WebP only)
-- File size limit 5 MB
-
-✅ **Rate Limiting**
-- Redis-based: 5 login attempts/15min, 100 API req/min
-- Upload throttling: 10 files/hour
-
-✅ **Webhook Security**
-- HMAC-SHA256 signature validation
-- Replay protection (Redis nonce + 5min timestamp window)
-
-✅ **Production Headers**
-- Content-Security-Policy
-- X-Frame-Options: DENY
-- Strict-Transport-Security
-- X-Content-Type-Options: nosniff
-
----
-
-## 🎨 Design System
-
-**PasokMataram Heritage Design Tokens:**
-
-- **Primer (Daun Tropis)**: `#2E5339` - Trust, sustainability, nature
-- **Sekunder (Baru Mataram)**: `#B85324` - Heritage, warmth, craftsmanship
-- **Aksen (Sinar Senja)**: `#D48028` - Opportunity, optimism, prosperity
-- **Pendukung (Rimbun Alam)**: `#6E8B6E` - Growth, balance, freshness
-
-**Compliance:**
-- WCAG 2.1 AA (contrast ratio 4.5:1 minimum)
-- Keyboard navigation support
-- Screen reader labels (ARIA)
-- Touch targets 44x44px minimum
-
-**Typography:**
-- Heading: Plus Jakarta Sans (700/800)
-- Body: Inter (400/500/600)
-- Code: JetBrains Mono (400/500)
-
----
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Watch mode
-npm test -- --watch
-
-# Coverage report
-npm test -- --coverage
-
-# E2E tests (Playwright)
-npm run test:e2e
-```
-
-**Test Coverage Target:** 70% for critical paths
-
----
-
-## 📦 Build & Deployment
-
-### Production Build
-
-```bash
-# Build all packages
+# Menjalankan kompilasi penuh 14 paket monorepo
 npm run build
-
-# Output:
-# - apps/web/.next/ (Next.js production build)
-# - apps/api/dist/ (NestJS compiled)
-# - services/*/dist/ (Microservices compiled)
 ```
 
-### Docker Production Image
-
-```bash
-# Build production image
-docker build -t pasokmataram-web:latest -f apps/web/Dockerfile .
-docker build -t pasokmataram-api:latest -f apps/api/Dockerfile .
-
-# Run production containers
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-### Deployment Platforms
-
-**Recommended:**
-- **Frontend (Next.js)**: Vercel, Netlify, Railway
-- **Backend (NestJS)**: Railway, Render, DigitalOcean App Platform
-- **Database**: Supabase, Neon, Railway PostgreSQL
-- **Redis**: Upstash, Redis Cloud
-- **Storage**: Cloudflare R2, AWS S3, DigitalOcean Spaces
-
-**Shared Hosting (via SSH):**
-- See `.github/workflows/deploy.yml` for CI/CD setup
-- Requires: Node.js 20+, PM2, Nginx reverse proxy
-
 ---
 
-## 🤝 Contributing
+## 10. Lisensi & Hak Cipta
 
-**Code Style:**
-- TypeScript strict mode (no `any`)
-- ESLint + Prettier enforced
-- Conventional Commits
-- PR requires review + CI passing
-
-**Development Workflow:**
-1. Create feature branch: `feat/pooling-campaign-ui`
-2. Make changes, commit with conventional format
-3. Run `npm test` and `npm run build` locally
-4. Push and create PR
-5. Wait for CI checks + code review
-
----
-
-## 📊 Business Model
-
-**Revenue Streams:**
-
-1. **Platform Fee (0.5% merchant)**: Charged to suppliers per transaction
-2. **Service Fee (0.3% buyer)**: Transparent fee shown at checkout
-3. **Premium Features** (future): Priority pooling slots, extended payment terms
-4. **Data Insights** (future): ML forecasting API for enterprise clients
-
-**Unit Economics:**
-
-- Average Order Value (AOV): Rp 2.000.000
-- Platform fee: Rp 10.000 (0.5%) + Rp 6.000 (0.3%) = Rp 16.000/order
-- Target: 1.000 orders/month = Rp 16.000.000 GMV
-- Break-even: ~500 orders/month (infrastructure cost ~Rp 8.000.000)
-
----
-
-## 🗺️ Roadmap
-
-**Q4 2026 (Current):**
-- ✅ MVP Pooling + Escrow + QC Hub
-- ✅ KYB verification workflow
-- ✅ ML price forecasting
-- 🚧 Mobile-responsive UI polish
-
-**Q1 2027:**
-- Expand ke Solo & Semarang (200+ UMKM target)
-- B2C marketplace pilot (direct to consumer)
-- Mobile app (React Native) untuk supplier di lapangan
-
-**Q2 2027:**
-- Cold chain logistics tracking (IoT sensor suhu)
-- Smart contract escrow (blockchain settlement)
-- Multi-language support (EN, ID)
-
-**Q3 2027:**
-- Pan-Jawa expansion (Jakarta, Surabaya, Bandung)
-- API marketplace untuk fintech/ERP integration
-- White-label platform for agri-corps
-
----
-
-## 📄 License
-
-**Proprietary** - All rights reserved by PasokMataram Team
-
-For licensing inquiries: [contact information placeholder]
-
----
-
-## 📞 Contact
-
-**Development Team:**
-- GitHub: [SyaPratama/PasokanMataram](https://github.com/SyaPratama/PasokanMataram)
-- Email: [team email placeholder]
-
-**Competition:**
-- GTNIC 2026 Web Development Category
-- Garda Tech National Innovation Competition
-
----
-
-## 🙏 Acknowledgments
-
-- **Garda Tech** - Platform kompetisi & mentorship
-- **BPD DIY** - Escrow banking partnership
-- **Solosmartpay** - Payment gateway integration
-- **BAPANAS & PIHPS** - Historical price data sources
-
----
-
-**Built with ❤️ for UMKM Indonesia by PasokMataram Team**
+Hak Cipta (c) 2026 Tim Pengembang PasokMataram. Seluruh hak cipta dilindungi undang-undang.
+Platform ini dikembangkan untuk digitalisasi dan efisiensi pengadaan pangan usaha kuliner D.I. Yogyakarta.
