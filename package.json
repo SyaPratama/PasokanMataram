@@ -18,7 +18,9 @@
     "test:turbo": "turbo run test",
     "test:watch": "vitest",
     "test:e2e": "vitest run tests/e2e",
-    "db:migrate": "node scripts/migrate.mjs",
+    "db:migrate": "tsx packages/database/scripts/migrate.ts",
+    "db:seed": "tsx packages/database/scripts/seed.ts",
+    "db:reset": "npm run db:migrate && npm run db:seed",
     "db:sandbox:reset": "node scripts/db-clean-sandbox.mjs",
     "audit:cleanliness": "node scripts/audit-cleanliness.mjs"
   },
