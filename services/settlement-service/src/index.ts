@@ -5,3 +5,4 @@
 
 export * from './solosmartpay';
 export * from './service';
+export type { PaymentMethod, PaymentStatus } from '@pasok/config';

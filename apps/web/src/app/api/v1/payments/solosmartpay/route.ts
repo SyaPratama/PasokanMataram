@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { SettlementService, type SolosmartpayMethod } from '@pasok/settlement-service';
+import { SettlementService, type PaymentMethod } from '@pasok/settlement-service';
 import { verifySessionToken } from '@/lib/auth';
 
 const settlementService = new SettlementService();
@@ -66,9 +66,14 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const invoice = await settlementService.issuePaymentInvoice({
-      ...parseResult.data,
-      method: parseResult.data.method as SolosmartpayMethod,
+    const invoice = await settlementService.createPaymentInvoice({
+      amount: parseResult.data.amountRp,
+      reference: parseResult.data.orderId,
+      description: `Payment for ${parseResult.data.customerName}`,
+      customerName: parseResult.data.customerName,
+      customerEmail: parseResult.data.customerEmail,
+      customerPhone: parseResult.data.customerPhone,
+      paymentMethod: parseResult.data.method as PaymentMethod,
     });
 
     return NextResponse.json(
