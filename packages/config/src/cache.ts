@@ -12,6 +12,7 @@ const cacheConfigSchema = z.object({
   password: z.string().optional(),
   db: z.number().int().min(0).default(0),
   url: z.string(),
+  socketPath: z.string().optional(),
   defaultLockTtlSeconds: z.number().int().positive().default(10),
   defaultLockTimeoutMs: z.number().int().positive().default(2000),
   retryIntervalMs: z.number().int().positive().default(50),
@@ -24,7 +25,23 @@ export type CacheConfig = z.infer<typeof cacheConfigSchema>;
  * Build Redis URL from individual parameters or use REDIS_URL directly
  * Priority: REDIS_URL > individual params (HOST, PORT, PASSWORD, DB)
  */
+function resolveSocketPath(): string | undefined {
+  const direct = process.env.REDIS_SOCKET || process.env.REDIS_PATH;
+  if (direct) return direct.replace(/^unix:\/\//, '');
+
+  const envUrl = process.env.REDIS_URL;
+  if (envUrl && (envUrl.startsWith('/') || envUrl.includes('.sock') || envUrl.startsWith('unix://'))) {
+    return envUrl.replace(/^unix:\/\//, '');
+  }
+  return undefined;
+}
+
 function buildRedisUrl(): string {
+  const socketPath = resolveSocketPath();
+  if (socketPath) {
+    return `unix://${socketPath}`;
+  }
+
   const envUrl = process.env.REDIS_URL;
   if (envUrl) {
     return envUrl;
@@ -44,6 +61,7 @@ export const cacheConfig: CacheConfig = cacheConfigSchema.parse({
   port: parseInt(process.env.REDIS_PORT || '6379', 10),
   password: process.env.REDIS_PASSWORD,
   db: parseInt(process.env.REDIS_DB || '0', 10),
+  socketPath: resolveSocketPath(),
   url: buildRedisUrl(),
   defaultLockTtlSeconds: 10,
   defaultLockTimeoutMs: 2000,
