@@ -51,7 +51,18 @@ Thumbs.db
 /tests/screenshots/*
 !/tests/screenshots/.gitignore
 
-# Agent internal workspace ignore (root-only)
+# Agent internal workspace, specs, and planning documents
 /business/
 /contract/
 /graphify-out/
+.specify/
+specs/
+.agents/
+.orca/
+.claude/
+.cursor/
+.gemini/
+.zeroshot/
+*-plan.md
+*plan*.md
+MIGRATION-PLAN.md

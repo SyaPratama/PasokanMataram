@@ -22,8 +22,9 @@ const cacheConfigSchema = z.object({
 export type CacheConfig = z.infer<typeof cacheConfigSchema>;
 
 /**
- * Build Redis URL from individual parameters or use REDIS_URL directly
- * Priority: REDIS_URL > individual params (HOST, PORT, PASSWORD, DB)
+ * Mendeteksi jalur berkas soket Unix Domain Redis dari environment variabel.
+ * Mendukung format langsung REDIS_SOCKET atau prefix unix:// pada REDIS_URL.
+ * @returns Jalur absolut berkas soket Unix atau undefined jika mode TCP.
  */
 function resolveSocketPath(): string | undefined {
   const direct = process.env.REDIS_SOCKET || process.env.REDIS_PATH;
@@ -36,6 +37,11 @@ function resolveSocketPath(): string | undefined {
   return undefined;
 }
 
+/**
+ * Membangun URL koneksi Redis baku berdasarkan ketersediaan Unix socket atau TCP parameter.
+ * Prioritas: Unix Socket > REDIS_URL > Parameter individual (HOST, PORT, PASSWORD, DB).
+ * @returns String URL koneksi Redis lengkap.
+ */
 function buildRedisUrl(): string {
   const socketPath = resolveSocketPath();
   if (socketPath) {
