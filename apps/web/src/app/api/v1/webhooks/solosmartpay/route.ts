@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseWebhook } from '@/../../services/settlement-service/src/solosmartpay';
+import { parseWebhook } from '@/lib/settlement';
 import { query } from '@pasok/database';
 
 export const runtime = 'nodejs';

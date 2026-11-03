@@ -19,7 +19,7 @@ import {
 import type { Request } from 'express';
 import type { SecurityContext } from '@pasok/domain';
 import { SettlementService } from './settlement.service';
-import type { CreateInvoiceParams } from '@pasok/settlement-service';
+import type { CreateInvoiceParams } from './settlement.service';
 
 @Controller('settlement')
 export class SettlementController {

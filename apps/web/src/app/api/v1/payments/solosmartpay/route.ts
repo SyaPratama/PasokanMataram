@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { SettlementService, type PaymentMethod } from '@pasok/settlement-service';
+import { SettlementService, type PaymentMethod } from '@/lib/settlement';
 import { verifySessionToken } from '@/lib/auth';
 
 const settlementService = new SettlementService();
