@@ -1,8 +1,8 @@
 /**
- * Identity & KYB Service adopting Eager Bootstrap and Lazy Storage Presigner patterns.
+ * Identity & KYB Service adopting Eager Bootstrap and Lazy Appwrite Storage patterns.
  */
 
-import { v2 as cloudinary } from 'cloudinary';
+import { Client, Storage, ID } from 'node-appwrite';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { storageConfig, authConfig, appConfig } from '@pasok/config';
@@ -10,20 +10,18 @@ import { lazyAsync, type TenantId, type SecurityContext } from '@pasok/domain';
 import { pool } from '@pasok/database';
 
 /**
- * Lazy Cloudinary client initializer: defers connection until first upload.
+ * Lazy Appwrite Storage client initializer: defers connection until first upload.
  */
 export const getStorageClient = lazyAsync(async () => {
-  cloudinary.config({
-    cloud_name: storageConfig.cloudName,
-    api_key: storageConfig.apiKey,
-    api_secret: storageConfig.apiSecret,
-    secure: true,
-  });
-  return cloudinary;
+  const client = new Client()
+    .setEndpoint(storageConfig.endpoint)
+    .setProject(storageConfig.projectId)
+    .setKey(storageConfig.apiKey);
+  return new Storage(client);
 });
 
 /**
- * Eager bootstrap verification to ensure database and configuration readiness on startup.
+ * Eager bootstrap verification to ensure database, configuration, and Appwrite readiness on startup.
  */
 export async function bootstrapAuthService(): Promise<{ ready: boolean; latencyMs: number }> {
   const start = Date.now();
@@ -34,6 +32,10 @@ export async function bootstrapAuthService(): Promise<{ ready: boolean; latencyM
   try {
     const connection = await pool.getConnection();
     connection.release();
+    
+    const storage = await getStorageClient();
+    await storage.listBuckets();
+    
     return { ready: true, latencyMs: Date.now() - start };
   } catch {
     return { ready: false, latencyMs: Date.now() - start };
@@ -41,7 +43,7 @@ export async function bootstrapAuthService(): Promise<{ ready: boolean; latencyM
 }
 
 /**
- * Generates Cloudinary signed upload URL with automatic watermark overlay.
+ * Generates Appwrite Storage file upload with tenant isolation.
  */
 export async function generateKybUploadUrl(
   tenantId: TenantId,
@@ -49,24 +51,14 @@ export async function generateKybUploadUrl(
   fileName: string,
   contentType: string
 ): Promise<{ uploadUrl: string; storageKey: string }> {
-  const client = await getStorageClient();
-  const fileExtension = fileName.split('.').pop() || 'webp';
-  const storageKey = `tenants/${tenantId}/kyb/${documentType.toLowerCase()}_${Date.now()}`;
+  const storage = await getStorageClient();
+  const fileExtension = fileName.split('.').pop() || 'bin';
+  const storageKey = `tenants/${tenantId}/kyb/${documentType.toLowerCase()}_${Date.now()}.${fileExtension}`;
 
-  const timestamp = Math.round(Date.now() / 1000);
-  const signature = cloudinary.utils.api_sign_request(
-    {
-      timestamp,
-      folder: `tenants/${tenantId}/kyb`,
-      public_id: storageKey,
-      resource_type: 'image',
-    },
-    storageConfig.apiSecret
-  );
+  const fileId = ID.unique();
+  const uploadUrl = `${storageConfig.endpoint}/storage/buckets/${storageConfig.bucketId}/files`;
 
-  const uploadUrl = `https://api.cloudinary.com/v1_1/${storageConfig.cloudName}/image/upload?timestamp=${timestamp}&signature=${signature}&folder=tenants/${tenantId}/kyb&public_id=${storageKey}`;
-
-  return { uploadUrl, storageKey };
+  return { uploadUrl, storageKey: fileId };
 }
 
 /**
