@@ -3,6 +3,7 @@
  * @description BFF Route Handler for fetching notifications and updating read status.
  */
 
+import { NextResponse } from 'next/server';
 import { query } from '@pasok/database';
 import { verifySessionToken } from '@/lib/auth';
 
