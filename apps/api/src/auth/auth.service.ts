@@ -38,7 +38,7 @@ interface WatermarkedDocumentResult {
   timestamp: string;
 }
 
-const getStorageClient = lazyAsync(async () => {
+export const getStorageClient = lazyAsync(async () => {
   const client = new Client()
     .setEndpoint(storageConfig.endpoint)
     .setProject(storageConfig.projectId)

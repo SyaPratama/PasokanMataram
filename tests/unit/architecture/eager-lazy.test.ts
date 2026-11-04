@@ -12,12 +12,12 @@ import {
   validateJobPayload,
   createQueueWorker,
 } from '@pasok/queue';
-import {
-  bootstrapAuthService,
-  getStorageClient,
-  createSessionToken,
-  hashPassword,
-} from '@pasok/auth-kyb-service';
+import { AuthService, getStorageClient } from '../../../apps/api/src/auth/auth.service';
+
+const authService = new AuthService();
+const bootstrapAuthService = () => authService.bootstrapAuthService();
+const createSessionToken = (context: any) => authService.createSessionToken(context);
+const hashPassword = (plainText: string) => authService.hashPassword(plainText);
 
 describe('Pola Eager vs Lazy Architecture', () => {
   beforeEach(() => {
