@@ -19,12 +19,12 @@ PasokMataram uses Solosmartpay as the payment gateway for all transactions.
 
 ```bash
 # Sandbox
-SOLOSMARTPAY_API_TOKEN=ssp_test_sandbox_token_here
+SOLOSMARTPAY_TOKEN=ssp_test_sandbox_token_here
 SOLOSMARTPAY_WEBHOOK_SECRET=whsec_sandbox_secret_key_here
 SOLOSMARTPAY_SANDBOX=true
 
 # Production
-SOLOSMARTPAY_API_TOKEN=your_production_api_token_here
+SOLOSMARTPAY_TOKEN=your_production_api_token_here
 SOLOSMARTPAY_WEBHOOK_SECRET=your_production_webhook_secret_here
 SOLOSMARTPAY_SANDBOX=false
 ```
