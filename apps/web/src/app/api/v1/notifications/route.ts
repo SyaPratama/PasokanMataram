@@ -79,13 +79,11 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     const id = body.id as string | undefined;
 
     if (id) {
-      // Mark single notification as read
       await query(
         `UPDATE notifications SET is_read = TRUE, read_at = NOW() WHERE id = ? AND tenant_id = ?`,
         [id, session.tenantId]
       );
     } else {
-      // Mark all notifications as read
       await query(
         `UPDATE notifications SET is_read = TRUE, read_at = NOW() WHERE tenant_id = ?`,
         [session.tenantId]

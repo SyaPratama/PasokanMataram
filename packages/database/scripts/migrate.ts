@@ -46,14 +46,14 @@ async function runMigrations() {
       multipleStatements: true,
     });
 
-    console.log('✓ Connected to MySQL server\n');
+    console.log('Connected to MySQL server\n');
 
     // Create database if not exists
     console.log(`📦 Creating database "${config.database}" if not exists...`);
     await rootConnection.query(
       `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
-    console.log(`✓ Database "${config.database}" ready\n`);
+    console.log(`Database "${config.database}" ready\n`);
 
     await rootConnection.end();
 
@@ -89,7 +89,7 @@ async function runMigrations() {
 
       try {
         await connection.query(sql);
-        console.log(`✓ Completed: ${file.filename}\n`);
+        console.log(`Completed: ${file.filename}\n`);
       } catch (error: unknown) {
         const mysqlError = error as { code?: string; message?: string };
         // Ignore duplicate table errors (migrations are not tracked)
@@ -101,10 +101,10 @@ async function runMigrations() {
       }
     }
 
-    console.log('✅ All migrations completed successfully!\n');
+    console.log('All migrations completed successfully!\n');
   } catch (error: unknown) {
     const err = error as { message?: string; sql?: string };
-    console.error('\n❌ Migration failed:', err.message || String(error));
+    console.error('\nMigration failed:', err.message || String(error));
     if (err.sql) {
       console.error('Failed SQL:', err.sql);
     }

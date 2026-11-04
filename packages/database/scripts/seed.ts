@@ -353,7 +353,7 @@ async function seedDatabase() {
     console.log();
   } catch (error: unknown) {
     const err = error as { message?: string; code?: string };
-    console.error('\n❌ Seeding failed:', err.message || String(error));
+    console.error('\nSeeding failed:', err.message || String(error));
     if (err.code) {
       console.error('Error code:', err.code);
     }

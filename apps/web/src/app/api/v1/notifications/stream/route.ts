@@ -39,7 +39,6 @@ export async function GET(request: Request): Promise<Response> {
         )
       );
 
-      // Fetch notifications from database
       if (tenantId) {
         try {
           const result = await query(
@@ -67,7 +66,6 @@ export async function GET(request: Request): Promise<Response> {
         }
       }
 
-      // Send periodic ping to keep connection alive
       const pingInterval = setInterval(() => {
         try {
           controller.enqueue(encoder.encode(`: ping\n\n`));
@@ -76,7 +74,6 @@ export async function GET(request: Request): Promise<Response> {
         }
       }, 15000);
 
-      // Clean up on client disconnect
       request.signal.addEventListener('abort', () => {
         clearInterval(pingInterval);
         try {
