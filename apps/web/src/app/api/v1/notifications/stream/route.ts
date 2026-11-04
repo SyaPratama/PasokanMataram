@@ -5,6 +5,7 @@
  */
 
 import type { NotificationItem } from '@pasok/domain';
+import { query } from '@pasok/database';
 import { verifySessionToken } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';

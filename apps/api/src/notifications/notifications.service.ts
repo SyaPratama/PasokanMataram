@@ -105,10 +105,13 @@ export class NotificationsService {
       };
       return await this.adapter.markAsRead(context, id);
     } catch {
-      const item = this.inMemoryNotifications.find((n) => n.id === id);
-      if (item) {
-        item.isRead = true;
-        item.readAt = new Date().toISOString();
+      const index = this.inMemoryNotifications.findIndex((n) => n.id === id);
+      if (index !== -1) {
+        this.inMemoryNotifications[index] = {
+          ...this.inMemoryNotifications[index],
+          isRead: true,
+          readAt: new Date().toISOString(),
+        } as NotificationItem;
         return true;
       }
       return false;
@@ -131,12 +134,16 @@ export class NotificationsService {
       return await this.adapter.markAllAsRead(context);
     } catch {
       let count = 0;
-      this.inMemoryNotifications.forEach((n) => {
+      this.inMemoryNotifications = this.inMemoryNotifications.map((n) => {
         if (!n.isRead) {
-          n.isRead = true;
-          n.readAt = new Date().toISOString();
           count++;
+          return {
+            ...n,
+            isRead: true,
+            readAt: new Date().toISOString(),
+          };
         }
+        return n;
       });
       return count;
     }
