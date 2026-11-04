@@ -33,6 +33,7 @@
       "@pasok/pooling-service": ["services/pooling-service/src/index.ts"],
       "@pasok/logistics-hub-service": ["services/logistics-hub-service/src/index.ts"],
       "@pasok/settlement-service": ["services/settlement-service/src/index.ts"],
+      "@pasok/payment-gateways": ["packages/payment-gateways/src/index.ts"],
       "@/*": ["apps/web/src/*"]
     }
   }

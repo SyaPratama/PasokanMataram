@@ -18,6 +18,7 @@
     "@pasok/config": "*",
     "@pasok/database": "*",
     "@pasok/domain": "*",
+    "@pasok/payment-gateways": "*",
     "@pasok/logistics-hub-service": "*",
     "@pasok/pooling-service": "*",
     "@pasok/queue": "*",

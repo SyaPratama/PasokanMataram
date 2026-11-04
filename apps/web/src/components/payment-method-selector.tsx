@@ -2,24 +2,28 @@
 
 import * as React from 'react';
 import { Check } from 'lucide-react';
+import { PAYMENT_METHODS, type PaymentMethod } from '@pasok/config';
 
-export type PaymentMethod = 'qris' | 'va_bca' | 'va_bni' | 'va_mandiri' | 'va_bri' | 'va_bsi' | 'va_bpd_diy';
+export type { PaymentMethod };
 
 interface PaymentMethodOption {
   id: PaymentMethod;
   label: string;
-  logo?: string;
   description: string;
 }
 
-const PAYMENT_METHODS: PaymentMethodOption[] = [
-  { id: 'qris', label: 'QRIS', description: 'Scan QR Code dari aplikasi e-wallet' },
-  { id: 'va_bca', label: 'BCA Virtual Account', description: 'Transfer ke Virtual Account BCA' },
-  { id: 'va_mandiri', label: 'Mandiri Virtual Account', description: 'Transfer ke Virtual Account Mandiri' },
-  { id: 'va_bni', label: 'BNI Virtual Account', description: 'Transfer ke Virtual Account BNI' },
-  { id: 'va_bri', label: 'BRI Virtual Account', description: 'Transfer ke Virtual Account BRI' },
-  { id: 'va_bsi', label: 'BSI Virtual Account', description: 'Transfer ke Virtual Account BSI' },
-  { id: 'va_bpd_diy', label: 'BPD DIY Virtual Account', description: 'Transfer ke Virtual Account BPD DIY' },
+const PAYMENT_METHOD_OPTIONS: PaymentMethodOption[] = [
+  { id: PAYMENT_METHODS.QRIS,          label: 'QRIS',                        description: 'Scan QR Code dari aplikasi e-wallet' },
+  { id: PAYMENT_METHODS.VA_BCA,        label: 'BCA Virtual Account',         description: 'Transfer ke Virtual Account BCA' },
+  { id: PAYMENT_METHODS.VA_MANDIRI,    label: 'Mandiri Virtual Account',     description: 'Transfer ke Virtual Account Mandiri' },
+  { id: PAYMENT_METHODS.VA_BNI,        label: 'BNI Virtual Account',         description: 'Transfer ke Virtual Account BNI' },
+  { id: PAYMENT_METHODS.VA_BRI,        label: 'BRI Virtual Account',         description: 'Transfer ke Virtual Account BRI' },
+  { id: PAYMENT_METHODS.VA_BSI,        label: 'BSI Virtual Account',         description: 'Transfer ke Virtual Account BSI' },
+  { id: PAYMENT_METHODS.VA_BPD_DIY,    label: 'BPD DIY Virtual Account',     description: 'Transfer ke Virtual Account BPD DIY' },
+  { id: PAYMENT_METHODS.EWALLET_GOPAY, label: 'GoPay',                       description: 'Bayar via GoPay' },
+  { id: PAYMENT_METHODS.EWALLET_DANA,  label: 'DANA',                        description: 'Bayar via DANA' },
+  { id: PAYMENT_METHODS.EWALLET_OVO,   label: 'OVO',                         description: 'Bayar via OVO' },
+  { id: PAYMENT_METHODS.EWALLET_SHOPEE,label: 'ShopeePay',                   description: 'Bayar via ShopeePay' },
 ];
 
 interface PaymentMethodSelectorProps {
@@ -32,7 +36,7 @@ export function PaymentMethodSelector({ selected, onSelect }: PaymentMethodSelec
     <div className="space-y-3">
       <label className="text-sm font-semibold text-gelap">Metode Pembayaran</label>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {PAYMENT_METHODS.map((method) => (
+        {PAYMENT_METHOD_OPTIONS.map((method) => (
           <button
             key={method.id}
             type="button"
