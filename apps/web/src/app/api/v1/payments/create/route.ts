@@ -22,7 +22,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
       ?.split('=')[1];
 
-    verifySessionToken(sessionCookie ?? '');
+    if (!sessionCookie) {
+      return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
+    }
+    const session = verifySessionToken(sessionCookie);
+    if (!session) {
+      return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
+    }
     const body = await request.json();
 
     const payload: Record<string, unknown> = {
