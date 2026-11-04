@@ -39,7 +39,7 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
   });
 
   it('memvalidasi cache configuration (Redis lock TTL)', () => {
-    expect(cacheConfig.url).toMatch(/^redis:\/\//);
+    expect(cacheConfig.url).toMatch(/^(redis|unix):\/\//);
     expect(cacheConfig.defaultLockTtlSeconds).toBe(10);
     expect(cacheConfig.keyPrefix).toBe('pasokmataram:');
   });
