@@ -8,11 +8,21 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { IdempotencyGuard } from './common/idempotency.guard';
-
+import { autoMigrate } from '@pasok/database';
 /**
  * Menginisialisasi dan menjalankan server backend NestJS.
  */
 async function bootstrap(): Promise<void> {
+  console.log('[NestJS Startup] Running auto-migration...');
+  const migrationResult = await autoMigrate(false);
+  
+  if (!migrationResult.success) {
+    console.error('[NestJS Startup] Migration failed:', migrationResult.error);
+    console.error('[NestJS Startup] App will continue but database may be outdated');
+  } else {
+    console.log(`[NestJS Startup] Migration complete (${migrationResult.migrationsRun} migrations)`);
+  }
+
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
