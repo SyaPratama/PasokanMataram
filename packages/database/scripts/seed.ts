@@ -53,7 +53,7 @@ async function seedDatabase() {
     connection = await mysql.createConnection(config);
     console.log('Connected to MySQL\n');
 
-    console.log('🧹 Clearing existing test data...');
+    console.log(' Clearing existing test data...');
     await connection.query('SET FOREIGN_KEY_CHECKS = 0');
     await connection.query('TRUNCATE TABLE users');
     await connection.query('TRUNCATE TABLE tenants');
@@ -65,7 +65,7 @@ async function seedDatabase() {
     await connection.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log('Test data cleared\n');
 
-    console.log('👤 Seeding Super Admin...');
+    console.log(' Seeding Super Admin...');
     const adminId = generateUUID();
     const adminTenantId = generateUUID();
 
@@ -154,7 +154,7 @@ async function seedDatabase() {
     }
     console.log();
 
-    console.log('🍽️  Seeding Buyers...');
+    console.log('🍽  Seeding Buyers...');
     const buyers = [
       {
         email: 'buyer.hotel@test.com',
@@ -209,7 +209,7 @@ async function seedDatabase() {
     }
     console.log();
 
-    console.log('🚚 Seeding Hub Operators...');
+    console.log(' Seeding Hub Operators...');
     const operators = [
       {
         email: 'operator.sleman@test.com',
@@ -254,7 +254,7 @@ async function seedDatabase() {
     }
     console.log();
 
-    console.log('📦 Seeding Pooling Campaigns...');
+    console.log(' Seeding Pooling Campaigns...');
     const campaigns = [
       {
         commodity: 'Tomat Merah',
@@ -294,7 +294,7 @@ async function seedDatabase() {
     }
     console.log();
 
-    console.log('🔔 Seeding Notifications...');
+    console.log(' Seeding Notifications...');
     const notifications = [
       {
         tenantId: adminTenantId,

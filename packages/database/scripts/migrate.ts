@@ -47,7 +47,7 @@ async function runMigrations() {
 
     console.log('Connected to MySQL server\n');
 
-    console.log(`📦 Creating database "${config.database}" if not exists...`);
+    console.log(` Creating database "${config.database}" if not exists...`);
     await rootConnection.query(
       `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
@@ -72,11 +72,11 @@ async function runMigrations() {
       .sort((a, b) => a.order - b.order);
 
     if (files.length === 0) {
-      console.log('⚠️  No migration files found in packages/database/migrations/\n');
+      console.log('  No migration files found in packages/database/migrations/\n');
       return;
     }
 
-    console.log(`📋 Found ${files.length} migration file(s):\n`);
+    console.log(` Found ${files.length} migration file(s):\n`);
 
     for (const file of files) {
       console.log(`⏳ Running: ${file.filename}...`);
@@ -88,7 +88,7 @@ async function runMigrations() {
       } catch (error: unknown) {
         const mysqlError = error as { code?: string; message?: string };
         if (mysqlError.code === 'ER_TABLE_EXISTS_ERROR') {
-          console.log(`⚠️  Table already exists, skipping: ${file.filename}\n`);
+          console.log(`  Table already exists, skipping: ${file.filename}\n`);
         } else {
           throw error;
         }
