@@ -37,7 +37,6 @@ async function runMigrations() {
   let connection: mysql.Connection | null = null;
 
   try {
-    // Connect without database first
     const rootConnection = await mysql.createConnection({
       host: config.host,
       port: config.port,
@@ -48,7 +47,6 @@ async function runMigrations() {
 
     console.log('Connected to MySQL server\n');
 
-    // Create database if not exists
     console.log(`📦 Creating database "${config.database}" if not exists...`);
     await rootConnection.query(
       `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
@@ -57,10 +55,8 @@ async function runMigrations() {
 
     await rootConnection.end();
 
-    // Connect to the specific database
     connection = await mysql.createConnection(config);
 
-    // Get migration files
     const migrationsDir = join(__dirname, '../migrations');
     const files = readdirSync(migrationsDir)
       .filter((f) => f.endsWith('.sql'))
@@ -82,7 +78,6 @@ async function runMigrations() {
 
     console.log(`📋 Found ${files.length} migration file(s):\n`);
 
-    // Run migrations
     for (const file of files) {
       console.log(`⏳ Running: ${file.filename}...`);
       const sql = readFileSync(file.path, 'utf-8');
@@ -92,7 +87,6 @@ async function runMigrations() {
         console.log(`Completed: ${file.filename}\n`);
       } catch (error: unknown) {
         const mysqlError = error as { code?: string; message?: string };
-        // Ignore duplicate table errors (migrations are not tracked)
         if (mysqlError.code === 'ER_TABLE_EXISTS_ERROR') {
           console.log(`⚠️  Table already exists, skipping: ${file.filename}\n`);
         } else {

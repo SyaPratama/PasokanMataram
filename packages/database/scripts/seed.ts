@@ -53,7 +53,6 @@ async function seedDatabase() {
     connection = await mysql.createConnection(config);
     console.log('Connected to MySQL\n');
 
-    // Clear existing test data (optional)
     console.log('🧹 Clearing existing test data...');
     await connection.query('SET FOREIGN_KEY_CHECKS = 0');
     await connection.query('TRUNCATE TABLE users');
@@ -66,7 +65,6 @@ async function seedDatabase() {
     await connection.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log('Test data cleared\n');
 
-    // Seed Super Admin
     console.log('👤 Seeding Super Admin...');
     const adminId = generateUUID();
     const adminTenantId = generateUUID();
@@ -93,7 +91,6 @@ async function seedDatabase() {
     );
     console.log(`  admin@pasokmataram.com / Admin123!\n`);
 
-    // Seed Suppliers (3)
     console.log('🌾 Seeding Suppliers...');
     const suppliers = [
       {
@@ -157,7 +154,6 @@ async function seedDatabase() {
     }
     console.log();
 
-    // Seed Buyers (2)
     console.log('🍽️  Seeding Buyers...');
     const buyers = [
       {
@@ -213,7 +209,6 @@ async function seedDatabase() {
     }
     console.log();
 
-    // Seed Hub Operators (2)
     console.log('🚚 Seeding Hub Operators...');
     const operators = [
       {
@@ -259,7 +254,6 @@ async function seedDatabase() {
     }
     console.log();
 
-    // Seed Pooling Campaigns (2 Active)
     console.log('📦 Seeding Pooling Campaigns...');
     const campaigns = [
       {
@@ -300,7 +294,6 @@ async function seedDatabase() {
     }
     console.log();
 
-    // Seed Notifications (5 sample)
     console.log('🔔 Seeding Notifications...');
     const notifications = [
       {
