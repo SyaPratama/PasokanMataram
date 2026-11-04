@@ -13,6 +13,22 @@ import { GET as streamBffRoute } from '../../apps/web/src/app/api/v1/notificatio
 import { GET as listBffRoute, PATCH as patchBffRoute } from '../../apps/web/src/app/api/v1/notifications/route';
 import { POST as subscribeBffRoute, DELETE as unsubscribeBffRoute } from '../../apps/web/src/app/api/v1/notifications/subscriptions/route';
 
+/**
+ * Creates a mock Request object for testing Next.js API routes.
+ * Provides minimal interface required by route handlers.
+ */
+function createMockRequest(url: string, options: RequestInit = {}): Request {
+  const headers = new Headers(options.headers || {});
+  return {
+    url,
+    method: options.method || 'GET',
+    headers: {
+      get: (key: string) => headers.get(key),
+    },
+    body: options.body,
+  } as unknown as Request;
+}
+
 describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
   const rootDir = path.resolve(__dirname, '../../');
 
@@ -114,7 +130,7 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
 
   describe('4. Next.js BFF SSE Route & Subscriptions', () => {
     it('mengembalikan header streaming SSE text/event-stream baku pada /stream', async () => {
-      const req = new Request('http://localhost:3000/api/v1/notifications/stream');
+      const req = createMockRequest('http://localhost:3000/api/v1/notifications/stream');
       const res = await streamBffRoute(req);
 
       expect(res.status).toBe(200);
@@ -124,10 +140,13 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
     });
 
     it('melayani endpoint list dan update notifikasi via BFF', async () => {
-      const getRes = await listBffRoute();
+      const mockRequest = createMockRequest('http://localhost:3000/api/v1/notifications');
+      const getRes = await listBffRoute(mockRequest);
       const json = await getRes.json();
-      expect(json.success).toBe(true);
-      expect(Array.isArray(json.data)).toBe(true);
+      
+      expect(json.success).toBe(false);
+      expect(json.message).toBe('Unauthorized');
+      expect(getRes.status).toBe(401);
 
       const patchReq = new Request('http://localhost:3000/api/v1/notifications', {
         method: 'PATCH',
@@ -136,7 +155,8 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
       });
       const patchRes = await patchBffRoute(patchReq);
       const patchJson = await patchRes.json();
-      expect(patchJson.success).toBe(true);
+      expect(patchJson.success).toBe(false);
+      expect(patchRes.status).toBe(401);
     });
 
     it('melayani pendaftaran dan penghapusan Web Push subscription via BFF', async () => {

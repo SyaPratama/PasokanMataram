@@ -19,6 +19,7 @@ export class NotificationsService {
   private readonly adapter: NotificationAdapter;
   private readonly eventStream$: Subject<{ tenantId: string; item: NotificationItem }>;
   private inMemorySubscriptions: Map<string, WebPushSubscriptionDto> = new Map();
+  private inMemoryNotifications: NotificationItem[] = [];
 
   public constructor() {
     this.adapter = new NotificationAdapter();
