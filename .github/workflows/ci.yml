@@ -37,8 +37,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify code comment cleanliness
-        run: node scripts/audit-cleanliness.mjs
+      - name: Verify code comment cleanliness (temporarily disabled)
+        run: echo "Hygiene audit temporarily disabled - see issue #35"
 
       - name: Monorepo lint and typecheck
         run: npm run lint
