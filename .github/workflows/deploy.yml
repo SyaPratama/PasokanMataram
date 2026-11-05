@@ -39,8 +39,12 @@ jobs:
           echo "${{ secrets.ENV_PRODUCTION }}" > apps/web/.env.production
       
       - name: Run database migrations
-        if: ${{ secrets.DB_HOST != '' && secrets.DB_PASSWORD != '' }}
-        run: npm run db:migrate
+        run: |
+          if [ -z "$DB_HOST" ] || [ -z "$DB_PASSWORD" ]; then
+            echo "Database secrets (DB_HOST / DB_PASSWORD) not configured. Skipping pre-deploy migration."
+            exit 0
+          fi
+          npm run db:migrate
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
