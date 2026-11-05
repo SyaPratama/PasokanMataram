@@ -220,7 +220,7 @@ APPWRITE_API_KEY=prod_api_key
 APPWRITE_BUCKET_ID=kyb-documents-prod
 
 # Solosmartpay
-SOLOSMARTPAY_API_TOKEN=ssp_live_xxxxxx
+SOLOSMARTPAY_TOKEN=ssp_live_xxxxxx
 SOLOSMARTPAY_WEBHOOK_SECRET=webhook_secret
 SOLOSMARTPAY_SANDBOX=false
 
@@ -255,7 +255,7 @@ APPWRITE_API_KEY=prod_api_key
 APPWRITE_BUCKET_ID=kyb-documents-prod
 
 # Solosmartpay (same as Web)
-SOLOSMARTPAY_API_TOKEN=ssp_live_xxxxxx
+SOLOSMARTPAY_TOKEN=ssp_live_xxxxxx
 SOLOSMARTPAY_WEBHOOK_SECRET=webhook_secret
 SOLOSMARTPAY_SANDBOX=false
 ```
