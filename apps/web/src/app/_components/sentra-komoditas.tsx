@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import {
   MapPin,
   Calendar,
@@ -28,10 +28,71 @@ export function SentraKomoditasSection() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [items, setItems] = useState<KomoditasItem[]>(DATA_KOMODITAS);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    fetch('/api/v1/commodities')
+      .then((res) => res.json())
+      .then((resData) => {
+        if (!isMounted) return;
+        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
+          const mapped: KomoditasItem[] = resData.data.map((c: any, idx: number) => {
+            const reg = (c.origin_region || '').toUpperCase();
+            const regCode = reg.includes('SLEMAN')
+              ? 'SLEMAN'
+              : reg.includes('BANTUL')
+                ? 'BANTUL'
+                : reg.includes('KULON')
+                  ? 'KULON_PROGO'
+                  : reg.includes('GUNUNG')
+                    ? 'GUNUNGKIDUL'
+                    : 'YOGYAKARTA';
+
+            const regName =
+              regCode === 'KULON_PROGO'
+                ? 'Kulon Progo'
+                : regCode === 'GUNUNGKIDUL'
+                  ? 'Gunungkidul'
+                  : regCode === 'YOGYAKARTA'
+                    ? 'Kota Yogyakarta'
+                    : regCode.charAt(0) + regCode.slice(1).toLowerCase();
+            return {
+              id: c.id || `k-${idx + 1}`,
+              nama: c.name,
+              sentra: c.origin_region || 'D.I. Yogyakarta',
+              kabupaten: regCode as any,
+              kabupatenNama: regName,
+              hargaEstimasi: `Rp ${Number(c.current_price || 25000).toLocaleString('id-ID')}`,
+              satuan: c.unit || 'kg',
+              kuotaTerkumpul: 500 + idx * 75,
+              kuotaTarget: 1000,
+              jadwalPanen: 'Panen Subuh & Siap Kirim',
+              standarMutu:
+                c.recommended_action === 'BELI_SEKARANG'
+                  ? 'Grade A Super, Mutu SNI Terjamin'
+                  : 'Kualitas Terkurasi Hub Transit Bantul',
+            };
+          });
+          setItems(mapped);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const filteredItems = useMemo(() => {
-    return DATA_KOMODITAS.filter((item) => {
+    return items.filter((item) => {
       const matchRegency = filter === 'SEMUA' || item.kabupaten === filter;
       if (!matchRegency) return false;
 
@@ -45,7 +106,7 @@ export function SentraKomoditasSection() {
 
       return matchName || matchSentra || matchMutu || matchKabupaten;
     });
-  }, [filter, searchQuery]);
+  }, [items, filter, searchQuery]);
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
 
@@ -112,7 +173,7 @@ export function SentraKomoditasSection() {
 
           <div className="text-sm text-gelap/70 font-medium">
             Menampilkan <span className="font-bold text-primer">{filteredItems.length}</span> dari{' '}
-            <span className="font-bold text-gelap">{DATA_KOMODITAS.length}</span> bahan pangan siap kirim
+            <span className="font-bold text-gelap">{items.length}</span> bahan pangan siap kirim
           </div>
         </div>
 

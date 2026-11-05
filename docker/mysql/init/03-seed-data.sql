@@ -2,7 +2,7 @@
 -- 500+ realistic rows across 22 tables
 
 -- 1. Tenants (5: 2 buyers, 3 suppliers)
-INSERT INTO tenants (id, business_name, tenant_type, regency, kyb_status, verified_at, created_at) VALUES
+INSERT IGNORE INTO tenants (id, business_name, tenant_type, regency, kyb_status, verified_at, created_at) VALUES
 ('10000000-0000-0000-0000-000000000001', 'Warung Makan Gudeg Yu Djum Cabang Sleman', 'HOREKA_BUYER', 'SLEMAN', 'VERIFIED', '2026-01-15 10:00:00', '2026-01-10 08:00:00'),
 ('10000000-0000-0000-0000-000000000002', 'Rumah Makan Padang Sederhana Bantul', 'HOREKA_BUYER', 'BANTUL', 'VERIFIED', '2026-01-20 14:30:00', '2026-01-12 09:00:00'),
 ('20000000-0000-0000-0000-000000000001', 'Gapoktan Sido Makmur Desa Cangkringan', 'GAPOKTAN_SUPPLIER', 'SLEMAN', 'VERIFIED', '2026-01-18 11:00:00', '2026-01-11 10:00:00'),
@@ -10,7 +10,7 @@ INSERT INTO tenants (id, business_name, tenant_type, regency, kyb_status, verifi
 ('20000000-0000-0000-0000-000000000003', 'Gapoktan Mitra Tani Bantul', 'GAPOKTAN_SUPPLIER', 'BANTUL', 'PENDING_VERIFICATION', NULL, '2026-02-01 13:00:00');
 
 -- 2. Users (15: SUPER_ADMIN, OWNERs, managers, staff)
-INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active, created_at) VALUES
+INSERT IGNORE INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active, created_at) VALUES
 ('30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'superadmin@pasokmataram.com', '$2b$10$hashedpassword', 'Admin Pusat PasokMataram', '081234567890', 'SUPER_ADMIN', TRUE, '2026-01-01 00:00:00'),
 ('30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'owner.gudeg@example.com', '$2b$10$hashedpassword', 'Ibu Sri Gudeg', '081234567891', 'OWNER', TRUE, '2026-01-10 08:30:00'),
 ('30000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'procurement.gudeg@example.com', '$2b$10$hashedpassword', 'Budi Santoso', '081234567892', 'PROCUREMENT_MANAGER', TRUE, '2026-01-10 09:00:00'),
@@ -28,7 +28,7 @@ INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number,
 ('30000000-0000-0000-0000-000000000015', '20000000-0000-0000-0000-000000000003', 'logistik.mitratani@example.com', '$2b$10$hashedpassword', 'Eko Prasetyo', '081234567804', 'PROCUREMENT_MANAGER', TRUE, '2026-02-01 14:00:00');
 
 -- 3. KYB Documents (15: 3 per tenant)
-INSERT INTO kyb_documents (id, tenant_id, doc_type, file_url, status, verified_by, verified_at, created_at) VALUES
+INSERT IGNORE INTO kyb_documents (id, tenant_id, doc_type, file_url, status, verified_by, verified_at, created_at) VALUES
 ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'NIB', 'https://storage.pasokmataram.com/kyb/gudeg-nib.pdf', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:00:00', '2026-01-10 09:00:00'),
 ('40000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'KTP', 'https://storage.pasokmataram.com/kyb/gudeg-ktp.jpg', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:05:00', '2026-01-10 09:05:00'),
 ('40000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'NPWP', 'https://storage.pasokmataram.com/kyb/gudeg-npwp.pdf', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:10:00', '2026-01-10 09:10:00'),
@@ -46,7 +46,7 @@ INSERT INTO kyb_documents (id, tenant_id, doc_type, file_url, status, verified_b
 ('40000000-0000-0000-0000-000000000015', '20000000-0000-0000-0000-000000000003', 'KTP', 'https://storage.pasokmataram.com/kyb/mitratani-ktp.jpg', 'PENDING_VERIFICATION', NULL, NULL, '2026-02-01 13:40:00');
 
 -- 4. Business outlets (8: main + branches)
-INSERT INTO business_outlets (id, tenant_id, outlet_name, regency, address, is_primary, created_at) VALUES
+INSERT IGNORE INTO business_outlets (id, tenant_id, outlet_name, regency, address, is_primary, created_at) VALUES
 ('50000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Gudeg Yu Djum Pusat Sleman', 'SLEMAN', 'Jl. Kaliurang KM 5, Sleman', TRUE, '2026-01-10 08:30:00'),
 ('50000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'Gudeg Yu Djum Cabang Bantul', 'BANTUL', 'Jl. Imogiri Timur KM 3, Bantul', FALSE, '2026-01-11 10:00:00'),
 ('50000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'Gudeg Yu Djum Cabang Kota', 'KOTA_YOGYAKARTA', 'Jl. Malioboro No 45, Kota Yogyakarta', FALSE, '2026-01-12 09:00:00'),
@@ -57,7 +57,7 @@ INSERT INTO business_outlets (id, tenant_id, outlet_name, regency, address, is_p
 ('50000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000002', 'RM Padang Cabang Sleman', 'SLEMAN', 'Jl. Seturan Raya No 12, Sleman', FALSE, '2026-01-15 11:00:00');
 
 -- 5. Commodities (10 items with English categories)
-INSERT INTO commodities (id, code, name, category, origin_region, unit, is_active, created_at) VALUES
+INSERT IGNORE INTO commodities (id, code, name, category, origin_region, unit, is_active, created_at) VALUES
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CABAI_MERAH', 'Cabai Merah Keriting', 'PERISHABLE_VEGETABLE', 'Sleman & Bantul', 'kg', TRUE, '2026-01-01 00:00:00'),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'BAWANG_MERAH', 'Bawang Merah Brebes', 'PERISHABLE_VEGETABLE', 'Kulon Progo & Bantul', 'kg', TRUE, '2026-01-01 00:00:00'),
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'BAWANG_PUTIH', 'Bawang Putih Kating', 'PERISHABLE_VEGETABLE', 'Nasional / Impor', 'kg', TRUE, '2026-01-01 00:00:00'),
@@ -74,13 +74,13 @@ INSERT INTO commodities (id, code, name, category, origin_region, unit, is_activ
 -- Seed focuses on structural data for business flow testing.
 
 -- 6. Supplier profiles
-INSERT INTO supplier_profiles (id, tenant_id, business_description, certifications, production_capacity_kg, delivery_radius_km, created_at) VALUES
+INSERT IGNORE INTO supplier_profiles (id, tenant_id, business_description, certifications, production_capacity_kg, delivery_radius_km, created_at) VALUES
 ('60000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'Gapoktan dengan 45 anggota petani sayur organik', '[]', 5000.00, 50, '2026-01-11 12:00:00'),
 ('60000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 'Gapoktan fokus beras premium dan jagung', '[]', 10000.00, 80, '2026-01-14 09:00:00'),
 ('60000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', 'Gapoktan mixed vegetables dan unggas', '[]', 3000.00, 30, '2026-02-01 14:30:00');
 
 -- 7. Supplier products (20 items)
-INSERT INTO supplier_products (id, supplier_tenant_id, commodity_name, price_per_kg, stock_kg, is_available, created_at) VALUES
+INSERT IGNORE INTO supplier_products (id, supplier_tenant_id, commodity_name, price_per_kg, stock_kg, is_available, created_at) VALUES
 ('70000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'Cabai Merah Keriting', 48000.00, 150.00, TRUE, '2026-01-11 12:30:00'),
 ('70000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', 'Bawang Merah', 42000.00, 200.00, TRUE, '2026-01-11 12:35:00'),
 ('70000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000001', 'Bayam Hijau', 8000.00, 80.00, TRUE, '2026-01-11 12:40:00'),
@@ -103,7 +103,7 @@ INSERT INTO supplier_products (id, supplier_tenant_id, commodity_name, price_per
 ('70000000-0000-0000-0000-000000000020', '20000000-0000-0000-0000-000000000003', 'Cabai Merah Keriting', 47500.00, 80.00, TRUE, '2026-02-01 16:30:00');
 
 -- 8. B2B reviews (12 reviews, bidirectional)
-INSERT INTO b2b_reviews (id, reviewer_tenant_id, reviewee_tenant_id, rating, comment, created_at) VALUES
+INSERT IGNORE INTO b2b_reviews (id, reviewer_tenant_id, reviewee_tenant_id, rating, comment, created_at) VALUES
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 5, 'Cabai selalu segar, pengiriman tepat waktu!', '2026-01-20 10:00:00'),
 ('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', 4, 'Beras berkualitas, harga bersaing.', '2026-01-22 11:00:00'),
 ('80000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', 5, 'Sayuran organik terbaik di DIY!', '2026-01-23 09:00:00'),
@@ -118,7 +118,7 @@ INSERT INTO b2b_reviews (id, reviewer_tenant_id, reviewee_tenant_id, rating, com
 ('80000000-0000-0000-0000-000000000012', '20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 5, 'Mitra terpercaya, repeat order tinggi.', '2026-02-08 15:00:00');
 
 -- 9. Review tags
-INSERT INTO review_tags (review_id, tag) VALUES
+INSERT IGNORE INTO review_tags (review_id, tag) VALUES
 ('80000000-0000-0000-0000-000000000001', 'segar'),
 ('80000000-0000-0000-0000-000000000001', 'tepat_waktu'),
 ('80000000-0000-0000-0000-000000000002', 'berkualitas'),
@@ -145,7 +145,7 @@ INSERT INTO review_tags (review_id, tag) VALUES
 ('80000000-0000-0000-0000-000000000012', 'repeat_order');
 
 -- 10. Pooling campaigns (5: 3 OPEN, 1 CLOSED, 1 FULL)
-INSERT INTO pooling_campaigns (id, supplier_tenant_id, commodity_name, commodity_category, temperature_zone, target_quota_kg, allocated_quota_kg, price_per_kg, status, starts_at, ends_at, created_at) VALUES
+INSERT IGNORE INTO pooling_campaigns (id, supplier_tenant_id, commodity_name, commodity_category, temperature_zone, target_quota_kg, allocated_quota_kg, price_per_kg, status, starts_at, ends_at, created_at) VALUES
 ('90000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'Cabai Merah Keriting', 'PERISHABLE_VEGETABLE', 'CHILLED', 500.00, 320.00, 48000.00, 'OPEN', '2026-02-01 00:00:00', '2026-02-15 23:59:59', '2026-01-30 10:00:00'),
 ('90000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 'Beras Premium Sleman', 'GRAIN', 'AMBIENT_VENTILATED', 1000.00, 450.00, 14500.00, 'OPEN', '2026-02-01 00:00:00', '2026-02-20 23:59:59', '2026-01-30 11:00:00'),
 ('90000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', 'Telur Ayam Negeri', 'PROCESSED', 'CHILLED', 300.00, 180.00, 28000.00, 'OPEN', '2026-02-03 00:00:00', '2026-02-17 23:59:59', '2026-02-01 09:00:00'),
@@ -153,7 +153,7 @@ INSERT INTO pooling_campaigns (id, supplier_tenant_id, commodity_name, commodity
 ('90000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000002', 'Jagung Pipilan', 'GRAIN', 'AMBIENT_VENTILATED', 600.00, 600.00, 9000.00, 'CLOSED', '2026-01-15 00:00:00', '2026-01-30 23:59:59', '2026-01-12 08:00:00');
 
 -- 11. Pool reservations (10: mix statuses, MTV Rp 500k enforced)
-INSERT INTO pool_reservations (id, campaign_id, buyer_tenant_id, quantity_kg, price_per_kg, total_amount_rp, status, delivery_address, va_number, payment_reference, created_at) VALUES
+INSERT IGNORE INTO pool_reservations (id, campaign_id, buyer_tenant_id, quantity_kg, price_per_kg, total_amount_rp, status, delivery_address, va_number, payment_reference, created_at) VALUES
 ('a1000000-0000-0000-0000-000000000001', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 150.00, 48000.00, 7200000.00, 'PAID', 'Jl. Kaliurang KM 5, Sleman', 'VA8001234567890', 'PAY-20260202-001', '2026-02-02 09:00:00'),
 ('a1000000-0000-0000-0000-000000000002', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002', 100.00, 48000.00, 4800000.00, 'ALLOCATED', 'Jl. Parangtritis KM 2, Bantul', 'VA8001234567891', 'PAY-20260203-002', '2026-02-03 10:00:00'),
 ('a1000000-0000-0000-0000-000000000003', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 70.00, 48000.00, 3360000.00, 'RECEIVED', 'Jl. Malioboro No 45, Kota Yogyakarta', 'VA8001234567892', 'PAY-20260204-003', '2026-02-04 11:00:00'),
@@ -166,7 +166,7 @@ INSERT INTO pool_reservations (id, campaign_id, buyer_tenant_id, quantity_kg, pr
 ('a1000000-0000-0000-0000-000000000010', '90000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000002', 200.00, 42000.00, 8400000.00, 'RECEIVED', 'Jl. Parangtritis KM 2, Bantul', 'VA8001234567899', 'PAY-20260126-010', '2026-01-26 11:00:00');
 
 -- 12. Weighing verifications (5: for RECEIVED reservations)
-INSERT INTO weighing_verifications (id, reservation_id, hub_id, operator_id, commodity_category, temperature_zone, measured_temp_celsius, manifest_weight_kg, actual_weight_kg, weight_difference_kg, shrinkage_percentage, tolerance_status, created_at) VALUES
+INSERT IGNORE INTO weighing_verifications (id, reservation_id, hub_id, operator_id, commodity_category, temperature_zone, measured_temp_celsius, manifest_weight_kg, actual_weight_kg, weight_difference_kg, shrinkage_percentage, tolerance_status, created_at) VALUES
 ('b1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'HUB-SLEMAN-01', '30000000-0000-0000-0000-000000000009', 'PERISHABLE_VEGETABLE', 'CHILLED', 4.5, 70.00, 69.20, -0.80, 1.14, 'WITHIN_TOLERANCE', '2026-02-05 08:00:00'),
 ('b1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000006', 'HUB-BANTUL-01', '30000000-0000-0000-0000-000000000011', 'GRAIN', 'AMBIENT_VENTILATED', 25.0, 100.00, 99.50, -0.50, 0.50, 'WITHIN_TOLERANCE', '2026-02-08 09:00:00'),
 ('b1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000009', 'HUB-SLEMAN-01', '30000000-0000-0000-0000-000000000009', 'PERISHABLE_VEGETABLE', 'AMBIENT_VENTILATED', 22.0, 200.00, 198.00, -2.00, 1.00, 'WITHIN_TOLERANCE', '2026-01-26 10:00:00'),
@@ -174,7 +174,7 @@ INSERT INTO weighing_verifications (id, reservation_id, hub_id, operator_id, com
 ('b1000000-0000-0000-0000-000000000005', 'a1000000-0000-0000-0000-000000000006', 'HUB-BANTUL-01', '30000000-0000-0000-0000-000000000011', 'GRAIN', 'AMBIENT_VENTILATED', 26.0, 100.00, 100.20, 0.20, -0.20, 'SURPLUS', '2026-02-08 10:00:00');
 
 -- 13. Escrow settlements (8: mix statuses)
-INSERT INTO escrow_settlements (id, reservation_id, escrow_account_number, locked_amount_rp, disbursed_amount_rp, status, locked_at, disbursed_at, created_at) VALUES
+INSERT IGNORE INTO escrow_settlements (id, reservation_id, escrow_account_number, locked_amount_rp, disbursed_amount_rp, status, locked_at, disbursed_at, created_at) VALUES
 ('c1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'ESC-20260202-001', 7200000.00, NULL, 'ESCROW_LOCKED', '2026-02-02 09:30:00', NULL, '2026-02-02 09:30:00'),
 ('c1000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'ESC-20260203-002', 4800000.00, NULL, 'ESCROW_LOCKED', '2026-02-03 10:30:00', NULL, '2026-02-03 10:30:00'),
 ('c1000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000003', 'ESC-20260204-003', 3360000.00, 3360000.00, 'DISBURSED', '2026-02-04 11:30:00', '2026-02-06 08:00:00', '2026-02-04 11:30:00'),
@@ -185,7 +185,7 @@ INSERT INTO escrow_settlements (id, reservation_id, escrow_account_number, locke
 ('c1000000-0000-0000-0000-000000000008', 'a1000000-0000-0000-0000-000000000010', 'ESC-20260126-010', 8400000.00, 8232000.00, 'DISBURSED', '2026-01-26 11:30:00', '2026-01-28 11:00:00', '2026-01-26 11:30:00');
 
 -- 14. Funnel telemetry (50 events tracking campaign journey)
-INSERT INTO funnel_telemetry_events (id, campaign_id, tenant_id, event_stage, event_timestamp, metadata) VALUES
+INSERT IGNORE INTO funnel_telemetry_events (id, campaign_id, tenant_id, event_stage, event_timestamp, metadata) VALUES
 ('d1000000-0000-0000-0000-000000000001', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'CAMPAIGN_VIEW', '2026-02-01 08:00:00', '{"source":"homepage"}'),
 ('d1000000-0000-0000-0000-000000000002', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'DETAIL_VIEW', '2026-02-01 08:05:00', '{"duration_sec":45}'),
 ('d1000000-0000-0000-0000-000000000003', '90000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'ADD_TO_CART', '2026-02-01 08:10:00', '{"quantity_kg":150}'),
@@ -195,7 +195,7 @@ INSERT INTO funnel_telemetry_events (id, campaign_id, tenant_id, event_stage, ev
 -- Additional 44 events omitted for brevity, pattern follows campaign → detail → cart → reservation → payment
 
 -- 15. Notifications (30: mix categories, 50% unread)
-INSERT INTO notifications (id, tenant_id, user_id, category, priority, title, body, action_url, payload, is_read, read_at, created_at) VALUES
+INSERT IGNORE INTO notifications (id, tenant_id, user_id, category, priority, title, body, action_url, payload, is_read, read_at, created_at) VALUES
 ('e1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'POOLING', 'HIGH', 'Kampanye Cabai Merah Baru Tersedia', 'Gapoktan Sido Makmur membuka pooling cabai merah 500kg, harga Rp 48.000/kg', '/pooling/90000000-0000-0000-0000-000000000001', '{"campaign_id":"90000000-0000-0000-0000-000000000001"}', FALSE, NULL, '2026-02-01 07:00:00'),
 ('e1000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'PAYMENT', 'URGENT', 'Pembayaran Berhasil', 'Pembayaran reservasi #a1000000-0000-0000-0000-000000000001 sebesar Rp 7.200.000 berhasil', '/reservations/a1000000-0000-0000-0000-000000000001', '{"reservation_id":"a1000000-0000-0000-0000-000000000001"}', TRUE, '2026-02-02 10:00:00', '2026-02-02 09:30:00'),
 ('e1000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', 'ORDER', 'NORMAL', 'Pesanan Dialokasikan', 'Pesanan cabai merah 150kg telah dialokasikan untuk pengiriman', '/orders/a1000000-0000-0000-0000-000000000001', '{"reservation_id":"a1000000-0000-0000-0000-000000000001"}', FALSE, NULL, '2026-02-03 08:00:00'),
@@ -204,7 +204,7 @@ INSERT INTO notifications (id, tenant_id, user_id, category, priority, title, bo
 -- Additional 25 notifications omitted, mix of POOLING, PAYMENT, ORDER, KYB_STATUS, SYSTEM
 
 -- 16. User push subscriptions (5 dummy endpoints for testing)
-INSERT INTO user_push_subscriptions (id, tenant_id, user_id, endpoint, p256dh_key, auth_key, user_agent, is_active, created_at) VALUES
+INSERT IGNORE INTO user_push_subscriptions (id, tenant_id, user_id, endpoint, p256dh_key, auth_key, user_agent, is_active, created_at) VALUES
 ('f1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'https://fcm.googleapis.com/fcm/send/test-endpoint-1', 'BDummyP256dhKey1234567890ABCDEF', 'DummyAuthKey12345678', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', TRUE, '2026-02-01 09:00:00'),
 ('f1000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000006', 'https://fcm.googleapis.com/fcm/send/test-endpoint-2', 'BDummyP256dhKey1234567890ABCDEF', 'DummyAuthKey12345679', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', TRUE, '2026-02-02 10:00:00'),
 ('f1000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000008', 'https://fcm.googleapis.com/fcm/send/test-endpoint-3', 'BDummyP256dhKey1234567890ABCDEF', 'DummyAuthKey12345680', 'Chrome/120.0.0.0 Mobile Safari/537.36', TRUE, '2026-02-03 11:00:00'),
@@ -212,7 +212,7 @@ INSERT INTO user_push_subscriptions (id, tenant_id, user_id, endpoint, p256dh_ke
 ('f1000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', 'https://fcm.googleapis.com/fcm/send/test-endpoint-5', 'BDummyP256dhKey1234567890ABCDEF', 'DummyAuthKey12345682', 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)', FALSE, '2026-02-05 13:00:00');
 
 -- 17. Notification delivery logs (20: audit trail)
-INSERT INTO notification_delivery_logs (id, notification_id, channel, delivered_at, status) VALUES
+INSERT IGNORE INTO notification_delivery_logs (id, notification_id, channel, delivered_at, status) VALUES
 ('g1000000-0000-0000-0000-000000000001', 'e1000000-0000-0000-0000-000000000001', 'sse', '2026-02-01 07:00:05', 'DELIVERED'),
 ('g1000000-0000-0000-0000-000000000002', 'e1000000-0000-0000-0000-000000000001', 'push', '2026-02-01 07:00:10', 'DELIVERED'),
 ('g1000000-0000-0000-0000-000000000003', 'e1000000-0000-0000-0000-000000000002', 'sse', '2026-02-02 09:30:05', 'DELIVERED'),
@@ -224,19 +224,19 @@ INSERT INTO notification_delivery_logs (id, notification_id, channel, delivered_
 -- Additional 12 logs omitted
 
 -- 18. Payment invoices (8 records)
-INSERT INTO payment_invoices (id, tenant_id, reservation_id, external_invoice_id, reference, amount, currency, provider, payment_method, status, virtual_account_number, created_at) VALUES
+INSERT IGNORE INTO payment_invoices (id, tenant_id, reservation_id, external_invoice_id, reference, amount, currency, provider, payment_method, status, virtual_account_number, created_at) VALUES
 ('h1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'INV-20260202-001', 'REF-SSP-001', 7200000.00, 'IDR', 'solosmartpay', 'VA_BPD_DIY', 'PAID', '9888100123456789', '2026-02-02 09:00:00'),
 ('h1000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'INV-20260203-002', 'REF-SSP-002', 4800000.00, 'IDR', 'solosmartpay', 'QRIS', 'PAID', NULL, '2026-02-03 10:00:00'),
 ('h1000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'INV-20260204-003', 'REF-SSP-003', 3360000.00, 'IDR', 'solosmartpay', 'VA_MANDIRI', 'PAID', '8890100123456789', '2026-02-04 11:00:00'),
 ('h1000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000004', 'INV-20260205-004', 'REF-SSP-004', 2900000.00, 'IDR', 'solosmartpay', 'VA_BNI', 'PAID', '8810100123456789', '2026-02-05 08:00:00');
 
 -- 19. Webhook events (Idempotency logs)
-INSERT INTO webhook_events (id, provider, external_event_id, payload, received_at) VALUES
+INSERT IGNORE INTO webhook_events (id, provider, external_event_id, payload, received_at) VALUES
 ('i1000000-0000-0000-0000-000000000001', 'SOLOSMARTPAY', 'EVT-SSP-001', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260202-001\",\"amount\":7200000}', '2026-02-02 09:30:00'),
 ('i1000000-0000-0000-0000-000000000002', 'SOLOSMARTPAY', 'EVT-SSP-002', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260203-002\",\"amount\":4800000}', '2026-02-03 10:30:00');
 
 -- 20. Terms acceptances
-INSERT INTO terms_acceptances (id, user_id, document_type, document_version, accepted_at, ip_address) VALUES
+INSERT IGNORE INTO terms_acceptances (id, user_id, document_type, document_version, accepted_at, ip_address) VALUES
 ('j1000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', 'TERMS_OF_SERVICE', '1.5.0', '2026-01-10 08:30:00', '127.0.0.1'),
 ('j1000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000005', 'TERMS_OF_SERVICE', '1.5.0', '2026-01-12 10:00:00', '127.0.0.1');
 

@@ -37,32 +37,35 @@ async function runMigrations() {
   let connection: mysql.Connection | null = null;
 
   try {
-    const rootConnection = await mysql.createConnection({
-      host: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      multipleStatements: true,
-    });
+    try {
+      const rootConnection = await mysql.createConnection({
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        password: config.password,
+        multipleStatements: true,
+      });
 
-    console.log('Connected to MySQL server\n');
-
-    console.log(` Creating database "${config.database}" if not exists...`);
-    await rootConnection.query(
-      `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    );
-    console.log(`Database "${config.database}" ready\n`);
-
-    await rootConnection.end();
+      console.log('Connected to MySQL server\n');
+      console.log(` Creating database "${config.database}" if not exists...`);
+      await rootConnection.query(
+        `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      );
+      console.log(`Database "${config.database}" ready\n`);
+      await rootConnection.end();
+    } catch {
+      console.log('Note: Root database creation skipped (normal for cPanel/shared hosts). Connecting directly.\n');
+    }
 
     connection = await mysql.createConnection(config);
 
     const candidateDirs = [
       join(__dirname, '../src/schema'),
+      join(process.cwd(), 'packages/database/src/schema'),
+      join(process.cwd(), 'docker/mysql/init'),
+      join(__dirname, '../../../docker/mysql/init'),
       join(__dirname, '../schema'),
       join(__dirname, '../migrations'),
-      join(process.cwd(), 'packages/database/src/schema'),
-      join(process.cwd(), 'packages/database/migrations'),
     ];
 
     let migrationsDir = '';

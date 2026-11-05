@@ -24,7 +24,8 @@ import { ForecastInsightCards } from '../../../components/forecast/forecast-insi
  * Membantu kepala dapur dan manajer purchasing merencanakan menu dan pesanan bahan baku lebih hemat.
  */
 export default function BuyerForecastPage() {
-  const defaultCommodity = MOCK_COMMODITY_FORECASTS[0] as CommodityForecast;
+  const [forecastList, setForecastList] = React.useState<CommodityForecast[]>([...MOCK_COMMODITY_FORECASTS]);
+  const defaultCommodity = (forecastList[0] || MOCK_COMMODITY_FORECASTS[0]) as CommodityForecast;
   const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>(
     defaultCommodity.id
   );
@@ -34,6 +35,16 @@ export default function BuyerForecastPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const pickerRef = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    fetch('/api/v1/forecast')
+      .then((r) => r.json())
+      .then((resData) => {
+        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
+          setForecastList(resData.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
@@ -46,16 +57,17 @@ export default function BuyerForecastPage() {
 
   const filteredCommodities = React.useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return MOCK_COMMODITY_FORECASTS;
-    return MOCK_COMMODITY_FORECASTS.filter(
+    if (!q) return forecastList;
+    return forecastList.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.originRegion.toLowerCase().includes(q) ||
         c.category.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [forecastList, searchQuery]);
+
   const selectedCommodity: CommodityForecast =
-    MOCK_COMMODITY_FORECASTS.find((c) => c.id === selectedCommodityId) ||
+    forecastList.find((c) => c.id === selectedCommodityId) ||
     defaultCommodity;
 
   const handleRefresh = () => {

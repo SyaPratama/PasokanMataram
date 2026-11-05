@@ -64,6 +64,33 @@ export default function SupplierMarketPage() {
     MOCK_ECOSYSTEM_PRODUCTS.filter((p) => p.supplierName.includes('Turi') || p.supplierName.includes('Panjatan'))
   );
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch('/api/v1/supplier/products')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: SupplierProduct[] = data.data.map((p: any, idx: number) => ({
+            id: p.id || `prod-${idx + 1}`,
+            supplierTenantId: p.supplierTenantId || '20000000-0000-0000-0000-000000000001',
+            supplierName: p.supplierName || 'Gapoktan Sido Makmur',
+            name: p.name || 'Cabai Merah Keriting',
+            category: 'Hasil Tani Segar',
+            skuCode: `SKU-${idx + 100}`,
+            unit: 'kg',
+            price: Number(p.pricePerKg) || 45000,
+            minOrderQty: 10,
+            stockAvailable: Number(p.stockKg) || 200,
+            leadTimeHours: 12,
+            storageZone: 'CHILLED',
+            certifications: ['SNI', 'Organik'],
+            isAvailable: Boolean(p.isAvailable),
+          }));
+          setProducts(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [newProductName, setNewProductName] = React.useState('');
   const [newProductCategory, setNewProductCategory] = React.useState('Unggas & Telur');
   const [newProductPrice, setNewProductPrice] = React.useState('');

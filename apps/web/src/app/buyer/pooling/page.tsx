@@ -114,6 +114,15 @@ export default function BuyerPoolingPage() {
   } | null>(null);
 
   React.useEffect(() => {
+    fetch('/api/v1/pooling/campaigns')
+      .then((r) => r.json())
+      .then((resData) => {
+        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
+          setPools(resData.data);
+        }
+      })
+      .catch(() => {});
+
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
       if (match && match[1]) {

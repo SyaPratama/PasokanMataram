@@ -24,6 +24,26 @@ export default function OutletsPage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [successToast, setSuccessToast] = React.useState<string | null>(null);
 
+  React.useEffect(() => {
+    fetch('/api/v1/outlets')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: MockOutlet[] = data.data.map((o: any, idx: number) => ({
+            id: o.id || `out-${idx + 1}`,
+            name: o.name || 'Gerai Cabang',
+            regency: o.regency || 'SLEMAN',
+            streetAddress: o.address || 'Jl. Kaliurang KM 5',
+            contactPerson: 'Manajer Operasional',
+            contactPhone: '+6281234567890',
+            isPrimary: Boolean(o.isPrimary),
+          }));
+          setOutlets(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   /**
    * Menangani penambahan outlet baru dari dialog modal.
    */

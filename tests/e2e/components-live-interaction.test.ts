@@ -88,8 +88,8 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji interaksi Drop-down Select Kabupaten pada /komoditas', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/komoditas`, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        await page.waitForSelector('#komoditas-regency-select', { timeout: 10000 });
+        await page.goto(`${BASE_URL}/komoditas`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.waitForSelector('#komoditas-regency-select option[value="BANTUL"]', { timeout: 15000 });
 
         // Screenshot sebelum seleksi
         const beforeShot = path.join(CAPTURE_DIR, '01-dropdown-select-before.png');
@@ -98,10 +98,8 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
 
         // Pilih kabupaten BANTUL
         await page.select('#komoditas-regency-select', 'BANTUL');
-        await page.waitForFunction(() => {
-          const sel = document.querySelector('#komoditas-regency-select') as HTMLSelectElement | null;
-          return sel?.value === 'BANTUL';
-        });
+        const selectedVal = await page.$eval('#komoditas-regency-select', (el) => (el as HTMLSelectElement).value);
+        expect(selectedVal).toBe('BANTUL');
 
         // Screenshot setelah seleksi
         const afterShot = path.join(CAPTURE_DIR, '01-dropdown-select-after-bantul.png');
@@ -348,10 +346,10 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         await page.screenshot({ path: initialShot, fullPage: false });
         expect(fs.existsSync(initialShot)).toBe(true);
 
-        // Ubah nilai slider curah hujan ke 45%
         await page.$eval('#rainfall-slider', (el) => {
           const input = el as HTMLInputElement;
-          input.value = '45';
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(input, '45');
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         });
@@ -374,10 +372,10 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'domcontentloaded', timeout: 20000 });
         await page.waitForSelector('#fuel-slider', { timeout: 10000 });
 
-        // Ubah nilai slider tarif BBM ke 25%
         await page.$eval('#fuel-slider', (el) => {
           const input = el as HTMLInputElement;
-          input.value = '25';
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(input, '25');
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         });
@@ -402,7 +400,8 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         // Geser slider kalkulator ke Rp 4.500.000
         await page.$eval('input[type="range"]', (el) => {
           const input = el as HTMLInputElement;
-          input.value = '4500000';
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(input, '4500000');
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         });

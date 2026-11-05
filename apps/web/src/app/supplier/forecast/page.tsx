@@ -21,15 +21,27 @@ import { ForecastInsightCards } from '../../../components/forecast/forecast-insi
  * Membantu kelompok tani menentukan jadwal petik optimal dan memprediksi nilai tampung di Hub Transit.
  */
 export default function SupplierForecastPage() {
-  const defaultCommodity = MOCK_COMMODITY_FORECASTS[0] as CommodityForecast;
+  const [forecastList, setForecastList] = React.useState<CommodityForecast[]>([...MOCK_COMMODITY_FORECASTS]);
+  const defaultCommodity = (forecastList[0] || MOCK_COMMODITY_FORECASTS[0]) as CommodityForecast;
   const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>(
     defaultCommodity.id
   );
   const [horizon, setHorizon] = React.useState<ForecastHorizon>(30);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
 
+  React.useEffect(() => {
+    fetch('/api/v1/forecast')
+      .then((r) => r.json())
+      .then((resData) => {
+        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
+          setForecastList(resData.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const selectedCommodity: CommodityForecast =
-    MOCK_COMMODITY_FORECASTS.find((c) => c.id === selectedCommodityId) ||
+    forecastList.find((c) => c.id === selectedCommodityId) ||
     defaultCommodity;
 
   const handleRefresh = () => {

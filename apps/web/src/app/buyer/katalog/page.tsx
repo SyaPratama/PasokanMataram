@@ -33,14 +33,42 @@ const CATEGORIES = [
 ];
 
 export default function BuyerKatalogPage() {
+  const [products, setProducts] = React.useState<SupplierProduct[]>(MOCK_ECOSYSTEM_PRODUCTS);
   const [selectedCategory, setSelectedCategory] = React.useState('Semua');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeSupplierModal, setActiveSupplierModal] = React.useState<SupplierProfile | null>(null);
   const [orderNotice, setOrderNotice] = React.useState<string | null>(null);
   const [isKybVerified, setIsKybVerified] = React.useState<boolean>(true);
   const [isKybModalOpen, setIsKybModalOpen] = React.useState<boolean>(false);
-
   React.useEffect(() => {
+    fetch('/api/v1/supplier/products')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: SupplierProduct[] = data.data.map((p: any, idx: number) => ({
+            id: p.id || `sp-${idx + 1}`,
+            supplierTenantId: p.supplierTenantId || '20000000-0000-0000-0000-000000000001',
+            supplierName: p.supplierName || 'Gapoktan Sido Makmur',
+            name: p.name || 'Cabai Merah Keriting',
+            category: 'Hasil Tani Segar',
+            skuCode: `SKU-${(p.name || 'PRD').slice(0, 3).toUpperCase()}-${idx + 1}`,
+            unit: 'kg',
+            pricePerUnit: Number(p.pricePerKg) || 45000,
+            minimumOrderQuantity: 10,
+            availableStock: Number(p.stockKg) || 100,
+            leadTimeHours: 12,
+            storageTemperatureZone: 'CHILLED',
+            originRegion: p.regency || 'Sleman',
+            harvestDate: new Date().toISOString().slice(0, 10),
+            isAvailable: Boolean(p.isAvailable),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }));
+          setProducts(mapped);
+        }
+      })
+      .catch(() => {});
+
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
       if (match && match[1]) {
@@ -48,7 +76,7 @@ export default function BuyerKatalogPage() {
       }
     }
   }, []);
-  const filteredProducts = MOCK_ECOSYSTEM_PRODUCTS.filter((item) => {
+  const filteredProducts = products.filter((item) => {
     const matchCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
     const matchSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

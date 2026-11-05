@@ -71,8 +71,27 @@ export default function BuyerOrdersPage() {
   const [notification, setNotification] = React.useState<string | null>(null);
   const [isKybVerified, setIsKybVerified] = React.useState<boolean>(true);
   const [isKybModalOpen, setIsKybModalOpen] = React.useState<boolean>(false);
-
   React.useEffect(() => {
+    fetch('/api/v1/orders')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: StandingOrder[] = data.data.map((o: any, idx: number) => ({
+            id: o.id || `SO-2026-${100 + idx}`,
+            commodity: o.commodity || 'Cabai Merah Keriting',
+            origin: o.supplierName || 'Sentra Panen DIY',
+            frequency: 'Setiap Hari (Senin - Minggu)',
+            dailyVolumeKg: Number(o.quantityKg) || 25,
+            unitPrice: Number(o.pricePerKg) || 45000,
+            totalWeeklyIdr: (Number(o.quantityKg) || 25) * (Number(o.pricePerKg) || 45000) * 7,
+            deliveryTime: '04:30 WIB',
+            status: (o.status === 'PAID' || o.status === 'ALLOCATED' ? 'VERIFIED' : o.status === 'RECEIVED' ? 'ACTIVE' : 'PENDING') as any,
+          }));
+          setOrders(mapped);
+        }
+      })
+      .catch(() => {});
+
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
       if (match && match[1]) {

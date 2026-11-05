@@ -33,12 +33,32 @@ interface TenantIdentity {
 }
 
 export default function BuyerDashboardPage() {
-  const [orders] = React.useState<MockStandingOrder[]>(MOCK_STANDING_ORDERS);
+  const [orders, setOrders] = React.useState<MockStandingOrder[]>(MOCK_STANDING_ORDERS);
   const [currentRole, setCurrentRole] = React.useState<MicroRole>('HEAD_CHEF');
   const [kybModalOpen, setKybModalOpen] = React.useState(false);
   const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
   const [loadingTenant, setLoadingTenant] = React.useState(true);
 
+  React.useEffect(() => {
+    fetch('/api/v1/orders')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: MockStandingOrder[] = data.data.map((o: any, idx: number) => ({
+            id: o.id || `SO-${idx + 1}`,
+            commodityName: o.commodity || 'Cabai Merah Keriting',
+            outletName: o.deliveryAddress || 'Dapur Pusat Sleman',
+            quantityKg: Number(o.quantityKg) || 25,
+            unitPriceRp: Number(o.pricePerKg) || 48000,
+            deliveryWindow: 'Subuh 04:30 - 05:30 WIB',
+            status: (o.status === 'PAID' || o.status === 'ALLOCATED' ? 'CONFIRMED' : o.status === 'RECEIVED' ? 'ACTIVE' : 'PENDING') as any,
+            driverName: 'Slamet - Armada Subuh Bantul',
+          }));
+          setOrders(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
   React.useEffect(() => {
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/pasok_session_role=([^;]+)/);

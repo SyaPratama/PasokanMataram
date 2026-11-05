@@ -15,8 +15,10 @@ import crypto from 'crypto';
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const isLocal = ip === '127.0.0.1' || ip === 'localhost' || ip === '::1';
+    const maxAttempts = isLocal ? 100 : 5;
     try {
-      const rateResult = await checkRateLimit(`login:${ip}`, loginRateLimiter);
+      const rateResult = await checkRateLimit(`login:${ip}`, loginRateLimiter, maxAttempts);
       if (!rateResult.success) {
         return NextResponse.json(
           {

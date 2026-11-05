@@ -76,8 +76,8 @@ PasokMataram/
 
 ### Layanan Backend & Basis Data
 - **API Gateway**: NestJS 10 dengan Express engine dan TypeScript ketat (strict mode, zero `any`)
-- **Basis Data Utama**: MySQL 8.0 (Normalisasi 3NF, connection pool `mysql2`, isolasi multi-tenant)
-- **Cache & Mutex Lock**: Redis 7 (Mendukung TCP port `6379` dan Unix Domain Socket `unix:///...` cPanel)
+- **Basis Data Utama**: MySQL 8.0 (Arsitektur 26 Tabel 4NF, connection pool `mysql2`, isolasi multi-tenant `withTenantContext`, Smart Seed Gate)
+- **Cache & Mutex Lock**: Redis 7 (Mendukung TCP port `6379` dan Unix Domain Socket `unix:///...` cPanel, TTL 300s untuk ML forecasts)
 - **Penyimpanan Berkas Legalitas**: MinIO / S3 Object Storage API dengan presigned URL
 
 ### Payment Gateway & Perbankan
@@ -120,11 +120,12 @@ PasokMataram/
    ```
    Salin nilai dari `.env.development.example` ke `.env.development` atau `.env.local`.
 
-4. **Jalankan Migrasi Basis Data**:
+4. **Jalankan Migrasi & Seeding Basis Data**:
    ```bash
    npm run db:migrate
+   npm run db:seed
    ```
-
+   *Catatan Mitigasi*: Skrip seeding dilindungi oleh **Smart Seed Gate** (`SELECT COUNT(*) FROM tenants`), hanya mengisi basis data jika kosong dan tidak akan menimpa data produksi yang aktif.
 5. **Jalankan Server Pengembangan**:
    ```bash
    npm run dev
@@ -220,5 +221,6 @@ Untuk pertanyaan teknis, pelaporan kendala infrastruktur, dan informasi pengemba
 
 ## 11. Lisensi & Hak Cipta
 
-Hak Cipta (c) 2026 Tim Pengembang PasokMataram. Seluruh hak cipta dilindungi undang-undang.
+Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).  
+Hak Cipta (c) 2026 PT Pasok Mataram Nusantara. Seluruh hak cipta dilindungi undang-undang.
 Platform ini dikembangkan untuk digitalisasi dan efisiensi pengadaan pangan usaha kuliner D.I. Yogyakarta.

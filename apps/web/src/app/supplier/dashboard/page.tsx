@@ -28,9 +28,29 @@ interface TenantIdentity {
 }
 
 export default function SupplierDashboardPage() {
-  const [commitments] = React.useState<MockHarvestCommitment[]>(MOCK_HARVEST_COMMITMENTS);
+  const [commitments, setCommitments] = React.useState<MockHarvestCommitment[]>(MOCK_HARVEST_COMMITMENTS);
   const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
   const [loadingTenant, setLoadingTenant] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/v1/pooling/campaigns')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const mapped: MockHarvestCommitment[] = data.data.map((c: any, idx: number) => ({
+            id: c.id || `HC-2026-${idx + 1}`,
+            commodityName: c.commodity || 'Cabai Merah Keriting',
+            harvestDate: 'Panen Subuh Terjadwal',
+            estimatedYieldKg: Number(c.targetQuotaKg) || 500,
+            allocatedHubKg: Number(c.currentCollectedKg) || 320,
+            hubDestination: 'Sentra Hub Transit Bantul',
+            status: (c.status === 'OPEN' ? 'ALLOCATED' : c.status === 'FULL' ? 'VERIFIED' : 'PENDING') as any,
+          }));
+          setCommitments(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   React.useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -52,7 +72,6 @@ export default function SupplierDashboardPage() {
       fetchTenant();
     }
   }, []);
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-netral-border/60 pb-4">
