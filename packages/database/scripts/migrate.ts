@@ -106,7 +106,7 @@ async function runMigrations() {
         continue;
       }
 
-      console.log(`⏳ Running: ${file.filename}...`);
+      console.log(`  Applying migration: ${file.filename}...`);
 
       try {
         await connection.query(sql);

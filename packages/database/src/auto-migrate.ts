@@ -107,7 +107,7 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
       }
       try {
         await connection.query(sql);
-        log(`[Auto-Migration] ✓ ${file.filename}`);
+        log(`[Auto-Migration] APPLIED: ${file.filename}`);
       } catch (error: unknown) {
         const mysqlError = error as { code?: string; message?: string };
         const ignorableCodes = [

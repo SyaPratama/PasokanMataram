@@ -91,7 +91,7 @@ async function seedDatabase() {
     );
     console.log(`  admin@pasokmataram.com / Admin123!\n`);
 
-    console.log('🌾 Seeding Suppliers...');
+    console.log('Seeding Suppliers...');
     const suppliers = [
       {
         email: 'supplier.sayur@test.com',
@@ -154,7 +154,7 @@ async function seedDatabase() {
     }
     console.log();
 
-    console.log('🍽  Seeding Buyers...');
+    console.log('Seeding Buyers...');
     const buyers = [
       {
         email: 'buyer.hotel@test.com',
@@ -262,7 +262,7 @@ async function seedDatabase() {
         reservedKg: 450,
         pricePerKg: 8500,
         minReservationKg: 50,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 days
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
       {
         commodity: 'Kubis Putih',
@@ -270,7 +270,7 @@ async function seedDatabase() {
         reservedKg: 320,
         pricePerKg: 6000,
         minReservationKg: 30,
-        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // +5 days
+        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       },
     ];
 
@@ -338,7 +338,7 @@ async function seedDatabase() {
     console.log('   - 2 Pooling Campaigns');
     console.log('   - 3 Notifications');
     console.log();
-    console.log('🔐 Test Credentials:');
+    console.log('Test Credentials:');
     console.log('   Admin:    admin@pasokmataram.com / Admin123!');
     console.log('   Supplier: supplier.sayur@test.com / Supplier123!');
     console.log('   Buyer:    buyer.hotel@test.com / Buyer123!');

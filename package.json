@@ -22,7 +22,8 @@
     "db:seed": "tsx packages/database/scripts/seed.ts",
     "db:reset": "npm run db:migrate && npm run db:seed",
     "db:sandbox:reset": "node scripts/db-clean-sandbox.mjs",
-    "audit:cleanliness": "node scripts/audit-cleanliness.mjs"
+    "audit:cleanliness": "node scripts/audit-cleanliness.mjs",
+    "prebuild": "node scripts/patch-next-font.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.670.0",
