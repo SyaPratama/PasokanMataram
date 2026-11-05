@@ -27,6 +27,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV CI=true
 RUN npm run build
 
 FROM base AS runner
