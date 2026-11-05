@@ -41,8 +41,8 @@ jobs:
       - name: Run database migrations
         run: |
           if [ -z "$DB_HOST" ] || [ -z "$DB_PASSWORD" ]; then
-            echo "Database secrets (DB_HOST / DB_PASSWORD) not configured. Skipping pre-deploy migration."
-            exit 0
+            echo "::error::Database secrets (DB_HOST / DB_PASSWORD) are required for mandatory production deployment migration."
+            exit 1
           fi
           npm run db:migrate
         env:
@@ -51,7 +51,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
-        continue-on-error: true
+        continue-on-error: false
       
       - name: Build web with Next.js standalone output
         run: npm run build -- --filter=@pasok/web

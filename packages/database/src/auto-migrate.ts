@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
@@ -59,7 +59,28 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
 
     connection = await mysql.createConnection(config);
 
-    const migrationsDir = join(__dirname, '../migrations');
+    const candidateDirs = [
+      join(__dirname, './schema'),
+      join(__dirname, '../src/schema'),
+      join(__dirname, '../schema'),
+      join(__dirname, '../migrations'),
+      join(process.cwd(), 'packages/database/src/schema'),
+      join(process.cwd(), 'packages/database/migrations'),
+    ];
+
+    let migrationsDir = '';
+    for (const dir of candidateDirs) {
+      if (existsSync(dir) && readdirSync(dir).some((f) => f.endsWith('.sql'))) {
+        migrationsDir = dir;
+        break;
+      }
+    }
+
+    if (!migrationsDir) {
+      log(`[Auto-Migration] No migration directory found. Checked: ${candidateDirs.join(', ')}`);
+      return { success: true, migrationsRun: 0 };
+    }
+
     const files = readdirSync(migrationsDir)
       .filter((f) => f.endsWith('.sql'))
       .map((filename) => {
@@ -80,9 +101,27 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
     log(`[Auto-Migration] Running ${files.length} migration(s)...`);
 
     for (const file of files) {
-      const sql = readFileSync(file.path, 'utf-8');
-      await connection.query(sql);
-      log(`[Auto-Migration] ✓ ${file.filename}`);
+      const sql = readFileSync(file.path, 'utf-8').trim();
+      if (!sql) {
+        continue;
+      }
+      try {
+        await connection.query(sql);
+        log(`[Auto-Migration] ✓ ${file.filename}`);
+      } catch (error: unknown) {
+        const mysqlError = error as { code?: string; message?: string };
+        const ignorableCodes = [
+          'ER_TABLE_EXISTS_ERROR',
+          'ER_DUP_FIELDNAME',
+          'ER_DUP_KEYNAME',
+          'ER_CANT_DROP_FIELD_OR_KEY',
+        ];
+        if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
+          log(`[Auto-Migration] - ${file.filename} (already applied)`);
+        } else {
+          throw error;
+        }
+      }
     }
 
     log('[Auto-Migration] Complete!');

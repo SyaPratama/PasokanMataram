@@ -6,7 +6,7 @@
  * Creates database if not exists and runs all SQL migrations
  */
 
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
@@ -57,7 +57,28 @@ async function runMigrations() {
 
     connection = await mysql.createConnection(config);
 
-    const migrationsDir = join(__dirname, '../migrations');
+    const candidateDirs = [
+      join(__dirname, '../src/schema'),
+      join(__dirname, '../schema'),
+      join(__dirname, '../migrations'),
+      join(process.cwd(), 'packages/database/src/schema'),
+      join(process.cwd(), 'packages/database/migrations'),
+    ];
+
+    let migrationsDir = '';
+    for (const dir of candidateDirs) {
+      if (existsSync(dir) && readdirSync(dir).some((f) => f.endsWith('.sql'))) {
+        migrationsDir = dir;
+        break;
+      }
+    }
+
+    if (!migrationsDir) {
+      throw new Error(`Migration directory not found. Checked: ${candidateDirs.join(', ')}`);
+    }
+
+    console.log(`Loading migrations from: ${migrationsDir}\n`);
+
     const files = readdirSync(migrationsDir)
       .filter((f) => f.endsWith('.sql'))
       .map((filename) => {
@@ -72,23 +93,34 @@ async function runMigrations() {
       .sort((a, b) => a.order - b.order);
 
     if (files.length === 0) {
-      console.log('  No migration files found in packages/database/migrations/\n');
+      console.log(`  No migration files found in ${migrationsDir}\n`);
       return;
     }
 
     console.log(` Found ${files.length} migration file(s):\n`);
 
     for (const file of files) {
+      const sql = readFileSync(file.path, 'utf-8').trim();
+      if (!sql) {
+        console.log(`  Skipping empty file: ${file.filename}\n`);
+        continue;
+      }
+
       console.log(`⏳ Running: ${file.filename}...`);
-      const sql = readFileSync(file.path, 'utf-8');
 
       try {
         await connection.query(sql);
         console.log(`Completed: ${file.filename}\n`);
       } catch (error: unknown) {
         const mysqlError = error as { code?: string; message?: string };
-        if (mysqlError.code === 'ER_TABLE_EXISTS_ERROR') {
-          console.log(`  Table already exists, skipping: ${file.filename}\n`);
+        const ignorableCodes = [
+          'ER_TABLE_EXISTS_ERROR',
+          'ER_DUP_FIELDNAME',
+          'ER_DUP_KEYNAME',
+          'ER_CANT_DROP_FIELD_OR_KEY',
+        ];
+        if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
+          console.log(`  Already applied (${mysqlError.code}), skipping: ${file.filename}\n`);
         } else {
           throw error;
         }
