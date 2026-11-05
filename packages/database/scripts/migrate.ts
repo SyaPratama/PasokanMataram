@@ -97,8 +97,9 @@ async function runMigrations() {
 
     console.log('All migrations completed successfully!\n');
   } catch (error: unknown) {
-    const err = error as { message?: string; sql?: string };
-    console.error('\nMigration failed:', err.message || String(error));
+    const err = error as { message?: string; sql?: string; errors?: Error[] };
+    const detail = err.errors ? err.errors.map(e => e.message).join(', ') : (err.message || String(error));
+    console.error('\nMigration failed:', detail);
     if (err.sql) {
       console.error('Failed SQL:', err.sql);
     }

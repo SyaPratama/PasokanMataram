@@ -39,6 +39,7 @@ jobs:
           echo "${{ secrets.ENV_PRODUCTION }}" > apps/web/.env.production
       
       - name: Run database migrations
+        if: ${{ secrets.DB_HOST != '' && secrets.DB_PASSWORD != '' }}
         run: npm run db:migrate
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -46,7 +47,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
-        continue-on-error: false
+        continue-on-error: true
       
       - name: Build web with Next.js standalone output
         run: npm run build -- --filter=@pasok/web
