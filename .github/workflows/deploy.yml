@@ -58,7 +58,8 @@ jobs:
         env:
           NODE_ENV: production
           CI: true
-      
+          STANDALONE: 'true'
+          NEXT_OUTPUT_STANDALONE: 'true'
       - name: Package web standalone build (artifacts only, no TS sources)
         run: |
           mkdir -p web-dist
