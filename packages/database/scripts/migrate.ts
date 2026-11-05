@@ -118,6 +118,7 @@ async function runMigrations() {
           'ER_DUP_FIELDNAME',
           'ER_DUP_KEYNAME',
           'ER_CANT_DROP_FIELD_OR_KEY',
+          'ER_NO_SUCH_TABLE',
         ];
         if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
           console.log(`  Already applied (${mysqlError.code}), skipping: ${file.filename}\n`);

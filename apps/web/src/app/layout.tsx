@@ -12,6 +12,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-heading',
   display: 'swap',
   fallback: ['system-ui', 'sans-serif'],
+  adjustFontFallback: false,
 });
 
 const inter = Inter({
@@ -20,6 +21,7 @@ const inter = Inter({
   variable: '--font-body',
   display: 'swap',
   fallback: ['system-ui', 'sans-serif'],
+  adjustFontFallback: false,
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -28,6 +30,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
   display: 'swap',
   fallback: ['ui-monospace', 'monospace'],
+  adjustFontFallback: false,
 });
 
 export const viewport: Viewport = {

@@ -115,6 +115,7 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
           'ER_DUP_FIELDNAME',
           'ER_DUP_KEYNAME',
           'ER_CANT_DROP_FIELD_OR_KEY',
+          'ER_NO_SUCH_TABLE',
         ];
         if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
           log(`[Auto-Migration] - ${file.filename} (already applied)`);
