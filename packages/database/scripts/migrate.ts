@@ -62,7 +62,7 @@ async function runMigrations() {
       .filter((f) => f.endsWith('.sql'))
       .map((filename) => {
         const orderMatch = filename.match(/^(\d+)/);
-        const order = orderMatch ? parseInt(orderMatch[1], 10) : 999;
+        const order = orderMatch ? parseInt(orderMatch[1] ?? '999', 10) : 999;
         return {
           filename,
           path: join(migrationsDir, filename),
