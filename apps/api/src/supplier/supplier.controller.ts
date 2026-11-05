@@ -20,6 +20,7 @@ import {
   type CreateProductDto,
   type DispatchOrderDto,
 } from './supplier.service';
+import { Roles } from '../common/roles.decorator';
 
 @Controller('supplier')
 export class SupplierController {
@@ -60,7 +61,7 @@ export class SupplierController {
    * @param body Data produk.
    * @param tenantId Header supplier.
    * @returns Entitas produk tersimpan.
-   */
+  @Roles('OWNER')
   @Post('products')
   public async addProduct(
     @Body() body: CreateProductDto,

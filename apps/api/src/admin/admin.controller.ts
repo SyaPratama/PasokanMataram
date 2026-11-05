@@ -14,6 +14,7 @@ import {
   Optional,
 } from '@nestjs/common';
 import { AdminService, type ReviewKybDto } from './admin.service';
+import { Roles } from '../common/roles.decorator';
 
 @Controller('admin')
 export class AdminController {
@@ -27,6 +28,7 @@ export class AdminController {
    * Mengambil daftar seluruh penyewa bisnis terdaftar (HoReKa, Gapoktan, Hub Operator).
    * @returns Array organisasi penyewa.
    */
+  @Roles('SUPER_ADMIN')
   @Get('tenants')
   public async getTenants() {
     try {

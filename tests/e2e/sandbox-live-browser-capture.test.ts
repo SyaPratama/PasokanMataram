@@ -65,9 +65,10 @@ describe('Sandbox Mode Live Browser Testing & Visual Capture (Puppeteer)', { tim
       await browser.close();
     }
   });
+  const isSandboxEnabled = process.env.ENABLE_SANDBOX_MODE === 'true';
 
   beforeEach((ctx) => {
-    if (!isServerUp || !browser) {
+    if (!isServerUp || !browser || !isSandboxEnabled) {
       ctx.skip();
     }
   });

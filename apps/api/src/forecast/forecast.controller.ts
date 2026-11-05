@@ -15,6 +15,8 @@ import {
   Optional,
 } from '@nestjs/common';
 import { ForecastService } from './forecast.service';
+import { Public } from '../common/public.decorator';
+import { Roles } from '../common/roles.decorator';
 
 @Controller('forecast')
 export class ForecastController {
@@ -51,6 +53,30 @@ export class ForecastController {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Gagal memproses simulasi.';
       throw new HttpException(message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Public()
+  @Get('commodities')
+  async getAllCommodities() {
+    try {
+      const data = await this.forecastService.getAllCommodities();
+      return { success: true, data };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch commodities';
+      throw new HttpException(message, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
+
+  @Roles('SUPER_ADMIN', 'OWNER')
+  @Post('sync')
+  async syncForecasts() {
+    try {
+      const result = await this.forecastService.syncForecastsToDB();
+      return { success: true, data: result };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Sync failed';
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

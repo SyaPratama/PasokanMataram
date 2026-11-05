@@ -5,6 +5,7 @@
  */
 
 import { Controller, Get } from '@nestjs/common';
+import { Public } from '../common/public.decorator';
 import { query } from '@pasok/database';
 
 @Controller('health')
@@ -13,6 +14,7 @@ export class HealthController {
    * Endpoint probe kesiapan dan keandalan sistem backend NestJS.
    * @returns Status probe basis data, redis, dan runtime memori.
    */
+  @Public()
   @Get()
   public async getHealth() {
     let dbStatus = 'HEALTHY';

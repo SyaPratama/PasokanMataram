@@ -7,19 +7,15 @@
 import path from 'path';
 
 export const migrationsConfig = {
-  migrationsDir: path.resolve(process.cwd(), 'docker/postgres/migrations'),
+  migrationsDir: path.resolve(process.cwd(), 'docker/mysql/init'),
   trackingTable: '_migrations',
-  schema: 'public',
+  schema: 'pasokmataram_db',
   statementTimeoutMs: 30000,
   lockId: 424242,
   migrationFiles: [
-    '001_create_extensions_and_enums.sql',
-    '002_create_tenants_table.sql',
-    '003_create_users_table.sql',
-    '004_create_kyb_documents_table.sql',
-    '005_create_business_outlets_table.sql',
-    '006_create_indexes.sql',
-    '007_create_rls_policies.sql',
+    '01-schema.sql',
+    '02-seed-taxonomy.sql',
+    '03-seed-data.sql',
   ] as const,
 } as const;
 

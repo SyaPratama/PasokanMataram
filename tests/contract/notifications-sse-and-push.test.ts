@@ -33,20 +33,17 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
   const rootDir = path.resolve(__dirname, '../../');
 
   describe('1. 3NF Database Migration Integrity', () => {
-    it('memvalidasi skema 3NF migration 011 memuat notifications, push subscriptions, dan RLS', () => {
-      const migrationPath = path.join(
+    it('memvalidasi skema 3NF MySQL memuat notifications, push subscriptions, dan delivery logs', () => {
+      const schemaPath = path.join(
         rootDir,
-        'docker/postgres/migrations/011_create_notifications_and_push_subscriptions.sql'
+        'docker/mysql/init/01-schema.sql'
       );
-      expect(fs.existsSync(migrationPath)).toBe(true);
+      expect(fs.existsSync(schemaPath)).toBe(true);
 
-      const sql = fs.readFileSync(migrationPath, 'utf-8');
-      expect(sql).toContain('CREATE TYPE notification_category_enum');
-      expect(sql).toContain('CREATE TYPE notification_priority_enum');
+      const sql = fs.readFileSync(schemaPath, 'utf-8');
       expect(sql).toContain('CREATE TABLE IF NOT EXISTS notifications');
       expect(sql).toContain('CREATE TABLE IF NOT EXISTS user_push_subscriptions');
       expect(sql).toContain('CREATE TABLE IF NOT EXISTS notification_delivery_logs');
-      expect(sql).toContain('ALTER TABLE notifications ENABLE ROW LEVEL SECURITY');
       expect(sql).toContain('idx_notifications_tenant_unread');
     });
   });

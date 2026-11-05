@@ -173,7 +173,7 @@ export default function RegisterPage() {
           aria-pressed={intent === 'HOREKA'}
         >
           <Utensils className="w-4 h-4" />
-          Kafe & Restoran
+          <span>Pembeli HoReKa</span>
         </button>
         <button
           type="button"
@@ -186,7 +186,7 @@ export default function RegisterPage() {
           aria-pressed={intent === 'GAPOKTAN'}
         >
           <Store className="w-4 h-4" />
-          Kelompok Tani
+          <span>Pemasok Gapoktan</span>
         </button>
       </div>
 

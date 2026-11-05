@@ -58,8 +58,10 @@ function LoginForm() {
         const { tenantId, userId, role, macroRole } = data.data;
 
         if (typeof document !== 'undefined') {
-          document.cookie = `pasok_session=${data.sessionToken || ''}; path=/; max-age=604800; SameSite=Lax`;
-          document.cookie = `pasok_session_role=${role}; path=/; max-age=604800; SameSite=Lax`;
+          const token = data.sessionToken || data.data.sessionToken || '';
+          if (token) {
+            document.cookie = `pasok_session=${token}; path=/; max-age=604800; SameSite=Lax`;
+          }
           document.cookie = `pasok_macro_role=${macroRole}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_kyb_status=VERIFIED; path=/; max-age=604800; SameSite=Lax`;
         }
@@ -76,7 +78,11 @@ function LoginForm() {
           destination = '/buyer/outlets';
         }
 
-        router.push(destination);
+        if (typeof window !== 'undefined') {
+          window.location.href = destination;
+        } else {
+          router.push(destination);
+        }
       } else {
         setErrorMessage('Respons server tidak valid.');
       }

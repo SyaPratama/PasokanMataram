@@ -11,8 +11,16 @@ import {
   HttpStatus,
   Inject,
   Optional,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
+import type { SecurityContext } from '@pasok/domain';
 import { AuthService } from './auth.service';
+import { Public } from '../common/public.decorator';
+
+interface RequestWithContext extends Request {
+  securityContext: SecurityContext;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -32,21 +40,32 @@ export class AuthController {
    */
   @Get('kyb/upload-url')
   public async getUploadUrl(
-    @Query('tenantId') tenantId: string,
+    @Req() req: RequestWithContext,
     @Query('documentType') documentType: string,
     @Query('fileName') fileName: string,
     @Query('contentType') contentType: string
   ) {
-    if (!tenantId || !documentType || !fileName) {
+    const { tenantId } = req.securityContext;
+
+    if (!documentType || !fileName) {
       throw new HttpException('Parameter dokumen tidak lengkap.', HttpStatus.BAD_REQUEST);
     }
+
+    const allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    const mime = contentType || 'application/pdf';
+    if (!allowedMimes.includes(mime)) {
+      throw new HttpException('Format berkas tidak diizinkan. Hanya PDF/JPEG/PNG/WebP.', HttpStatus.BAD_REQUEST);
+    }
+
+    // Sanitize filename to prevent path traversal
+    const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
 
     try {
       const result = await this.authService.getKybUploadUrl(
         tenantId,
         documentType,
-        fileName,
-        contentType || 'application/pdf'
+        safeFileName,
+        mime
       );
       return {
         success: true,

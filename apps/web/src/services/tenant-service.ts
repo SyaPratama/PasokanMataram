@@ -195,14 +195,23 @@ export class TenantService {
     const userId = asUserId(row.id);
     const isSuperAdmin = row.role === 'SUPER_ADMIN';
 
-    const tokenPayload: TokenPayload = {
+    const macroRole = isSuperAdmin
+      ? 'SUPER_ADMIN'
+      : row.tenant_type === 'HOREKA_BUYER'
+        ? 'HOREKA'
+        : 'GAPOKTAN';
+    const microRole = row.role;
+
+    const tokenPayload = {
       tenantId,
       userId,
       role: row.role,
+      macroRole,
+      microRole,
       isSuperAdmin,
       email: row.email,
       businessName: row.business_name,
-    };
+    } as TokenPayload;
     const sessionToken = issueSessionToken(tokenPayload);
 
     return {
