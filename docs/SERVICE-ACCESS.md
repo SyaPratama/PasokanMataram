@@ -123,7 +123,7 @@ Client
 ```bash
 # .env
 NEXT_PUBLIC_API_URL=http://localhost:4000  # apps/api URL
-SOLOSMARTPAY_API_TOKEN=ssp_live_xxxxx
+SOLOSMARTPAY_TOKEN=ssp_live_xxxxx
 SOLOSMARTPAY_WEBHOOK_SECRET=xxx
 ```
 
@@ -316,7 +316,7 @@ DB_NAME=pasokmataram_db
 REDIS_URL=redis://localhost:6379
 
 # Solosmartpay
-SOLOSMARTPAY_API_TOKEN=ssp_test_xxxxx
+SOLOSMARTPAY_TOKEN=ssp_test_xxxxx
 SOLOSMARTPAY_WEBHOOK_SECRET=test_secret
 SOLOSMARTPAY_SANDBOX=true
 
@@ -341,7 +341,7 @@ API_BASE_URL=http://localhost:4000  # Internal
 ML_FORECAST_URL=http://ml-forecast:8000
 
 # Solosmartpay (production)
-SOLOSMARTPAY_API_TOKEN=ssp_live_xxxxx
+SOLOSMARTPAY_TOKEN=ssp_live_xxxxx
 SOLOSMARTPAY_WEBHOOK_SECRET=live_secret
 SOLOSMARTPAY_SANDBOX=false
 ```

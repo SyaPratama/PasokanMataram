@@ -96,14 +96,14 @@ Contact Solosmartpay merchant support to receive:
 
 Add to `.env.production`:
 ```bash
-SOLOSMARTPAY_API_TOKEN=ssp_live_your_token_here
+SOLOSMARTPAY_TOKEN=ssp_live_your_token_here
 SOLOSMARTPAY_WEBHOOK_SECRET=your_webhook_secret_here
 SOLOSMARTPAY_SANDBOX=false
 ```
 
 For development/testing, use sandbox mode:
 ```bash
-SOLOSMARTPAY_API_TOKEN=ssp_test_sandbox_token
+SOLOSMARTPAY_TOKEN=ssp_test_sandbox_token
 SOLOSMARTPAY_WEBHOOK_SECRET=test_webhook_secret
 SOLOSMARTPAY_SANDBOX=true
 ```

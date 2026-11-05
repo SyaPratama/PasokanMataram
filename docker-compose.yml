@@ -83,7 +83,7 @@ services:
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
       ML_SERVICE_URL: http://ml-service:8000
-      SOLOSMARTPAY_API_TOKEN: ${SOLOSMARTPAY_API_TOKEN:-ssp_test_pasokmataram_demo}
+      SOLOSMARTPAY_TOKEN: ${SOLOSMARTPAY_TOKEN:-ssp_test_pasokmataram_demo}
       SOLOSMARTPAY_WEBHOOK_SECRET: ${SOLOSMARTPAY_WEBHOOK_SECRET:-ssp_secret_default_key}
     ports:
       - "3001:3001"

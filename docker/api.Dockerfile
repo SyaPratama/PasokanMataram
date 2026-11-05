@@ -12,6 +12,7 @@ COPY packages/database/package.json ./packages/database/
 COPY packages/queue/package.json ./packages/queue/
 COPY packages/repository-contracts/package.json ./packages/repository-contracts/
 COPY packages/security/package.json ./packages/security/
+COPY packages/payment-gateways/package.json ./packages/payment-gateways/
 COPY services/pooling-service/package.json ./services/pooling-service/
 COPY services/logistics-hub-service/package.json ./services/logistics-hub-service/
 COPY services/ml-forecasting-service/package.json ./services/ml-forecasting-service/
