@@ -16,6 +16,7 @@
     "@nestjs/platform-express": "^10.4.15",
     "@nestjs/throttler": "^6.7.1",
     "@pasok/auth-kyb-service": "*",
+    "@pasok/cache": "*",
     "@pasok/config": "*",
     "@pasok/database": "*",
     "@pasok/domain": "*",

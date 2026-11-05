@@ -77,9 +77,9 @@ services:
       PORT: 3001
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_USER: ${DB_USER:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
-      DB_NAME: ${DB_NAME:-pasokmataram_local}
+      DB_USER: ${DB_USER:-pasok_user}
+      DB_PASSWORD: ${DB_PASSWORD:-Tama123}
+      DB_NAME: ${DB_NAME:-pasokmataram_db}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
       ML_SERVICE_URL: http://ml-service:8000
@@ -119,9 +119,9 @@ services:
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_USER: ${DB_USER:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
-      DB_NAME: ${DB_NAME:-pasokmataram_local}
+      DB_USER: ${DB_USER:-pasok_user}
+      DB_PASSWORD: ${DB_PASSWORD:-Tama123}
+      DB_NAME: ${DB_NAME:-pasokmataram_db}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
     depends_on:

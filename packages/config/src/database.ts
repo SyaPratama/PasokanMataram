@@ -28,7 +28,7 @@ const rawDatabaseUrl = `mysql://${process.env.DB_USER || 'pasok_user'}:${process
 
 const sslEnabled =
   process.env.DB_SSL === 'true' ||
-  (process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false' && !process.env.DB_HOST?.includes('postgres'));
+  (process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false');
 
 export const databaseConfig: DatabaseConfig = databaseConfigSchema.parse({
   connectionString: rawDatabaseUrl,

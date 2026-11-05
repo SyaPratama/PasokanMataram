@@ -370,3 +370,64 @@ CREATE TABLE IF NOT EXISTS notification_delivery_logs (
     CONSTRAINT fk_delivery_notification FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE,
     INDEX idx_delivery_notification (notification_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 23. Forecast horizons (4NF normalization for multi-horizon price curves)
+CREATE TABLE IF NOT EXISTS forecast_horizons (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    forecast_id CHAR(36) NOT NULL,
+    horizon_days INT NOT NULL,
+    predicted_price DECIMAL(14, 2) NOT NULL,
+    confidence_lower DECIMAL(14, 2),
+    confidence_upper DECIMAL(14, 2),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_horizon_forecast FOREIGN KEY (forecast_id) REFERENCES commodity_forecasts(id) ON DELETE CASCADE,
+    INDEX idx_horizon_forecast (forecast_id, horizon_days)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 24. Payment invoices (Solosmartpay, Xendit, Duitku, Midtrans)
+CREATE TABLE IF NOT EXISTS payment_invoices (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    tenant_id CHAR(36) NOT NULL,
+    reservation_id CHAR(36),
+    external_invoice_id VARCHAR(255) UNIQUE,
+    reference VARCHAR(255) NOT NULL UNIQUE,
+    amount DECIMAL(15, 2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'IDR',
+    provider VARCHAR(20) NOT NULL DEFAULT 'solosmartpay',
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    invoice_url TEXT,
+    qr_code_url TEXT,
+    virtual_account_number VARCHAR(50),
+    expires_at DATETIME,
+    paid_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_invoice_tenant (tenant_id),
+    INDEX idx_invoice_status (status),
+    INDEX idx_invoice_provider (provider)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 25. Webhook events (Idempotency tracking & audit logs)
+CREATE TABLE IF NOT EXISTS webhook_events (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    provider VARCHAR(50) NOT NULL DEFAULT 'SOLOSMARTPAY',
+    external_event_id VARCHAR(255) NOT NULL UNIQUE,
+    payload JSON NOT NULL,
+    received_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_webhook_provider (provider),
+    INDEX idx_webhook_external_id (external_event_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 26. Terms acceptances (Legal consent & audit compliance)
+CREATE TABLE IF NOT EXISTS terms_acceptances (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    user_id CHAR(36) NOT NULL,
+    document_type VARCHAR(50) NOT NULL,
+    document_version VARCHAR(20) NOT NULL,
+    accepted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    INDEX idx_terms_user (user_id),
+    INDEX idx_terms_document (document_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

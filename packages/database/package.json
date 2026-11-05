@@ -17,8 +17,5 @@
     "@pasok/config": "*",
     "@pasok/domain": "*",
     "mysql2": "^3.24.6"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.11.10"
   }
 }

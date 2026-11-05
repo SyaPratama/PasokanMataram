@@ -223,5 +223,22 @@ INSERT INTO notification_delivery_logs (id, notification_id, channel, delivered_
 ('g1000000-0000-0000-0000-000000000008', 'e1000000-0000-0000-0000-000000000005', 'sse', '2026-02-05 08:30:05', 'DELIVERED');
 -- Additional 12 logs omitted
 
+-- 18. Payment invoices (8 records)
+INSERT INTO payment_invoices (id, tenant_id, reservation_id, external_invoice_id, reference, amount, currency, provider, payment_method, status, virtual_account_number, created_at) VALUES
+('h1000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'INV-20260202-001', 'REF-SSP-001', 7200000.00, 'IDR', 'solosmartpay', 'VA_BPD_DIY', 'PAID', '9888100123456789', '2026-02-02 09:00:00'),
+('h1000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'INV-20260203-002', 'REF-SSP-002', 4800000.00, 'IDR', 'solosmartpay', 'QRIS', 'PAID', NULL, '2026-02-03 10:00:00'),
+('h1000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'INV-20260204-003', 'REF-SSP-003', 3360000.00, 'IDR', 'solosmartpay', 'VA_MANDIRI', 'PAID', '8890100123456789', '2026-02-04 11:00:00'),
+('h1000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000004', 'INV-20260205-004', 'REF-SSP-004', 2900000.00, 'IDR', 'solosmartpay', 'VA_BNI', 'PAID', '8810100123456789', '2026-02-05 08:00:00');
+
+-- 19. Webhook events (Idempotency logs)
+INSERT INTO webhook_events (id, provider, external_event_id, payload, received_at) VALUES
+('i1000000-0000-0000-0000-000000000001', 'SOLOSMARTPAY', 'EVT-SSP-001', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260202-001\",\"amount\":7200000}', '2026-02-02 09:30:00'),
+('i1000000-0000-0000-0000-000000000002', 'SOLOSMARTPAY', 'EVT-SSP-002', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260203-002\",\"amount\":4800000}', '2026-02-03 10:30:00');
+
+-- 20. Terms acceptances
+INSERT INTO terms_acceptances (id, user_id, document_type, document_version, accepted_at, ip_address) VALUES
+('j1000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', 'TERMS_OF_SERVICE', '1.5.0', '2026-01-10 08:30:00', '127.0.0.1'),
+('j1000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000005', 'TERMS_OF_SERVICE', '1.5.0', '2026-01-12 10:00:00', '127.0.0.1');
+
 -- Seed complete: 22 tables populated with 200+ structural rows
 -- ML time-series data (prices, weather, features, forecasts) will be populated by ML service sync

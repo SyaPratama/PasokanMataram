@@ -10,6 +10,7 @@ import {
   type MlSimulationInput,
 } from '@pasok/domain';
 import { query } from '@pasok/database';
+import * as cache from '@pasok/cache';
 
 @Injectable()
 export class ForecastService {
@@ -51,6 +52,14 @@ export class ForecastService {
    * @returns Proyeksi multi-horizon H+1 s.d. H+7.
    */
   public async getCommodityForecast(commodityId: string) {
+    const cacheKey = `ml:forecast:${commodityId}`;
+    try {
+      const cached = await cache.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch {}
+
     try {
       const response = await fetch(
         `${this.mlBaseUrl}/api/v1/forecast/commodity/${encodeURIComponent(commodityId)}`
@@ -59,12 +68,13 @@ export class ForecastService {
         return this.generateDeterministicForecast(commodityId);
       }
       const data = await response.json();
+      try {
+        await cache.set(cacheKey, JSON.stringify(data), 300);
+      } catch {}
       return data;
     } catch {
       return this.generateDeterministicForecast(commodityId);
     }
-
-    return this.generateDeterministicForecast(commodityId);
   }
 
   /**
@@ -141,11 +151,23 @@ export class ForecastService {
    * Proxy to ML service: get all commodities with forecasts
    */
   async getAllCommodities(): Promise<unknown> {
+    const cacheKey = 'ml:forecast:commodities';
+    try {
+      const cached = await cache.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch {}
+
     const response = await fetch(`${this.mlBaseUrl}/api/v1/forecast/commodities`);
     if (!response.ok) {
       throw new Error(`ML service error: ${response.statusText}`);
     }
-    return response.json();
+    const data = await response.json();
+    try {
+      await cache.set(cacheKey, JSON.stringify(data), 300);
+    } catch {}
+    return data;
   }
 
   /**
