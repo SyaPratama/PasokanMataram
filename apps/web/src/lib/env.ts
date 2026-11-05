@@ -14,8 +14,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
 
   DB_HOST: z.string().default('localhost'),
-  DB_PORT: z.coerce.number().default(3306),
-  DB_USER: z.string().default('root'),
+  DB_PORT: z.coerce.number().default(3307),
+  DB_USER: z.string().default('pasok_user'),
   DB_PASSWORD: z.string().default('Tama123'),
   DB_NAME: z.string().default('pasokmataram_db'),
   DB_SSL: z.preprocess((v) => v === 'true' || v === true, z.boolean()).default(false),
@@ -52,7 +52,7 @@ try {
   }
   parsedEnv = envSchema.parse({
     ...process.env,
-    DB_PORT: process.env.DB_PORT || 3306,
+    DB_PORT: process.env.DB_PORT || 3307,
     JWT_SECRET: process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars',
   });
 }

@@ -5,9 +5,15 @@
  */
 
 import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { IdempotencyGuard } from './common/idempotency.guard';
+import { AuthGuard } from './common/auth.guard';
+import { RolesGuard } from './common/roles.guard';
+import { TenantContextGuard } from './common/tenant-context.guard';
 import { autoMigrate } from '@pasok/database';
 /**
  * Menginisialisasi dan menjalankan server backend NestJS.
@@ -43,8 +49,37 @@ async function bootstrap(): Promise<void> {
     credentials: true,
   });
 
-  app.useGlobalGuards(new IdempotencyGuard());
+  app.use(cookieParser());
 
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https://api.solosmartpay.com'],
+      },
+    },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    frameguard: { action: 'deny' },
+    noSniff: true,
+  }));
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(
+    new AuthGuard(reflector),
+    new RolesGuard(reflector),
+    new TenantContextGuard(),
+    new IdempotencyGuard()
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
   const port = Number(process.env.PORT) || 3001;
   await app.listen(port);
   console.log(`[PASOKMATARAM-API] NestJS Backend berjalan pada port ${port}`);

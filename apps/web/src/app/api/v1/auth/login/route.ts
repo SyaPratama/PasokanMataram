@@ -4,16 +4,36 @@
  * Validasi password dengan Argon2id, penerbitan session token, dan routing adaptif berbasis role.
  * Kepatuhan: Konstitusi Prinsip VI (Multi-tenant security).
  */
+export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { LoginSchema } from '@/lib/validations/auth-schemas';
 import { TenantService } from '@/services/tenant-service';
 import { getSessionCookieOptions } from '@/lib/auth';
-
+import { loginRateLimiter, checkRateLimit } from '@/lib/rate-limit';
+import crypto from 'crypto';
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json();
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    try {
+      const rateResult = await checkRateLimit(`login:${ip}`, loginRateLimiter);
+      if (!rateResult.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'RATE_LIMIT_EXCEEDED',
+              message: 'Terlalu banyak percobaan masuk. Silakan tunggu 15 menit.',
+            },
+          },
+          { status: 429 }
+        );
+      }
+    } catch {
+      // Graceful fallback if Redis rate limiter fails
+    }
 
+    const body = await request.json();
     const parseResult = LoginSchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
@@ -42,19 +62,28 @@ export async function POST(request: Request): Promise<NextResponse> {
           userId: user.id,
           role: user.role,
           macroRole: tenant.tenantType === 'HOREKA_BUYER' ? 'HOREKA' : 'GAPOKTAN',
+          sessionToken,
         },
+        sessionToken,
         message: 'Masuk berhasil.',
       },
       { status: 200 }
     );
-
     const cookieOptions = getSessionCookieOptions();
     response.cookies.set(cookieOptions.name, sessionToken, cookieOptions);
 
+    const xsrfToken = crypto.randomBytes(32).toString('hex');
+    response.cookies.set('XSRF-TOKEN', xsrfToken, {
+      httpOnly: false,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+
     return response;
   } catch (error: unknown) {
+    console.error('[LOGIN ERROR]:', error);
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan sistem saat memproses masuk.';
-
     if (message.includes('tidak valid') || message.includes('tidak aktif')) {
       return NextResponse.json(
         {

@@ -9,8 +9,8 @@ import { z } from 'zod';
 const databaseConfigSchema = z.object({
   connectionString: z.string().optional(),
   host: z.string().default('localhost'),
-  port: z.coerce.number().int().default(3306),
-  user: z.string().default('root'),
+  port: z.coerce.number().int().default(3307),
+  user: z.string().default('pasok_user'),
   password: z.string().default('Tama123'),
   database: z.string().default('pasokmataram_db'),
   ssl: z.boolean().default(false),
@@ -24,7 +24,7 @@ const databaseConfigSchema = z.object({
 
 export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 
-const rawDatabaseUrl = `mysql://${process.env.DB_USER || 'root'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'pasokmataram_db'}`;
+const rawDatabaseUrl = `mysql://${process.env.DB_USER || 'pasok_user'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3307}/${process.env.DB_NAME || 'pasokmataram_db'}`;
 
 const sslEnabled =
   process.env.DB_SSL === 'true' ||
@@ -33,8 +33,8 @@ const sslEnabled =
 export const databaseConfig: DatabaseConfig = databaseConfigSchema.parse({
   connectionString: rawDatabaseUrl,
   host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
-  user: process.env.DB_USER || 'root',
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3307,
+  user: process.env.DB_USER || 'pasok_user',
   password: process.env.DB_PASSWORD || 'Tama123',
   database: process.env.DB_NAME || 'pasokmataram_db',
   ssl: sslEnabled,

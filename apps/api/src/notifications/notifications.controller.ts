@@ -15,9 +15,11 @@ import {
   Body,
   Headers,
   Sse,
-  type MessageEvent,
+  HttpException,
+  HttpStatus,
   Inject,
   Optional,
+  type MessageEvent,
 } from '@nestjs/common';
 import type { Observable } from 'rxjs';
 import type {

@@ -5,6 +5,7 @@
 
 import { Injectable, type MessageEvent } from '@nestjs/common';
 import { Subject, Observable, map, filter } from 'rxjs';
+import type { Response } from 'express';
 import type {
   NotificationItem,
   CreateNotificationInput,
@@ -18,6 +19,7 @@ import { NotificationAdapter } from '@pasok/database';
 export class NotificationsService {
   private readonly adapter: NotificationAdapter;
   private readonly eventStream$: Subject<{ tenantId: string; item: NotificationItem }>;
+  private sseClients = new Map<string, Response>();
   private inMemorySubscriptions: Map<string, WebPushSubscriptionDto> = new Map();
   private inMemoryNotifications: NotificationItem[] = [];
 
@@ -188,6 +190,9 @@ export class NotificationsService {
       item: savedItem,
     });
 
+    // Send to SSE clients
+    this.sendToSseClients(savedItem);
+
     return savedItem;
   }
 
@@ -234,6 +239,42 @@ export class NotificationsService {
       return await this.adapter.removePushSubscription(context, endpoint);
     } catch {
       return this.inMemorySubscriptions.delete(endpoint);
+    }
+  }
+
+  subscribeSse(userId: string, res: Response): void {
+    this.sseClients.set(userId, res);
+    
+    const keepalive = setInterval(() => {
+      if (res.writableEnded) {
+        clearInterval(keepalive);
+        this.sseClients.delete(userId);
+        return;
+      }
+      res.write(': keepalive\n\n');
+    }, 30000);
+
+    res.on('close', () => {
+      clearInterval(keepalive);
+      this.sseClients.delete(userId);
+    });
+  }
+
+  unsubscribeSse(userId: string): void {
+    const client = this.sseClients.get(userId);
+    if (client && !client.writableEnded) {
+      client.end();
+    }
+    this.sseClients.delete(userId);
+  }
+
+  private sendToSseClients(notification: NotificationItem): void {
+    if (!notification.userId) return;
+    
+    const client = this.sseClients.get(notification.userId);
+    if (client && !client.writableEnded) {
+      const data = JSON.stringify(notification);
+      client.write(`data: ${data}\n\n`);
     }
   }
 }

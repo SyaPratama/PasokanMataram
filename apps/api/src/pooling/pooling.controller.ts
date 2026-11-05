@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import type { SecurityContext } from '@pasok/domain';
 import { PoolingService } from './pooling.service';
+import { Roles } from '../common/roles.decorator';
 
 @Controller('pooling')
 export class PoolingController {

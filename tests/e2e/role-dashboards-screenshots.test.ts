@@ -11,8 +11,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import puppeteer, { Browser, Page } from 'puppeteer';
-
 const BASE_URL = process.env.APP_URL || 'http://localhost:3000';
 const SCREENSHOTS_DIR = path.resolve(__dirname, '../screenshots');
 
@@ -38,7 +38,20 @@ function findChromeExecutable(): string {
 /**
  * Menghasilkan token sesi hermetis untuk simulasi otentikasi peran.
  */
+function getJwtSecret(): string {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  try {
+    const envLocalPath = path.resolve(__dirname, '../../apps/web/.env.local');
+    if (fs.existsSync(envLocalPath)) {
+      const match = fs.readFileSync(envLocalPath, 'utf-8').match(/^JWT_SECRET=(.+)$/m);
+      if (match) return match[1].trim();
+    }
+  } catch {}
+  return 'pasokmataram-super-secret-jwt-key-min-32-chars';
+}
+
 function generateMockSessionToken(macroRole: string, microRole: string): string {
+  const jwtSecret = getJwtSecret();
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
@@ -58,7 +71,11 @@ function generateMockSessionToken(macroRole: string, microRole: string): string 
       exp: Math.floor(Date.now() / 1000) + 7 * 86400,
     })
   ).toString('base64url');
-  return `${header}.${payload}.mock_sig_demo_${Date.now()}`;
+  const signature = crypto
+    .createHmac('sha256', jwtSecret)
+    .update(`${header}.${payload}`)
+    .digest('base64url');
+  return `${header}.${payload}.${signature}`;
 }
 
 describe('E2E Role Dashboards Screenshot & Quality Audit', () => {
@@ -125,9 +142,10 @@ describe('E2E Role Dashboards Screenshot & Quality Audit', () => {
 
       const targetUrl = `${BASE_URL}${options.route}`;
       const response = await page.goto(targetUrl, {
-        waitUntil: 'networkidle2',
-        timeout: 30000,
+        waitUntil: 'domcontentloaded',
+        timeout: 20000,
       });
+      await page.waitForSelector('body', { timeout: 10000 });
 
       const rawStatus = response ? response.status() : 0;
       const status = rawStatus === 304 ? 200 : rawStatus;

@@ -38,10 +38,10 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
       ctx.skip();
       return;
     }
-    const res = await query<{ table_name: string }>(
+    const res = await query<{ table_name?: string; TABLE_NAME?: string }>(
       "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY table_name"
     );
-    const tableNames = res.rows.map((r) => r.table_name);
+    const tableNames = res.rows.map((r) => r.table_name || r.TABLE_NAME);
 
     expect(tableNames).toContain('tenants');
     expect(tableNames).toContain('users');
