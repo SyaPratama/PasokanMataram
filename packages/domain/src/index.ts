@@ -13,4 +13,5 @@ export * from './rules/temperature-router';
 export * from './entities/hub-operator';
 export * from './utils/lazy';
 export * from './types/notification';
+export * from './payment-gateway';
 

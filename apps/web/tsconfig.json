@@ -19,7 +19,8 @@
       "@pasok/security/tokens": ["../../packages/security/src/tokens.ts"],
       "@pasok/security/passwords": ["../../packages/security/src/passwords.ts"],
       "@pasok/database": ["../../packages/database/src/index.ts"],
-      "@pasok/queue": ["../../packages/queue/src/index.ts"]
+      "@pasok/queue": ["../../packages/queue/src/index.ts"],
+      "@pasok/payment-gateways": ["../../packages/payment-gateways/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

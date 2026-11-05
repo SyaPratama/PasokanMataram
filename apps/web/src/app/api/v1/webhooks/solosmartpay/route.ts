@@ -1,10 +1,10 @@
 /**
  * Solosmartpay Webhook Handler
- * Endpoint: https://api-pasok.syapratama.tech/webhook/solosmartpay
+ * Endpoint: https://api-pasok.syapratama.tech/api/v1/webhooks/solosmartpay
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseWebhook } from '@/lib/webhook';
+import { parseWebhookEvent } from '@/lib/webhook';
 import { query } from '@pasok/database';
 
 export const runtime = 'nodejs';
@@ -16,17 +16,19 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const rawBody = await request.text();
-    const signature = request.headers.get('X-SoloSmartPay-Signature');
-    const timestamp = request.headers.get('X-SoloSmartPay-Timestamp');
+    const headers: Record<string, string> = {
+      'x-solosmartpay-signature': request.headers.get('X-SoloSmartPay-Signature') ?? '',
+      'x-solosmartpay-timestamp': request.headers.get('X-SoloSmartPay-Timestamp') ?? '',
+    };
 
-    const event = await parseWebhook(rawBody, signature || '', timestamp || '');
+    const event = await parseWebhookEvent('solosmartpay', rawBody, headers);
 
     const isDuplicate = await checkDuplicateEvent(event.id);
     if (isDuplicate) {
       return NextResponse.json({ received: true }, { status: 200 });
     }
 
-    await recordWebhookEvent(event.id, event.type, rawBody);
+    await recordWebhookEvent(event.id, event.type, 'solosmartpay', rawBody);
 
     if (event.type === 'payment.paid') {
       await query(
@@ -65,12 +67,13 @@ async function checkDuplicateEvent(eventId: string): Promise<boolean> {
 async function recordWebhookEvent(
   eventId: string,
   eventType: string,
-  payload: string
+  provider: string,
+  payload: string,
 ): Promise<void> {
   await query(
-    `INSERT INTO webhook_events (event_id, event_type, payload, processed_at) 
-     VALUES (?, ?, ?, NOW())
+    `INSERT INTO webhook_events (event_id, event_type, provider, payload, processed_at) 
+     VALUES (?, ?, ?, ?, NOW())
      ON DUPLICATE KEY UPDATE processed_at = NOW()`,
-    [eventId, eventType, payload]
+    [eventId, eventType, provider, payload]
   );
 }

@@ -1,6 +1,6 @@
 /**
  * @file apps/api/src/settlement/settlement.controller.ts
- * @description NestJS controller exposing Solosmartpay payment gateway, webhooks, and escrow disbursements.
+ * @description NestJS controller exposing payment gateway invoice creation and status endpoints.
  */
 
 import {
@@ -9,33 +9,31 @@ import {
   Post,
   Body,
   Param,
-  Headers,
-  Req,
   HttpException,
   HttpStatus,
-  Inject,
-  Optional,
 } from '@nestjs/common';
-import type { Request } from 'express';
-import type { SecurityContext } from '@pasok/domain';
+import type { PaymentProvider } from '@pasok/config';
 import { SettlementService } from './settlement.service';
 import type { CreateInvoiceParams } from './settlement.service';
 
+interface CreateInvoiceBody extends CreateInvoiceParams {
+  provider?: PaymentProvider;
+}
+
 @Controller('settlement')
 export class SettlementController {
-  private readonly settlementService: SettlementService;
-
-  public constructor(@Optional() @Inject(SettlementService) settlementService?: SettlementService) {
-    this.settlementService = settlementService ?? new SettlementService();
-  }
+  public constructor(private readonly settlementService: SettlementService) {}
 
   /**
-   * Membuat invoice pembayaran Solosmartpay.
+   * Membuat invoice pembayaran. Accepts optional `provider` to override active gateway.
    */
   @Post('invoice')
-  public async createInvoice(@Body() body: CreateInvoiceParams) {
+  public async createInvoice(@Body() body: CreateInvoiceBody) {
     try {
-      const invoice = await this.settlementService.createPaymentInvoice(body);
+      const { provider, ...params } = body;
+      const invoice = provider
+        ? await this.settlementService.createPaymentInvoiceWithProvider(params, provider)
+        : await this.settlementService.createPaymentInvoice(params);
       return { success: true, data: invoice };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Gagal membuat invoice';
