@@ -232,8 +232,8 @@ INSERT IGNORE INTO payment_invoices (id, tenant_id, reservation_id, external_inv
 
 -- 19. Webhook events (Idempotency logs)
 INSERT IGNORE INTO webhook_events (id, provider, external_event_id, payload, received_at) VALUES
-('i1000000-0000-0000-0000-000000000001', 'SOLOSMARTPAY', 'EVT-SSP-001', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260202-001\",\"amount\":7200000}', '2026-02-02 09:30:00'),
-('i1000000-0000-0000-0000-000000000002', 'SOLOSMARTPAY', 'EVT-SSP-002', '{\"event\":\"payment.success\",\"order_id\":\"INV-20260203-002\",\"amount\":4800000}', '2026-02-03 10:30:00');
+('i1000000-0000-0000-0000-000000000001', 'SOLOSMARTPAY', 'EVT-SSP-001', '{"event":"payment.success","order_id":"INV-20260202-001","amount":7200000}', '2026-02-02 09:30:00'),
+('i1000000-0000-0000-0000-000000000002', 'SOLOSMARTPAY', 'EVT-SSP-002', '{"event":"payment.success","order_id":"INV-20260203-002","amount":4800000}', '2026-02-03 10:30:00');
 
 -- 20. Terms acceptances
 INSERT IGNORE INTO terms_acceptances (id, user_id, document_type, document_version, accepted_at, ip_address) VALUES
