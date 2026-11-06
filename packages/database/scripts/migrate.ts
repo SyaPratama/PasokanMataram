@@ -38,6 +38,66 @@ async function connectWithRetry(
   }
   throw lastError;
 }
+/**
+ * Automatically aligns legacy tables that were created prior to 4NF refactor
+ * Ensures columns like reservation_id and UUID primary keys exist
+ */
+async function alignLegacyTables(connection: mysql.Connection) {
+  try {
+    // 1. payment_invoices: check for reservation_id
+    const [piCols] = await connection.query<any[]>(
+      "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'payment_invoices'"
+    );
+    if (Array.isArray(piCols) && piCols.length > 0) {
+      const colMap = new Map(piCols.map((c) => [c.COLUMN_NAME, c]));
+      if (!colMap.has('reservation_id')) {
+        const [cnt] = await connection.query<any[]>('SELECT COUNT(*) as c FROM payment_invoices');
+        if ((cnt[0]?.c ?? 0) <= 8) {
+          console.log('  Aligning legacy payment_invoices table to 4NF schema...');
+          await connection.query('DROP TABLE IF EXISTS payment_invoices');
+        } else {
+          console.log('  Adding missing 4NF columns to payment_invoices...');
+          await connection.query('ALTER TABLE payment_invoices ADD COLUMN reservation_id CHAR(36) AFTER tenant_id');
+          if (!colMap.has('external_invoice_id')) {
+            await connection.query('ALTER TABLE payment_invoices ADD COLUMN external_invoice_id VARCHAR(255) UNIQUE AFTER reservation_id');
+          }
+          if (!colMap.has('provider')) {
+            await connection.query("ALTER TABLE payment_invoices ADD COLUMN provider VARCHAR(20) NOT NULL DEFAULT 'solosmartpay' AFTER currency");
+          }
+          if (colMap.get('expires_at')?.IS_NULLABLE === 'NO') {
+            await connection.query('ALTER TABLE payment_invoices MODIFY COLUMN expires_at DATETIME NULL');
+          }
+        }
+      }
+    }
+
+    // 2. webhook_events: check for legacy BIGINT id
+    const [weCols] = await connection.query<any[]>(
+      "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'webhook_events'"
+    );
+    if (Array.isArray(weCols) && weCols.length > 0) {
+      const idCol = weCols.find((c) => c.COLUMN_NAME === 'id');
+      if (idCol && idCol.DATA_TYPE !== 'char' && idCol.DATA_TYPE !== 'varchar') {
+        console.log('  Aligning legacy webhook_events table to 4NF UUID schema...');
+        await connection.query('DROP TABLE IF EXISTS webhook_events');
+      }
+    }
+
+    // 3. terms_acceptances: check for legacy BIGINT id
+    const [taCols] = await connection.query<any[]>(
+      "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'terms_acceptances'"
+    );
+    if (Array.isArray(taCols) && taCols.length > 0) {
+      const idCol = taCols.find((c) => c.COLUMN_NAME === 'id');
+      if (idCol && idCol.DATA_TYPE !== 'char' && idCol.DATA_TYPE !== 'varchar') {
+        console.log('  Aligning legacy terms_acceptances table to 4NF UUID schema...');
+        await connection.query('DROP TABLE IF EXISTS terms_acceptances');
+      }
+    }
+  } catch (err) {
+    console.warn('  Note: Legacy table alignment check:', (err as Error).message);
+  }
+}
 
 async function runMigrations() {
   console.log('Starting database migration...\n');
@@ -108,6 +168,7 @@ async function runMigrations() {
 
     console.log(`Loading migrations from: ${migrationsDir}\n`);
 
+    await alignLegacyTables(connection);
     const files = readdirSync(migrationsDir)
       .filter((f) => f.endsWith('.sql'))
       .map((filename) => {
