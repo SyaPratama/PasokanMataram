@@ -28,7 +28,7 @@ INSERT IGNORE INTO users (id, tenant_id, email, password_hash, full_name, phone_
 ('30000000-0000-0000-0000-000000000015', '20000000-0000-0000-0000-000000000003', 'logistik.mitratani@example.com', '$2b$10$hashedpassword', 'Eko Prasetyo', '081234567804', 'PROCUREMENT_MANAGER', TRUE, '2026-02-01 14:00:00');
 
 -- 3. KYB Documents (15: 3 per tenant)
-INSERT IGNORE INTO kyb_documents (id, tenant_id, doc_type, file_url, status, verified_by, verified_at, created_at) VALUES
+INSERT IGNORE INTO kyb_documents (id, tenant_id, document_type, file_url, status, verified_by, verified_at, created_at) VALUES
 ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'NIB', 'https://storage.pasokmataram.com/kyb/gudeg-nib.pdf', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:00:00', '2026-01-10 09:00:00'),
 ('40000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'KTP', 'https://storage.pasokmataram.com/kyb/gudeg-ktp.jpg', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:05:00', '2026-01-10 09:05:00'),
 ('40000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'NPWP', 'https://storage.pasokmataram.com/kyb/gudeg-npwp.pdf', 'VERIFIED', '30000000-0000-0000-0000-000000000001', '2026-01-15 10:10:00', '2026-01-10 09:10:00'),
