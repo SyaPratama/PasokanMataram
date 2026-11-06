@@ -44,6 +44,18 @@ async function connectWithRetry(
  */
 async function alignLegacyTables(connection: mysql.Connection) {
   try {
+    // 0. escrow_settlements: check for missing reservation_id or legacy deprecated_at
+    const [esCols] = await connection.query<any[]>(
+      "SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'escrow_settlements'"
+    );
+    if (Array.isArray(esCols) && esCols.length > 0) {
+      const colMap = new Set(esCols.map((c) => c.COLUMN_NAME));
+      if (!colMap.has('reservation_id') || colMap.has('deprecated_at')) {
+        console.log('  Aligning legacy escrow_settlements table to 4NF schema...');
+        await connection.query('DROP TABLE IF EXISTS escrow_settlements');
+      }
+    }
+
     // 1. payment_invoices: check for reservation_id
     const [piCols] = await connection.query<any[]>(
       "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'payment_invoices'"
