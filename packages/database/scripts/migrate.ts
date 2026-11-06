@@ -19,6 +19,25 @@ interface MigrationFile {
   path: string;
   order: number;
 }
+async function connectWithRetry(
+  connConfig: mysql.ConnectionOptions,
+  maxRetries = 3,
+  delayMs = 2000
+): Promise<mysql.Connection> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await mysql.createConnection(connConfig);
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxRetries) {
+        console.log(`  Connection attempt ${attempt} failed (${(err as Error).message}). Retrying in ${delayMs / 1000}s...`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
+}
 
 async function runMigrations() {
   console.log('Starting database migration...\n');
@@ -38,11 +57,12 @@ async function runMigrations() {
 
   try {
     try {
-      const rootConnection = await mysql.createConnection({
+      const rootConnection = await connectWithRetry({
         host: config.host,
         port: config.port,
         user: config.user,
         password: config.password,
+        connectTimeout: 30000,
         multipleStatements: true,
       });
 
@@ -52,12 +72,18 @@ async function runMigrations() {
         `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
       );
       console.log(`Database "${config.database}" ready\n`);
-      await rootConnection.end();
+      await rootConnection.query(`USE \`${config.database}\``);
+      connection = rootConnection;
     } catch {
       console.log('Note: Root database creation skipped (normal for cPanel/shared hosts). Connecting directly.\n');
     }
 
-    connection = await mysql.createConnection(config);
+    if (!connection) {
+      connection = await connectWithRetry({
+        ...config,
+        connectTimeout: 30000,
+      });
+    }
 
     const candidateDirs = [
       join(__dirname, '../src/schema'),
