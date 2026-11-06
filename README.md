@@ -199,18 +199,68 @@ Deployment produksi ke server shared hosting diotomatisasi melalui GitHub Action
 # Menjalankan seluruh pengujian unit & kontrak terisolasi
 npm test -- --exclude='tests/e2e/**'
 
+# Menjalankan pengujian E2E Puppeteer lengkap (live browser)
+npm test
+
+# Memvalidasi konsistensi kolom seed vs skema SQL
+python3 -c "
+import re
+with open('packages/database/src/schema/001_core_enterprise_4nf_schema.sql') as f: schema = f.read()
+tables = {}
+for m in re.finditer(r'CREATE TABLE IF NOT EXISTS (\w+)\s*\((.*?)\)\s*ENGINE', schema, re.DOTALL):
+    cols = {re.match(r'\`?(\w+)\`?', l.strip()).group(1) for l in m.group(2).split('\n') if l.strip() and not re.match(r'(INDEX|PRIMARY|UNIQUE|FOREIGN|KEY|CHECK)', l.strip(), re.I) and re.match(r'\`?(\w+)\`?', l.strip())}
+    tables[m.group(1)] = cols
+with open('docker/mysql/init/03-seed-data.sql') as f: seed = f.read()
+errs = [f'{t}: \"{c}\" not in schema' for m in re.finditer(r'INSERT\s+IGNORE\s+INTO\s+(\w+)\s*\(([^)]+)\)', seed) for t in [m.group(1)] for c in [x.strip() for x in m.group(2).split(',')] if t in tables and c not in tables[t]]
+print('PASS: 0 mismatches' if not errs else '\n'.join(errs))
+"
+
 # Menjalankan audit kebersihan komentar dan ketiadaan emoji
 node scripts/audit-cleanliness.mjs
 
 # Menjalankan pemeriksaan kompilasi TypeScript ketat
 npm run lint
 
-# Menjalankan kompilasi penuh 14 paket monorepo
+# Menjalankan kompilasi penuh monorepo
 npm run build
 ```
 
+Hasil verifikasi terakhir (commit `412511c`):
+- Build: `npm run build` -- 14/14 tasks successful
+- Test suite: 38 test files passed, 281 tests passed, 9 skipped
+- Seed validator: 0 mismatches di seluruh tabel
+
+## 10. Catatan Migrasi Skema & Seed Data
+
+### Skema 4NF `kyb_documents` (breaking change)
+
+Tabel `kyb_documents` telah direfaktor ke arsitektur 4NF. Kolom lama **tidak lagi ada** di skema:
+
+| Kolom Lama (dihapus) | Kolom Baru (4NF) | Keterangan |
+|---|---|---|
+| `doc_type` | `document_type` | Rename; ENUM tetap sama |
+| `file_url` | `file_storage_key` | Path S3/MinIO relatif, bukan URL absolut |
+| — | `document_number` | Nomor dokumen resmi (NIB, KTP, NPWP, SKT) |
+| — | `file_mime_type` | MIME type berkas (`application/pdf`, `image/jpeg`) |
+| — | `file_size_bytes` | Ukuran berkas dalam bytes |
+| — | `uploaded_at` | Timestamp upload; terpisah dari `created_at` |
+
+Jika terdapat skrip atau kode lama yang merujuk kolom `doc_type` atau `file_url` pada tabel `kyb_documents`, wajib diperbarui sebelum deployment.
+
+### Smart Seed Gate
+
+`npm run db:seed` dilindungi dua lapis perlindungan data produksi:
+
+1. **Smart Migration Gate** (`migrate.ts`): Skip tabel yang sudah ada (idempotent).
+2. **Smart Seed Gate** (`seed.ts`): Skip seeding jika tabel `tenants` sudah berisi data. Gunakan `DB_FORCE_RESET=true npm run db:seed` hanya di lingkungan development untuk memaksa re-seed.
+
+### Validasi Kolom Seed Otomatis
+
+Sebelum deployment, jalankan validator Python di atas (bagian 9) untuk memastikan seluruh kolom INSERT di `03-seed-data.sql` cocok dengan definisi skema terbaru. Validator ini mencegah error `Unknown column` di CI.
+
 ---
-## 10. Informasi Kontak & Pengembang
+
+## 11. Informasi Kontak & Pengembang
 
 Untuk pertanyaan teknis, pelaporan kendala infrastruktur, dan informasi pengembangan:
 - **Email Resmi**: `tama@syapratama.tech`
@@ -219,8 +269,8 @@ Untuk pertanyaan teknis, pelaporan kendala infrastruktur, dan informasi pengemba
 
 ---
 
-## 11. Lisensi & Hak Cipta
+## 12. Lisensi & Hak Cipta
 
-Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).  
+Proyek ini dilisensikan di bawah ketentuan [MIT License](LICENSE).
 Hak Cipta (c) 2026 PT Pasok Mataram Nusantara. Seluruh hak cipta dilindungi undang-undang.
 Platform ini dikembangkan untuk digitalisasi dan efisiensi pengadaan pangan usaha kuliner D.I. Yogyakarta.
