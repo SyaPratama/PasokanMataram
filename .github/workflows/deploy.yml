@@ -48,10 +48,10 @@ jobs:
           npm run db:seed
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
-        continue-on-error: false
       
       - name: Build web with Next.js standalone output
         run: npm run build -- --filter=@pasok/web

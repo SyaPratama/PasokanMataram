@@ -23,12 +23,31 @@ interface SeedConfig {
 }
 
 const config: SeedConfig = {
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: parseInt(process.env.DB_PORT || '3307', 10),
+  port: parseInt(process.env.DB_PORT || '3306', 10),
   user: process.env.DB_USER || 'pasok_user',
   password: process.env.DB_PASSWORD || 'Tama123',
   database: process.env.DB_NAME || 'pasokmataram_db',
 };
+
+async function connectWithRetry(
+  connConfig: mysql.ConnectionOptions,
+  maxRetries = 3,
+  delayMs = 2000
+): Promise<mysql.Connection> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await mysql.createConnection(connConfig);
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxRetries) {
+        console.log(`  Connection attempt ${attempt} failed (${(err as Error).message}). Retrying in ${delayMs / 1000}s...`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
+}
 
 async function seedDatabase() {
   console.log('--- PasokMataram Database Seeding ---');
@@ -37,8 +56,9 @@ async function seedDatabase() {
   let connection: mysql.Connection | null = null;
 
   try {
-    connection = await mysql.createConnection({
+    connection = await connectWithRetry({
       ...config,
+      connectTimeout: 30000,
       multipleStatements: true,
     });
     console.log('Connected to MySQL server successfully.\n');
