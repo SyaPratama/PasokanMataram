@@ -63,9 +63,15 @@ function LoginForm() {
             document.cookie = `pasok_session=${token}; path=/; max-age=604800; SameSite=Lax`;
           }
           document.cookie = `pasok_macro_role=${macroRole}; path=/; max-age=604800; SameSite=Lax`;
+          document.cookie = `pasok_session_role=${role}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_kyb_status=VERIFIED; path=/; max-age=604800; SameSite=Lax`;
+          if (data.data.businessName) {
+            document.cookie = `pasok_business_name=${encodeURIComponent(data.data.businessName)}; path=/; max-age=604800; SameSite=Lax`;
+          }
+          if (data.data.userName) {
+            document.cookie = `pasok_user_name=${encodeURIComponent(data.data.userName)}; path=/; max-age=604800; SameSite=Lax`;
+          }
         }
-
         let destination = redirectTarget || '/buyer/dashboard';
 
         if (macroRole === 'SUPER_ADMIN') {

@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import mysql from 'mysql2/promise';
 import { databaseConfig, migrationsConfig } from '@pasok/config';
+import { withDbRetry } from './client';
 
 export interface MigrationResult {
   file: string;
@@ -29,7 +30,7 @@ export async function runMigrations(): Promise<MigrationResult[]> {
     connectionLimit: 1,
   });
 
-  const connection = await pool.getConnection();
+  const connection = await withDbRetry(() => pool.getConnection());
   const results: MigrationResult[] = [];
 
   try {

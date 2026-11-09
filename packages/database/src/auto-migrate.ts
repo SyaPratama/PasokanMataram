@@ -3,6 +3,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
 import { databaseConfig } from '@pasok/config';
+import { withDbRetry } from './client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,13 +43,15 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
   let connection: mysql.Connection | null = null;
 
   try {
-    const rootConnection = await mysql.createConnection({
-      host: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      multipleStatements: true,
-    });
+    const rootConnection = await withDbRetry(() =>
+      mysql.createConnection({
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        password: config.password,
+        multipleStatements: true,
+      })
+    );
 
     log(`[Auto-Migration] Creating database "${config.database}" if not exists...`);
     await rootConnection.query(
@@ -57,7 +60,7 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
 
     await rootConnection.end();
 
-    connection = await mysql.createConnection(config);
+    connection = await withDbRetry(() => mysql.createConnection(config));
 
     const candidateDirs = [
       join(__dirname, './schema'),

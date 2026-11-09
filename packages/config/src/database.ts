@@ -19,6 +19,11 @@ const databaseConfigSchema = z.object({
     idleTimeoutMillis: z.number().int().positive().default(30000),
     connectionTimeoutMillis: z.number().int().positive().default(5000),
   }),
+  dbRetry: z.object({
+    maxRetries: z.number().int().min(1).default(5),
+    baseDelayMs: z.number().int().min(10).default(100),
+    maxDelayMs: z.number().int().min(100).default(2000),
+  }).default({}),
   slowQueryThresholdMs: z.number().int().positive().default(200),
 });
 

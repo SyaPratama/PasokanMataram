@@ -26,6 +26,9 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
     expect(databaseConfig.pool.idleTimeoutMillis).toBe(30000);
     expect(databaseConfig.pool.connectionTimeoutMillis).toBe(5000);
     expect(databaseConfig.slowQueryThresholdMs).toBe(200);
+    expect(databaseConfig.dbRetry.maxRetries).toBe(5);
+    expect(databaseConfig.dbRetry.baseDelayMs).toBe(100);
+    expect(databaseConfig.dbRetry.maxDelayMs).toBe(2000);
   });
 
   it('memvalidasi storage configuration (Appwrite)', () => {

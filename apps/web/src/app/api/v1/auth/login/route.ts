@@ -62,6 +62,8 @@ export async function POST(request: Request): Promise<NextResponse> {
         data: {
           tenantId: tenant.id,
           userId: user.id,
+          businessName: tenant.businessName,
+          userName: user.fullName,
           role: user.role,
           macroRole: tenant.tenantType === 'HOREKA_BUYER' ? 'HOREKA' : 'GAPOKTAN',
           sessionToken,

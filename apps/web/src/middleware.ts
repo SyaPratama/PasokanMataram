@@ -104,8 +104,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   const isSandbox =
-    request.nextUrl.searchParams.get('sandbox') === 'true' ||
-    request.cookies.get('pasok_sandbox_mode')?.value === 'true';
+    process.env.NODE_ENV !== 'production' &&
+    (request.nextUrl.searchParams.get('sandbox') === 'true' ||
+      request.cookies.get('pasok_sandbox_mode')?.value === 'true');
   const sandboxPersona = request.nextUrl.searchParams.get('persona') || 'BUYER';
 
   if (!claims && isSandbox) {
