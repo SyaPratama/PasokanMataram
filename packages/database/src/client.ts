@@ -5,6 +5,19 @@ import type { SecurityContext } from '@pasok/domain';
  * Execute async operation with exponential backoff retry.
  * Config via @pasok/config dbRetry (maxRetries, baseDelayMs, maxDelayMs).
  */
+function getPromiseResolver<T = void>() {
+  if (typeof Promise.withResolvers === 'function') {
+    return Promise.withResolvers<T>();
+  }
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
   const { maxRetries, baseDelayMs, maxDelayMs } = databaseConfig.dbRetry;
   let attempt = 0;
@@ -18,7 +31,7 @@ export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
       const backoff = Math.min(baseDelayMs * 2 ** (attempt - 1), maxDelayMs);
       const jitter = Math.floor(Math.random() * (backoff * 0.2));
       const delayMs = backoff + jitter;
-      const { promise, resolve } = Promise.withResolvers<void>();
+      const { promise, resolve } = getPromiseResolver<void>();
       setTimeout(resolve, delayMs);
       await promise;
     }
