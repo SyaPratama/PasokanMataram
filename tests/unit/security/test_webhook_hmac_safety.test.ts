@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import crypto from 'crypto';
+import { paymentProviderConfigs } from '@pasok/config';
 import { SolosmartpayGateway } from '../../../packages/payment-gateways/src/solosmartpay.gateway';
 import { XenditGateway } from '../../../packages/payment-gateways/src/xendit.gateway';
 import { MidtransGateway } from '../../../packages/payment-gateways/src/midtrans.gateway';
@@ -21,7 +22,7 @@ describe('Payment Gateway Webhook HMAC Defensive Verification', () => {
     const gateway = new SolosmartpayGateway();
     const rawBody = '{"id":"evt-123","type":"payment.paid"}';
     const timestamp = '1700000000';
-    const secret = process.env.SOLOSMARTPAY_WEBHOOK_SECRET || 'ssp_whsec_dev_local_mock';
+    const secret = paymentProviderConfigs.solosmartpay.webhookSecret;
 
     const validSig = crypto
       .createHmac('sha256', secret)
