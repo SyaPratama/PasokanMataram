@@ -47,28 +47,19 @@ export class SecurityException extends Error {
     Object.setPrototypeOf(this, SecurityException.prototype);
   }
 }
-const dbHost = '127.0.0.1';
-const rawPort = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3307;
-const dbPort = (!rawPort || rawPort === 3306) ? 3307 : rawPort;
-const rawUser = process.env.DB_USER;
-const dbUser = (!rawUser || rawUser === 'root') ? 'pasok_user' : rawUser;
-const dbPassword = 'Tama123';
-const rawName = process.env.DB_NAME;
-const dbName = (!rawName || rawName === 'pasokmataram') ? 'pasokmataram_db' : rawName;
-
 export const pool = mysql.createPool({
-  host: dbHost,
-  port: dbPort,
-  user: dbUser,
-  password: dbPassword,
-  database: dbName,
+  host: databaseConfig.host,
+  port: databaseConfig.port,
+  user: databaseConfig.user,
+  password: databaseConfig.password,
+  database: databaseConfig.database,
   ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : undefined,
   waitForConnections: true,
   connectionLimit: databaseConfig.pool.maxConnections,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-  connectTimeout: 5000,
+  connectTimeout: databaseConfig.pool.connectionTimeoutMillis,
 });
 
 

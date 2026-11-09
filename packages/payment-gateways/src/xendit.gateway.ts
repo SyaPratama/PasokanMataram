@@ -110,7 +110,10 @@ export class XenditGateway implements PaymentGateway {
   async verifyWebhookSignature(_rawBody: string, headers: Record<string, string>): Promise<boolean> {
     const token = headers['x-callback-token'];
     if (!token) return false;
-    return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(this.cfg.webhookToken));
+    const tokBuf = Buffer.from(token);
+    const expBuf = Buffer.from(this.cfg.webhookToken);
+    if (tokBuf.length !== expBuf.length) return false;
+    return crypto.timingSafeEqual(tokBuf, expBuf);
   }
 
   async parseWebhookEvent(rawBody: string, headers: Record<string, string>): Promise<GatewayWebhookEvent> {

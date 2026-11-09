@@ -127,7 +127,10 @@ export class DuitkuGateway implements PaymentGateway {
     if (!merchantCode || !amount || !merchantOrderId || !signature) return false;
 
     const expected = md5(`${merchantCode}${amount}${merchantOrderId}${this.cfg.apiKey}`);
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+    const sigBuf = Buffer.from(signature);
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length) return false;
+    return crypto.timingSafeEqual(sigBuf, expBuf);
   }
 
   async parseWebhookEvent(rawBody: string, headers: Record<string, string>): Promise<GatewayWebhookEvent> {
