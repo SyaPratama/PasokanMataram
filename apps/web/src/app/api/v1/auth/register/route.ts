@@ -47,7 +47,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const response = NextResponse.json(
       {
-        success: true,
         data: {
           tenantId: tenant.id,
           userId: user.id,
@@ -55,6 +54,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           tenantType: tenant.tenantType,
           kybStatus: tenant.kybStatus,
           role: user.role,
+          sessionToken,
         },
         message: 'Pendaftaran berhasil. Silakan lengkapi dokumen legalitas KYB.',
       },

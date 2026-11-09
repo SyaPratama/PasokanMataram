@@ -3,6 +3,8 @@ name: Continuous Integration
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -20,8 +22,6 @@ jobs:
   lint-and-typecheck:
     name: Code Quality & Typecheck
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,8 +46,6 @@ jobs:
   unit-and-contract-tests:
     name: Unit & Contract Tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,7 +68,6 @@ jobs:
     name: Monorepo Build Proof
     runs-on: ubuntu-latest
     needs: [lint-and-typecheck, unit-and-contract-tests]
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,8 +92,7 @@ jobs:
     name: CI Gate Summary
     runs-on: ubuntu-latest
     needs: [lint-and-typecheck, unit-and-contract-tests, build-monorepo]
-    if: always() && github.ref == 'refs/heads/main'
-
+    if: always()
     steps:
       - name: Evaluate gate status
         run: |

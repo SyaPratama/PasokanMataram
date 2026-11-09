@@ -110,21 +110,32 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (data.success && data.data) {
-        const { tenantId, userId, role, kybStatus } = data.data;
+        const { tenantId, userId, role, kybStatus, sessionToken } = data.data;
 
         if (typeof document !== 'undefined') {
-          const mockToken = createMockClientJwt({
-            userId,
-            tenantId,
-            macroRole: intent,
-            microRole: intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON',
-            email: formData.email || 'mitra@pasokmataram.id',
-            isSuperAdmin: false,
-          });
-          document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
+          const token = sessionToken || data.sessionToken;
+          if (token) {
+            document.cookie = `pasok_session=${token}; path=/; max-age=604800; SameSite=Lax`;
+          } else if (process.env.NODE_ENV !== 'production') {
+            const mockToken = createMockClientJwt({
+              userId,
+              tenantId,
+              macroRole: intent,
+              microRole: intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON',
+              email: formData.email || 'mitra@pasokmataram.id',
+              isSuperAdmin: false,
+            });
+            document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
+          }
           document.cookie = `pasok_session_role=${intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON'}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_macro_role=${intent}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_kyb_status=${kybStatus || 'KYB_PENDING'}; path=/; max-age=604800; SameSite=Lax`;
+          if (data.data.businessName) {
+            document.cookie = `pasok_business_name=${encodeURIComponent(data.data.businessName)}; path=/; max-age=604800; SameSite=Lax`;
+          }
+          if (formData.ownerName) {
+            document.cookie = `pasok_user_name=${encodeURIComponent(formData.ownerName)}; path=/; max-age=604800; SameSite=Lax`;
+          }
         }
 
         const targetDashboard = intent === 'HOREKA' ? '/buyer/dashboard' : '/supplier/dashboard';

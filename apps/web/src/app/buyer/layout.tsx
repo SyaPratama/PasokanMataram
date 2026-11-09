@@ -39,6 +39,8 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
     MOCK_OUTLETS[0]?.id || 'out-001'
   );
   const [userRole, setUserRole] = React.useState<string>('HEAD_CHEF');
+  const [businessName, setBusinessName] = React.useState<string>('Restoran Bale Raos');
+  const [userName, setUserName] = React.useState<string>('Ibu Sri Rejeki');
 
   React.useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -46,9 +48,16 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
       if (match && match[1]) {
         setUserRole(match[1]);
       }
+      const bMatch = document.cookie.match(/pasok_business_name=([^;]+)/);
+      if (bMatch && bMatch[1]) {
+        setBusinessName(decodeURIComponent(bMatch[1]));
+      }
+      const uMatch = document.cookie.match(/pasok_user_name=([^;]+)/);
+      if (uMatch && uMatch[1]) {
+        setUserName(decodeURIComponent(uMatch[1]));
+      }
     }
   }, []);
-
   const activeOutlet =
     MOCK_OUTLETS.find((o) => o.id === activeOutletId) || MOCK_OUTLETS[0];
 
@@ -175,9 +184,9 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
       }
       navGroups={navGroups}
       tenantProfile={{
-        tenantName: 'Restoran Bale Raos',
+        tenantName: businessName,
         statusBadge: 'VERIFIED',
-        userName: userRole === 'OWNER' ? 'Ibu Sri Rejeki' : 'Chef Bambang S.',
+        userName: userName,
         roleTitle: userRole,
         logoutHref: '/login',
       }}

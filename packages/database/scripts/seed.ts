@@ -29,26 +29,7 @@ const config: SeedConfig = {
   password: process.env.DB_PASSWORD || 'Tama123',
   database: process.env.DB_NAME || 'pasokmataram_db',
 };
-
-async function connectWithRetry(
-  connConfig: mysql.ConnectionOptions,
-  maxRetries = 3,
-  delayMs = 2000
-): Promise<mysql.Connection> {
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await mysql.createConnection(connConfig);
-    } catch (err) {
-      lastError = err;
-      if (attempt < maxRetries) {
-        console.log(`  Connection attempt ${attempt} failed (${(err as Error).message}). Retrying in ${delayMs / 1000}s...`);
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
-    }
-  }
-  throw lastError;
-}
+import { withDbRetry } from '../src/client';
 
 async function seedDatabase() {
   console.log('--- PasokMataram Database Seeding ---');
@@ -57,21 +38,26 @@ async function seedDatabase() {
   let connection: mysql.Connection | null = null;
 
   try {
-    connection = await connectWithRetry({
-      ...config,
-      connectTimeout: 30000,
-      multipleStatements: true,
-    });
+    connection = await withDbRetry(() =>
+      mysql.createConnection({
+        ...config,
+        connectTimeout: 30000,
+        multipleStatements: true,
+      })
+    );
     console.log('Connected to MySQL server successfully.\n');
 
-    // 1. SMART SEED GATE (Production Data Protection)
-    const [rows] = await connection.query<any[]>(
-      "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
+    const [rows] = await withDbRetry(() =>
+      connection!.query<any[]>(
+        "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
+      )
     );
     const tableExists = Array.isArray(rows) && rows[0]?.count > 0;
 
     if (tableExists) {
-      const [countRows] = await connection.query<any[]>('SELECT COUNT(*) as count FROM tenants');
+      const [countRows] = await withDbRetry(() =>
+        connection!.query<any[]>('SELECT COUNT(*) as count FROM tenants')
+      );
       const tenantCount = Array.isArray(countRows) ? countRows[0]?.count : 0;
 
       if (tenantCount > 0 && process.env.DB_FORCE_RESET !== 'true') {
@@ -81,10 +67,8 @@ async function seedDatabase() {
         return;
       }
     }
-
     console.log('[SEED] Running initial 4NF database population...');
 
-    // 2. Locate SQL seed files
     const candidateDirs = [
       join(process.cwd(), 'docker/mysql/init'),
       join(__dirname, '../../../docker/mysql/init'),
@@ -106,29 +90,26 @@ async function seedDatabase() {
 
     console.log(`Loading seed files from: ${seedDir}`);
 
-    // Execute taxonomy mapping
     const taxonomyFile = join(seedDir, '02-seed-taxonomy.sql');
     if (existsSync(taxonomyFile)) {
       const sql = readFileSync(taxonomyFile, 'utf-8').trim();
       if (sql) {
-        await connection.query(sql);
+        await withDbRetry(() => connection!.query(sql));
         console.log('  Applied 02-seed-taxonomy.sql');
       }
     }
 
-    // Execute comprehensive seed data (tenants, users, kyb, pooling, etc.)
     const seedDataFile = join(seedDir, '03-seed-data.sql');
     if (existsSync(seedDataFile)) {
       const sql = readFileSync(seedDataFile, 'utf-8').trim();
       if (sql) {
-        await connection.query(sql);
+        await withDbRetry(() => connection!.query(sql));
         console.log('  Applied 03-seed-data.sql');
       }
     }
 
-    // 3. Seed demo buyer account if not present
     const demoPasswordHash =
-      '$argon2id$v=19$m=65536,t=3,p=4$vnpRsVUMELfMlCGOmC5D7A$9Mbqk8n+7CSbjcy6n/dAqt2BBCcosEXI1YpCVA9dp04'; // demo123
+      '$argon2id$v=19$m=65536,t=3,p=4$vnpRsVUMELfMlCGOmC5D7A$9Mbqk8n+7CSbjcy6n/dAqt2BBCcosEXI1YpCVA9dp04';
     await connection.query(
       `INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active)
        VALUES (
@@ -145,7 +126,6 @@ async function seedDatabase() {
     );
     console.log('  Ensured demo buyer (buyer@demo.com / demo123)');
 
-    // 4. Seed Weather Observations (30 days x 5 regencies)
     console.log('  Seeding 150 weather observations...');
     const regencies = ['SLEMAN', 'BANTUL', 'KULON_PROGO', 'GUNUNGKIDUL', 'KOTA_YOGYAKARTA'];
     const now = Date.now();
@@ -164,7 +144,6 @@ async function seedDatabase() {
       }
     }
 
-    // 5. Seed Commodity Forecasts & 4NF Forecast Horizons
     console.log('  Seeding commodity forecasts & 4NF horizons...');
     const [comms] = await connection.query<any[]>('SELECT id, code, name, category FROM commodities');
     if (Array.isArray(comms) && comms.length > 0) {
@@ -185,7 +164,6 @@ async function seedDatabase() {
           [forecastId, c.id, basePrice, Math.round(basePrice * 1.02), Math.round(basePrice * 1.05), Math.round(basePrice * 1.08), basePrice]
         );
 
-        // 4NF multi-horizon table
         const horizons = [
           { days: 7, mult: 1.02 },
           { days: 30, mult: 1.05 },
@@ -193,15 +171,31 @@ async function seedDatabase() {
         ];
         for (const h of horizons) {
           const pred = Math.round(basePrice * h.mult);
-          await connection.query(
-            `INSERT INTO forecast_horizons (id, forecast_id, horizon_days, predicted_price, confidence_lower, confidence_upper, created_at)
-             VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
-            [forecastId, h.days, pred, Math.round(pred * 0.95), Math.round(pred * 1.05)]
+          const [existing] = await withDbRetry(() =>
+            connection!.query<any[]>(
+              'SELECT id FROM forecast_horizons WHERE forecast_id = ? AND horizon_days = ?',
+              [forecastId, h.days]
+            )
           );
+          if (!Array.isArray(existing) || existing.length === 0) {
+            await withDbRetry(() =>
+              connection!.query(
+                `INSERT INTO forecast_horizons (id, forecast_id, horizon_days, predicted_price, confidence_lower, confidence_upper, created_at)
+                 VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
+                [forecastId, h.days, pred, Math.round(pred * 0.95), Math.round(pred * 1.05)]
+              )
+            );
+          } else {
+            await withDbRetry(() =>
+              connection!.query(
+                `UPDATE forecast_horizons SET predicted_price = ?, confidence_lower = ?, confidence_upper = ? WHERE id = ?`,
+                [pred, Math.round(pred * 0.95), Math.round(pred * 1.05), existing[0].id]
+              )
+            );
+          }
         }
       }
     }
-
     console.log('\n[SUCCESS] Comprehensive 26-table seeding finished successfully!\n');
   } catch (error: unknown) {
     console.error('\n[ERROR] Seeding failed:', error);

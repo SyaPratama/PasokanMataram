@@ -128,7 +128,10 @@ export class MidtransGateway implements PaymentGateway {
       .update(`${order_id}${status_code}${gross_amount}${this.cfg.serverKey}`)
       .digest('hex');
 
-    return crypto.timingSafeEqual(Buffer.from(signature_key), Buffer.from(expected));
+    const sigBuf = Buffer.from(signature_key);
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length) return false;
+    return crypto.timingSafeEqual(sigBuf, expBuf);
   }
 
   async parseWebhookEvent(rawBody: string, headers: Record<string, string>): Promise<GatewayWebhookEvent> {

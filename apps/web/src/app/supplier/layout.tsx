@@ -30,7 +30,23 @@ interface SupplierLayoutProps {
  */
 export default function SupplierLayout({ children }: SupplierLayoutProps) {
   const pathname = usePathname();
+  const [businessName, setBusinessName] = React.useState<string>(
+    'Sentra Supplier Sleman (Gapoktan Srikayangan Makmur)'
+  );
+  const [userName, setUserName] = React.useState<string>('Pak Subardi');
 
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const bMatch = document.cookie.match(/pasok_business_name=([^;]+)/);
+      if (bMatch && bMatch[1]) {
+        setBusinessName(decodeURIComponent(bMatch[1]));
+      }
+      const uMatch = document.cookie.match(/pasok_user_name=([^;]+)/);
+      if (uMatch && uMatch[1]) {
+        setUserName(decodeURIComponent(uMatch[1]));
+      }
+    }
+  }, []);
   const navGroups: readonly NavGroup[] = [
     {
       title: 'MENU',
@@ -131,9 +147,9 @@ export default function SupplierLayout({ children }: SupplierLayoutProps) {
       }
       navGroups={navGroups}
       tenantProfile={{
-        tenantName: 'Sentra Supplier Sleman (Gapoktan Srikayangan Makmur)',
+        tenantName: businessName,
         statusBadge: 'VERIFIED',
-        userName: 'Pak Subardi',
+        userName: userName,
         roleTitle: 'Manajer Operasional Supplier',
         logoutHref: '/login',
       }}

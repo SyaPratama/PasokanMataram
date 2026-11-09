@@ -1,7 +1,37 @@
 import mysql from 'mysql2/promise';
 import { databaseConfig, isDevelopment } from '@pasok/config';
 import type { SecurityContext } from '@pasok/domain';
+/**
+ * Execute async operation with exponential backoff retry.
+ * Config via @pasok/config dbRetry (maxRetries, baseDelayMs, maxDelayMs).
+ */
+export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
+  const { maxRetries, baseDelayMs, maxDelayMs } = databaseConfig.dbRetry;
+  let attempt = 0;
+  while (true) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (++attempt > maxRetries) {
+        throw err;
+      }
+      const backoff = Math.min(baseDelayMs * 2 ** (attempt - 1), maxDelayMs);
+      const jitter = Math.floor(Math.random() * (backoff * 0.2));
+      const delayMs = backoff + jitter;
+      const { promise, resolve } = Promise.withResolvers<void>();
+      setTimeout(resolve, delayMs);
+      await promise;
+    }
+  }
+}
 
+/**
+ * Mendapatkan koneksi MySQL dari connection pool dengan mekanisme retry otomatis.
+ * @returns Koneksi aktif PoolConnection.
+ */
+export async function getClient(): Promise<mysql.PoolConnection> {
+  return withDbRetry(() => pool.getConnection());
+}
 /**
  * Pengecualian keamanan khusus untuk pelanggaran batas multi-tenant.
  */
@@ -17,28 +47,19 @@ export class SecurityException extends Error {
     Object.setPrototypeOf(this, SecurityException.prototype);
   }
 }
-const dbHost = '127.0.0.1';
-const rawPort = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3307;
-const dbPort = (!rawPort || rawPort === 3306) ? 3307 : rawPort;
-const rawUser = process.env.DB_USER;
-const dbUser = (!rawUser || rawUser === 'root') ? 'pasok_user' : rawUser;
-const dbPassword = 'Tama123';
-const rawName = process.env.DB_NAME;
-const dbName = (!rawName || rawName === 'pasokmataram') ? 'pasokmataram_db' : rawName;
-
 export const pool = mysql.createPool({
-  host: dbHost,
-  port: dbPort,
-  user: dbUser,
-  password: dbPassword,
-  database: dbName,
+  host: databaseConfig.host,
+  port: databaseConfig.port,
+  user: databaseConfig.user,
+  password: databaseConfig.password,
+  database: databaseConfig.database,
   ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : undefined,
   waitForConnections: true,
   connectionLimit: databaseConfig.pool.maxConnections,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-  connectTimeout: 5000,
+  connectTimeout: databaseConfig.pool.connectionTimeoutMillis,
 });
 
 
@@ -77,7 +98,7 @@ export async function withTenantContext<T>(
     throw new SecurityException('Konteks keamanan wajib memiliki tenantId yang valid', 'INVALID_SECURITY_CONTEXT');
   }
 
-  const client = await pool.getConnection();
+  const client = await getClient();
   try {
     await client.query('START TRANSACTION');
     await client.query('SET @current_tenant_id = ?', [context.tenantId]);
@@ -88,9 +109,6 @@ export async function withTenantContext<T>(
     return result;
   } catch (error: unknown) {
     await client.query('ROLLBACK');
-    if (error instanceof SecurityException) {
-      throw error;
-    }
     throw error;
   } finally {
     client.release();
@@ -105,7 +123,7 @@ export async function withTenantContext<T>(
 export async function withTransaction<T>(
   callback: (client: mysql.PoolConnection) => Promise<T>
 ): Promise<T> {
-  const client = await pool.getConnection();
+  const client = await getClient();
   try {
     await client.query('START TRANSACTION');
     const result = await callback(client);

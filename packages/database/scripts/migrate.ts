@@ -10,6 +10,7 @@ import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
+import { withDbRetry } from '../src/client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,32 +20,13 @@ interface MigrationFile {
   path: string;
   order: number;
 }
-async function connectWithRetry(
-  connConfig: mysql.ConnectionOptions,
-  maxRetries = 3,
-  delayMs = 2000
-): Promise<mysql.Connection> {
-  let lastError: unknown;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await mysql.createConnection(connConfig);
-    } catch (err) {
-      lastError = err;
-      if (attempt < maxRetries) {
-        console.log(`  Connection attempt ${attempt} failed (${(err as Error).message}). Retrying in ${delayMs / 1000}s...`);
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
-    }
-  }
-  throw lastError;
-}
+
 /**
  * Automatically aligns legacy tables that were created prior to 4NF refactor
  * Ensures columns like reservation_id and UUID primary keys exist
  */
 async function alignLegacyTables(connection: mysql.Connection) {
   try {
-    // 0. escrow_settlements: check for missing reservation_id or legacy deprecated_at
     const [esCols] = await connection.query<any[]>(
       "SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'escrow_settlements'"
     );
@@ -56,7 +38,6 @@ async function alignLegacyTables(connection: mysql.Connection) {
       }
     }
 
-    // 1. payment_invoices: check for reservation_id
     const [piCols] = await connection.query<any[]>(
       "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'payment_invoices'"
     );
@@ -83,7 +64,6 @@ async function alignLegacyTables(connection: mysql.Connection) {
       }
     }
 
-    // 2. webhook_events: check for legacy BIGINT id
     const [weCols] = await connection.query<any[]>(
       "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'webhook_events'"
     );
@@ -95,7 +75,6 @@ async function alignLegacyTables(connection: mysql.Connection) {
       }
     }
 
-    // 3. terms_acceptances: check for legacy BIGINT id
     const [taCols] = await connection.query<any[]>(
       "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'terms_acceptances'"
     );
@@ -128,35 +107,25 @@ async function runMigrations() {
   let connection: mysql.Connection | null = null;
 
   try {
-    try {
-      const rootConnection = await connectWithRetry({
+    const rootConnection = await withDbRetry(() =>
+      mysql.createConnection({
         host: config.host,
         port: config.port,
         user: config.user,
         password: config.password,
         connectTimeout: 30000,
         multipleStatements: true,
-      });
+      })
+    );
 
-      console.log('Connected to MySQL server\n');
-      console.log(` Creating database "${config.database}" if not exists...`);
-      await rootConnection.query(
-        `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-      );
-      console.log(`Database "${config.database}" ready\n`);
-      await rootConnection.query(`USE \`${config.database}\``);
-      connection = rootConnection;
-    } catch {
-      console.log('Note: Root database creation skipped (normal for cPanel/shared hosts). Connecting directly.\n');
-    }
-
-    if (!connection) {
-      connection = await connectWithRetry({
-        ...config,
-        connectTimeout: 30000,
-      });
-    }
-
+    console.log('Connected to MySQL server\n');
+    console.log(` Creating database "${config.database}" if not exists...`);
+    await rootConnection.query(
+      `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+    );
+    console.log(`Database "${config.database}" ready\n`);
+    await rootConnection.query(`USE \`${config.database}\``);
+    connection = rootConnection;
     const candidateDirs = [
       join(__dirname, '../src/schema'),
       join(process.cwd(), 'packages/database/src/schema'),
@@ -211,22 +180,29 @@ async function runMigrations() {
       console.log(`  Applying migration: ${file.filename}...`);
 
       try {
-        await connection.query(sql);
+        await withDbRetry(async () => {
+          try {
+            await connection!.query(sql);
+          } catch (error: unknown) {
+            const mysqlError = error as { code?: string; message?: string };
+            const ignorableCodes = [
+              'ER_TABLE_EXISTS_ERROR',
+              'ER_DUP_FIELDNAME',
+              'ER_DUP_KEYNAME',
+              'ER_CANT_DROP_FIELD_OR_KEY',
+              'ER_NO_SUCH_TABLE',
+            ];
+            if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
+              console.log(`  Already applied (${mysqlError.code}), skipping: ${file.filename}\n`);
+              return;
+            }
+            throw error;
+          }
+        });
         console.log(`Completed: ${file.filename}\n`);
       } catch (error: unknown) {
-        const mysqlError = error as { code?: string; message?: string };
-        const ignorableCodes = [
-          'ER_TABLE_EXISTS_ERROR',
-          'ER_DUP_FIELDNAME',
-          'ER_DUP_KEYNAME',
-          'ER_CANT_DROP_FIELD_OR_KEY',
-          'ER_NO_SUCH_TABLE',
-        ];
-        if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
-          console.log(`  Already applied (${mysqlError.code}), skipping: ${file.filename}\n`);
-        } else {
-          throw error;
-        }
+        console.error(`\nFailed applying migration ${file.filename}:`, error);
+        throw error;
       }
     }
 
