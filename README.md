@@ -1,6 +1,16 @@
 # PasokMataram
 
-Platform Pooling Purchasing Pangan B2B untuk Restoran, Kafe, Katering, dan Supplier UMKM D.I. Yogyakarta.
+Platform B2B SaaS pengadaan kolektif pangan & rantai pasok agrikultur yang menghubungkan Gapoktan dengan sektor Horeka di D.I. Yogyakarta. Dibangun dengan Next.js Monorepo, Strict TypeScript, PostgreSQL RLS, Escrow Settlement, dan ML Price Forecasting.
+
+### Tim Pengembang (GTNIC 2026)
+- **Rasya Putra Pratama (Ketua)** — Universitas Teknologi Yogyakarta
+- **Ibnu Sabil (Anggota)** — Universitas Teknologi Yogyakarta
+
+### Tautan Lingkungan Produksi (Live)
+- **Portal Web (Next.js 14 PWA)**: [https://pasok.syapratama.tech](https://pasok.syapratama.tech)
+- **Backend API Gateway & DB Probe**: [https://api-pasok.syapratama.tech/api/v1/health/db](https://api-pasok.syapratama.tech/api/v1/health/db)
+- **ML Forecasting Engine (FastAPI)**: [https://api-predict.syapratama.tech/health](https://api-predict.syapratama.tech/health)
+- **Repositori GitHub**: [https://github.com/SyaPratama/PasokanMataram](https://github.com/SyaPratama/PasokanMataram)
 
 ---
 

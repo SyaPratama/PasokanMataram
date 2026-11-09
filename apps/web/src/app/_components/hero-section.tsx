@@ -105,9 +105,9 @@ export function HeroSection() {
           src="/images/hero/hero-forest-overlay.webp"
           alt="Bingkai Kanopi Pohon Tropis Lereng Pegunungan Merapi DIY"
           fill
-          priority
-          sizes="100vw"
-          className="object-cover object-top sm:object-center opacity-95"
+          sizes="(max-width: 768px) 100vw, 100vw"
+          loading="lazy"
+          className="object-cover object-top sm:object-center opacity-95 pointer-events-none"
         />
       </motion.div>
 

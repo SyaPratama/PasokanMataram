@@ -32,8 +32,8 @@ export class ForecastService {
       throw new Error(`ML_SERVICE_URL must use http or https protocol, got: ${parsedUrl.protocol}`);
     }
 
-    // Allowlist: localhost, 127.0.0.1, or explicitly configured hosts
-    const allowedHosts = ['localhost', '127.0.0.1'];
+    // Allowlist: localhost, 127.0.0.1, production ML domain, or explicitly configured hosts
+    const allowedHosts = ['localhost', '127.0.0.1', 'api-predict.syapratama.tech'];
     if (process.env.ML_ALLOWED_HOSTS) {
       allowedHosts.push(...process.env.ML_ALLOWED_HOSTS.split(','));
     }
