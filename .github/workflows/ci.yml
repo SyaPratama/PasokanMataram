@@ -89,6 +89,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+
   ci-gate-summary:
     name: CI Gate Summary
     runs-on: ubuntu-latest
