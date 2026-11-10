@@ -89,7 +89,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji interaksi Drop-down Select Kabupaten pada /komoditas', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/komoditas`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(`${BASE_URL}/komoditas`, { waitUntil: 'networkidle0', timeout: 30000 });
         await page.waitForSelector('#komoditas-regency-select option[value="BANTUL"]', { timeout: 15000 });
 
         // Screenshot sebelum seleksi
@@ -114,7 +114,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji interaksi Drop-down Select pada form /register', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/register`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/register`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('#reg-regency', { timeout: 10000 });
 
         await page.select('#reg-regency', 'KULON PROGO');
@@ -166,7 +166,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji Button Intent Switcher (Kafe & Resto vs Pemasok Gapoktan) di /register', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/register`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/register`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('button[aria-pressed]', { timeout: 10000 });
 
         // Klik tombol Pemasok Gapoktan
@@ -207,7 +207,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji Preset Buttons pada simulator /prediksi-harga', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('#rainfall-slider', { timeout: 10000 });
 
         // Cari tombol skenario hujan ekstrem (+60%)
@@ -345,7 +345,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji interaksi Slider Curah Hujan BMKG (#rainfall-slider) pada /prediksi-harga', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('#rainfall-slider', { timeout: 10000 });
 
         // Screenshot slider awal
@@ -376,7 +376,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji interaksi Slider Tarif BBM (#fuel-slider) pada /prediksi-harga', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/prediksi-harga`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('#fuel-slider', { timeout: 10000 });
 
         await page.$eval('#fuel-slider', (el) => {
@@ -401,7 +401,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
     it('menguji Slider Kalkulator Penghematan Biaya Dapur pada /kalkulator', async () => {
       const page: Page = await browser.newPage();
       try {
-        await page.goto(`${BASE_URL}/kalkulator`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(`${BASE_URL}/kalkulator`, { waitUntil: 'networkidle0', timeout: 20000 });
         await page.waitForSelector('input[type="range"]', { timeout: 10000 });
 
         // Geser slider kalkulator ke Rp 4.500.000

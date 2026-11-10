@@ -7,7 +7,7 @@
 'use client';
 
 import * as React from 'react';
-import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Minus, CreditCard } from 'lucide-react';
+import { Users, ArrowRight, X, CheckCircle2, AlertCircle, ShieldCheck, Plus, Minus } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { PoolSpecAccordion } from './_components/pool-spec-accordion';
 import { trackFunnelStep } from '@/lib/telemetry';
@@ -99,8 +99,6 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
-  const openPaymentModal = (params?: { orderId?: string; amountRp?: number; method?: string }) => {};
-  const addPoolingReservation = (campaignId?: string, quantityKg?: number) => {};
   const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);
   const [selectedPool, setSelectedPool] = React.useState<PoolItem | null>(null);
   const [orderKg, setOrderKg] = React.useState<number>(20);
@@ -280,24 +278,6 @@ export default function BuyerPoolingPage() {
           <p className="text-xs sm:text-sm font-medium text-gelap leading-relaxed">
             Dana Anda tersimpan aman di rekening bersama Bank BPD DIY. Dana baru diteruskan ke petani setelah timbangan fisik dan uji mutu subuh di hub dinyatakan lolos SNI.
           </p>
-          {false && (
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() =>
-                  openPaymentModal({
-                    orderId: `RSV-SBX-${Date.now().toString().slice(-4)}`,
-                    amountRp: vaInstruction?.totalAmountRp,
-                    method: 'BPD_DIY',
-                  })
-                }
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primer text-white hover:bg-primer-hover active:scale-[0.98] font-bold text-sm min-h-[48px] shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primer/40"
-              >
-                <CreditCard className="w-4 h-4 text-aksen-light" />
-                <span>Bayar via Sandbox</span>
-              </button>
-            </div>
-          )}
         </div>
       )}
 

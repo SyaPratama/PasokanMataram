@@ -1,5 +1,6 @@
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import { query, withTenantContext, pool } from '@pasok/database';
+import { databaseConfig } from '@pasok/config';
 
 describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
   let isDbConnected = false;
@@ -30,7 +31,7 @@ describe('PostgreSQL 16 Connection & Row-Level Security Wrapper', () => {
     expect(res.rows.length).toBe(1);
     const firstRow = res.rows[0];
     expect(firstRow?.connected).toBe(1);
-    expect(firstRow?.db_name).toBe('pasokmataram_db');
+    expect(firstRow?.db_name).toBe(databaseConfig.database);
   });
 
   it('memastikan tabel-tabel 3NF telah terpasang di database', async (ctx) => {

@@ -71,16 +71,15 @@ describe('Database Resilience & Live Chaos Fault-Tolerance', () => {
 
   it('DbHealthController melempar ServiceUnavailableException (HTTP 503) saat koneksi terputus total', async () => {
     const unreachableController = new DbHealthController();
-    const originalQuery = pool.query;
-
-    const mockPool = vi.spyOn(pool, 'execute').mockImplementation(async () => {
-      throw new Error('connect ECONNREFUSED 127.0.0.1:3307');
-    });
+    const failingConnections = vi.spyOn(pool, 'getConnection').mockRejectedValue(
+      new Error('connect ECONNREFUSED 127.0.0.1:3307')
+    );
 
     try {
       await expect(unreachableController.check()).rejects.toThrow(ServiceUnavailableException);
+      expect(failingConnections).toHaveBeenCalledTimes(6);
     } finally {
-      mockPool.mockRestore();
+      failingConnections.mockRestore();
     }
   }, 10000);
 
