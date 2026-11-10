@@ -21,8 +21,13 @@ const authConfigSchema = z.object({
 
 export type AuthConfig = z.infer<typeof authConfigSchema>;
 
+const configuredJwtSecret = process.env.JWT_SECRET;
+if (!configuredJwtSecret) {
+  throw new Error('JWT_SECRET wajib dikonfigurasi dan tidak boleh kosong.');
+}
+
 export const authConfig: AuthConfig = authConfigSchema.parse({
-  jwtSecret: process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars',
+  jwtSecret: configuredJwtSecret,
   sessionExpiryDays: process.env.SESSION_EXPIRY_DAYS ? Number(process.env.SESSION_EXPIRY_DAYS) : 7,
   cookieName: 'pasok_session',
   cookieDomain: process.env.COOKIE_DOMAIN || 'localhost',

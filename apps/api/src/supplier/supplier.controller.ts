@@ -8,7 +8,6 @@ import {
   Get,
   Post,
   Body,
-  Headers,
   HttpException,
   HttpStatus,
   Inject,
@@ -21,7 +20,9 @@ import {
   type DispatchOrderDto,
 } from './supplier.service';
 import { Roles } from '../common/roles.decorator';
+import { SecurityContextParam } from '../common/security-context.decorator';
 
+@Roles('GAPOKTAN')
 @Controller('supplier')
 export class SupplierController {
   private readonly supplierService: SupplierService;
@@ -36,13 +37,7 @@ export class SupplierController {
    * @returns Array produk dagangan.
    */
   @Get('products')
-  public async getProducts(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'SUPPLIER',
-      isSuperAdmin: false,
-    };
+  public async getProducts(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const products = await this.supplierService.getProducts(context);
@@ -59,24 +54,17 @@ export class SupplierController {
   /**
    * Mendaftarkan produk pangan lokal baru ke etalase multi-SKU.
    * @param body Data produk.
-   * @param tenantId Header supplier.
    * @returns Entitas produk tersimpan.
-  @Roles('OWNER')
+   */
+  @Roles('GAPOKTAN', 'OWNER')
   @Post('products')
   public async addProduct(
     @Body() body: CreateProductDto,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    if (!body.name || !body.price || !body.skuCode) {
-      throw new HttpException('Nama, harga, dan kode SKU wajib diisi.', HttpStatus.BAD_REQUEST);
+    if (!body.name || !body.price) {
+      throw new HttpException('Nama dan harga wajib diisi.', HttpStatus.BAD_REQUEST);
     }
-
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'SUPPLIER',
-      isSuperAdmin: false,
-    };
 
     try {
       const product = await this.supplierService.createProduct(context, body);
@@ -97,13 +85,7 @@ export class SupplierController {
    * @returns Array kuota panen.
    */
   @Get('allocations')
-  public async getAllocations(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'SUPPLIER',
-      isSuperAdmin: false,
-    };
+  public async getAllocations(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const allocations = await this.supplierService.getAllocations(context);
@@ -123,13 +105,7 @@ export class SupplierController {
    * @returns Metrik ringkasan performa.
    */
   @Get('dashboard')
-  public async getMetrics(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'SUPPLIER',
-      isSuperAdmin: false,
-    };
+  public async getMetrics(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const metrics = await this.supplierService.getDashboardMetrics(context);
@@ -152,14 +128,8 @@ export class SupplierController {
   @Post('dispatch')
   public async postDispatch(
     @Body() body: DispatchOrderDto,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'SUPPLIER',
-      isSuperAdmin: false,
-    };
 
     try {
       const manifest = await this.supplierService.dispatchDelivery(context, body);

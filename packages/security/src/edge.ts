@@ -1,8 +1,10 @@
 import * as jose from 'jose';
-import type { MacroRole, MicroRole, TenantId, UserId, HubId } from '@pasok/domain';
+import { asHubId, asTenantId, asUserId, isMacroRole, isMicroRole, type MacroRole, type MicroRole, type TenantId, type UserId, type HubId } from '@pasok/domain';
+
+type SessionClaimsCandidate = Record<string, unknown>;
 
 /**
- * Klaim token sesi JWT pengguna terautentikasi.
+ * Validated session claims candidate.
  */
 export interface UserSessionClaims {
   readonly userId: UserId;
@@ -15,51 +17,41 @@ export interface UserSessionClaims {
 }
 
 /**
- * Verifikasi JWT dengan validasi signature HMAC-SHA256.
- * CRITICAL FIX: Prevents JWT forgery attacks (pentest finding #1).
+ * Verifies a signed session token and validates every required claim.
+ * @param token Signed JWT.
+ * @param secret Required HMAC secret.
+ * @returns Validated session claims or null.
  */
 export async function verifySessionToken(token: string, secret: string): Promise<UserSessionClaims | null> {
+  if (!secret) return null;
   try {
     const secretKey = new TextEncoder().encode(secret);
-    const { payload } = await jose.jwtVerify(token, secretKey, {
-      algorithms: ['HS256'],
-    });
-    
-    if (typeof payload === 'object' && payload !== null && 'userId' in payload && 'macroRole' in payload) {
-      return payload as unknown as UserSessionClaims;
+    const { payload } = await jose.jwtVerify(token, secretKey, { algorithms: ['HS256'] });
+    const candidate = payload as SessionClaimsCandidate;
+    if (
+      typeof candidate.userId !== 'string' ||
+      typeof candidate.tenantId !== 'string' ||
+      !isMacroRole(candidate.macroRole) ||
+      !isMicroRole(candidate.microRole) ||
+      typeof candidate.isSuperAdmin !== 'boolean' ||
+      typeof candidate.email !== 'string'
+    ) {
+      return null;
     }
-    return null;
+    return {
+      userId: asUserId(candidate.userId),
+      tenantId: asTenantId(candidate.tenantId),
+      macroRole: candidate.macroRole,
+      microRole: candidate.microRole,
+      assignedHubId: typeof candidate.assignedHubId === 'string' ? asHubId(candidate.assignedHubId) : undefined,
+      isSuperAdmin: candidate.isSuperAdmin,
+      email: candidate.email,
+    };
   } catch {
     return null;
   }
 }
 
-/**
- * Mendekode JWT tanpa validasi signature (DEPRECATED - backward compatibility only).
- * WARNING: Tidak aman - gunakan verifySessionToken() untuk autentikasi.
- */
-export function decodeSessionClaimsEdge(token: string): UserSessionClaims | null {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3 || !parts[1]) {
-      return null;
-    }
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    const decodedText = new TextDecoder().decode(bytes);
-    const parsed = JSON.parse(decodedText);
-    if (typeof parsed === 'object' && parsed !== null && 'userId' in parsed && 'macroRole' in parsed) {
-      return parsed as UserSessionClaims;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Memeriksa apakah suatu Micro-Role diizinkan melihat saldo escrow, mutasi bank, dan transaksi finansial.

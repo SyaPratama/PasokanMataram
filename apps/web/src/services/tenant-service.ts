@@ -131,6 +131,8 @@ export class TenantService {
         tenantId,
         userId,
         role: 'OWNER',
+        macroRole: input.macroRole ?? (input.tenantType === 'HOREKA_BUYER' ? 'HOREKA' : 'GAPOKTAN'),
+        microRole: 'OWNER',
         isSuperAdmin: false,
         email: input.email.toLowerCase(),
         businessName: input.businessName,

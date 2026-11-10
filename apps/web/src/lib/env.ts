@@ -40,21 +40,5 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-let parsedEnv: Env;
-try {
-  parsedEnv = envSchema.parse(process.env);
-} catch (error) {
-  if (error instanceof z.ZodError) {
-    const errorDetails = error.issues
-      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
-      .join('\n');
-    console.warn(`[PERINGATAN ENV] Konfigurasi environment belum lengkap:\n${errorDetails}\nMenggunakan nilai default untuk pengembangan lokal.`);
-  }
-  parsedEnv = envSchema.parse({
-    ...process.env,
-    DB_PORT: process.env.DB_PORT || 3307,
-    JWT_SECRET: process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars',
-  });
-}
+export const env: Env = envSchema.parse(process.env);
 
-export const env = parsedEnv;

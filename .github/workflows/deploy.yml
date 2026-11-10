@@ -68,6 +68,8 @@ jobs:
           cp -r apps/web/.next/static web-dist/apps/web/.next/
           cp -r apps/web/public web-dist/apps/web/
           cp apps/web/public/.htaccess web-dist/.htaccess
+          mkdir -p web-dist/schema
+          cp packages/database/src/schema/*.sql web-dist/schema/
           cat << 'SERVER_JS_EOF' > web-dist/server.js
           import fs from 'fs';
           import path from 'path';
@@ -243,10 +245,16 @@ jobs:
       
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Configure pinned SSH host key
+        run: |
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          test -s "$HOME/.ssh/known_hosts"
       
       - name: Upload web build to server
         run: |
-          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P "${{ env.SSH_PORT }}" $SSH_OPTS \
@@ -277,7 +285,7 @@ jobs:
             ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
           
-          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH" 2>/dev/null || true
+          tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
           rm -f ~/web-build.tar.gz
           if [ -f /tmp/preserved_web_htaccess ]; then
             if grep -q "CLOUDLINUX" /tmp/preserved_web_htaccess 2>/dev/null; then
@@ -302,6 +310,23 @@ jobs:
             echo "    Deny from all" >> "$WEB_PATH/.htaccess"
             echo "</FilesMatch>" >> "$WEB_PATH/.htaccess"
           fi
+          if [ -d "$WEB_PATH/schema" ] && [ -n "${{ secrets.DB_HOST }}" ] && [ -n "${{ secrets.DB_PASSWORD }}" ]; then
+            echo "Applying remote database migrations & seeding via SSH..."
+            DB_HOST="${{ secrets.DB_HOST }}"
+            DB_PORT="${{ secrets.DB_PORT || '3306' }}"
+            DB_USER="${{ secrets.DB_USER }}"
+            DB_PASS="${{ secrets.DB_PASSWORD }}"
+            DB_NAME="${{ secrets.DB_NAME }}"
+            if command -v mysql >/dev/null 2>&1; then
+              for sql_file in "$WEB_PATH/schema/001_core_enterprise_4nf_schema.sql" "$WEB_PATH/schema/02-seed-taxonomy.sql" "$WEB_PATH/schema/03-seed-data.sql"; do
+                if [ -f "$sql_file" ]; then
+                  echo "Applying $sql_file to $DB_NAME..."
+                  mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$sql_file"
+                fi
+              done
+              echo "Remote database migrations & seeding completed."
+            fi
+          fi
           
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
           if command -v pm2 >/dev/null 2>&1; then
@@ -312,7 +337,7 @@ jobs:
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
-          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
@@ -350,10 +375,16 @@ jobs:
       
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Configure pinned SSH host key
+        run: |
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          test -s "$HOME/.ssh/known_hosts"
       
       - name: Upload API build to server
         run: |
-          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P "${{ env.SSH_PORT }}" $SSH_OPTS \
@@ -384,7 +415,7 @@ jobs:
             ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
           
-          tar -xzf ~/api-build.tar.gz -C "$API_PATH" 2>/dev/null || true
+          tar -xzf ~/api-build.tar.gz -C "$API_PATH"
           rm -f ~/api-build.tar.gz
           
           if [ -f /tmp/preserved_api_htaccess ]; then
@@ -420,7 +451,7 @@ jobs:
           echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
-          SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \

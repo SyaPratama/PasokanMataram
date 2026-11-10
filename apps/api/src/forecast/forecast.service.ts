@@ -1,13 +1,15 @@
 /**
  * @file apps/api/src/forecast/forecast.service.ts
  * @description NestJS service connecting to D:/MLPasokanMataram LightGBM multi-horizon forecasting service.
- * Supports simulation of BMKG rainfall anomalies and fuel price spikes with deterministic offline fallback.
+ * Fetches forecasts from the configured FastAPI ML service and persists synchronized results to MySQL.
  */
 
 import { Injectable } from '@nestjs/common';
 import {
+  MlForecastListResponseSchema,
   MlSimulationInputSchema,
   type MlSimulationInput,
+  type MlForecastListResponse,
 } from '@pasok/domain';
 import { query } from '@pasok/database';
 import * as cache from '@pasok/cache';
@@ -60,21 +62,19 @@ export class ForecastService {
       }
     } catch {}
 
-    try {
-      const response = await fetch(
-        `${this.mlBaseUrl}/api/v1/forecast/commodity/${encodeURIComponent(commodityId)}`
-      );
-      if (!response.ok) {
-        return this.generateDeterministicForecast(commodityId);
-      }
-      const data = await response.json();
-      try {
-        await cache.set(cacheKey, JSON.stringify(data), 300);
-      } catch {}
-      return data;
-    } catch {
-      return this.generateDeterministicForecast(commodityId);
+    const response = await fetch(
+      `${this.mlBaseUrl}/api/v1/forecast/commodity/${encodeURIComponent(commodityId)}`
+    );
+    if (!response.ok) {
+      throw new Error(`ML service returned ${response.status}.`);
     }
+    const data: unknown = await response.json();
+    try {
+      await cache.set(cacheKey, JSON.stringify(data), 300);
+    } catch {
+      return data;
+    }
+    return data;
   }
 
   /**
@@ -84,108 +84,46 @@ export class ForecastService {
    */
   public async simulateScenario(rawInput: unknown) {
     const validated: MlSimulationInput = MlSimulationInputSchema.parse(rawInput);
-
-    try {
-      const response = await fetch(`${this.mlBaseUrl}/api/v1/forecast/simulate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validated),
-      });
-      if (!response.ok) {
-        return this.generateDeterministicSimulation(validated);
-      }
-      const data = await response.json();
-      return data;
-    } catch {
-      return this.generateDeterministicSimulation(validated);
+    const response = await fetch(`${this.mlBaseUrl}/api/v1/forecast/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(validated),
+    });
+    if (!response.ok) {
+      throw new Error(`ML service returned ${response.status}.`);
     }
-
-    return this.generateDeterministicSimulation(validated);
+    return await response.json();
   }
 
-  private generateDeterministicForecast(commodityId: string) {
-    const base = 45000;
-    const horizon = Array.from({ length: 7 }, (_, i) => ({
-      day: i + 1,
-      date: new Date(Date.now() + (i + 1) * 86400000).toISOString().split('T')[0],
-      predictedPrice: base + Math.sin(i) * 2000,
-      confidence: 0.75,
-    }));
-
-    return {
-      success: true,
-      data: {
-        commodityId,
-        basePrice: base,
-        currentPrice: base,
-        algorithm: 'Deterministic Fallback v1.0',
-        forecast: horizon,
-        trend: 'STABLE',
-        confidence: 0.75,
-      },
-    };
-  }
-
-  private generateDeterministicSimulation(input: MlSimulationInput) {
-    const code = input.commodity_code || 'CABAI_MERAH';
-    const base = 48000;
-    const rainfallFactor = (input.rainfall_anomaly_percent || 0) * 50;
-    const fuelFactor = (input.fuel_price_hike_percent || 0) * 100;
-    const simulatedPrice = base + rainfallFactor + fuelFactor;
-
-    return {
-      success: true,
-      data: {
-        commodityCode: code,
-        baselinePrice: base,
-        simulatedPrice,
-        deltaRp: simulatedPrice - base,
-        deltaPercent: Number((((simulatedPrice - base) / base) * 100).toFixed(2)),
-        explanation:
-          'Simulasi model multivariat: anomali curah hujan dan penyesuaian biaya logistik bahan bakar.',
-      },
-    };
-  }
 
   /**
    * Proxy to ML service: get all commodities with forecasts
    */
-  async getAllCommodities(): Promise<unknown> {
+  async getAllCommodities(): Promise<MlForecastListResponse> {
     const cacheKey = 'ml:forecast:commodities';
     try {
       const cached = await cache.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        const parsed = MlForecastListResponseSchema.safeParse(JSON.parse(cached));
+        if (parsed.success) return parsed.data;
       }
-    } catch {}
-    try {
-      const response = await fetch(`${this.mlBaseUrl}/api/v1/forecast/commodities`);
-      if (response.ok) {
-        const data = await response.json();
-        try {
-          await cache.set(cacheKey, JSON.stringify(data), 300);
-        } catch {}
-        return data;
-      }
-    } catch {}
+    } catch {
+      return await this.fetchAllCommodities(cacheKey);
+    }
+    return await this.fetchAllCommodities(cacheKey);
+  }
 
-    // Fallback to MySQL commodities database query
-    const res = await query(
-      `SELECT c.id, c.code, c.name, c.category, c.origin_region, c.unit,
-              COALESCE(f.current_price, 25000) as current_price,
-              COALESCE(f.predicted_price_7d, 26000) as predicted_price_7d,
-              COALESCE(f.trend, 'STABLE') as trend,
-              COALESCE(f.confidence_score, 93.5) as confidence
-       FROM commodities c
-       LEFT JOIN commodity_forecasts f ON f.commodity_id = c.id
-       WHERE c.is_active = TRUE
-       ORDER BY c.name ASC`
-    );
-    const dbData = { source: 'MYSQL_DATABASE', commodities: res.rows || [] };
+  private async fetchAllCommodities(cacheKey: string): Promise<MlForecastListResponse> {
+    const response = await fetch(`${this.mlBaseUrl}/api/v1/forecast/commodities`);
+    if (!response.ok) throw new Error(`ML service error: ${response.statusText}`);
+    const parsed = MlForecastListResponseSchema.safeParse(await response.json());
+    if (!parsed.success) throw new Error('ML service response schema is invalid.');
     try {
-      await cache.set(cacheKey, JSON.stringify(dbData), 300);
-    } catch {}
-    return dbData;
+      await cache.set(cacheKey, JSON.stringify(parsed.data), 300);
+    } catch {
+      return parsed.data;
+    }
+    return parsed.data;
   }
   /**
    * Sync ML forecasts to database

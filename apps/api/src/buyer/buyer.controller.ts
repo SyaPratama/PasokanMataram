@@ -8,7 +8,6 @@ import {
   Get,
   Post,
   Body,
-  Headers,
   HttpException,
   HttpStatus,
   Inject,
@@ -16,8 +15,10 @@ import {
 } from '@nestjs/common';
 import type { SecurityContext } from '@pasok/domain';
 import { BuyerService, type CreateOutletDto, type SubmitReviewDto } from './buyer.service';
-
+import { SecurityContextParam } from '../common/security-context.decorator';
+import { Roles } from '../common/roles.decorator';
 @Controller('buyer')
+@Roles('HOREKA')
 export class BuyerController {
   private readonly buyerService: BuyerService;
 
@@ -31,13 +32,7 @@ export class BuyerController {
    * @returns Array outlet dapur.
    */
   @Get('outlets')
-  public async getOutlets(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
+  public async getOutlets(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const outlets = await this.buyerService.getOutlets(context);
@@ -60,18 +55,11 @@ export class BuyerController {
   @Post('outlets')
   public async addOutlet(
     @Body() body: CreateOutletDto,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
     if (!body.name || !body.address || !body.regency) {
       throw new HttpException('Nama, alamat, dan kabupaten outlet wajib diisi.', HttpStatus.BAD_REQUEST);
     }
-
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
 
     try {
       const outlet = await this.buyerService.createOutlet(context, body);
@@ -92,13 +80,7 @@ export class BuyerController {
    * @returns Array riwayat pesanan.
    */
   @Get('orders')
-  public async getOrders(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
+  public async getOrders(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const orders = await this.buyerService.getOrders(context);
@@ -117,9 +99,9 @@ export class BuyerController {
    * @returns Array katalog produk.
    */
   @Get('catalog')
-  public async getCatalog() {
+  public async getCatalog(@SecurityContextParam() context: SecurityContext) {
     try {
-      const items = await this.buyerService.getCatalog();
+      const items = await this.buyerService.getCatalog(context);
       return {
         success: true,
         data: items,
@@ -139,14 +121,8 @@ export class BuyerController {
   @Post('reviews')
   public async postReview(
     @Body() body: SubmitReviewDto,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
 
     try {
       const review = await this.buyerService.submitReview(context, body);

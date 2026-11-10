@@ -1,82 +1,69 @@
-/**
- * @file apps/web/src/app/api/v1/outlets/route.ts
- * @description Dynamic outlets API reading from MySQL 4NF business_outlets table
- */
-
 import { NextResponse } from 'next/server';
-import { query } from '@pasok/database';
+import type { RowDataPacket } from 'mysql2';
+import { z } from 'zod';
+import { withTenantContext } from '@pasok/database';
+import { verifySessionToken } from '@/lib/auth';
+
+interface OutletRow extends RowDataPacket {
+  readonly id: string;
+  readonly name: string;
+  readonly regency: string;
+  readonly address: string;
+  readonly isPrimary: boolean;
+  readonly createdAt: string;
+}
+
+const OutletInputSchema = z.object({
+  name: z.string().trim().min(1).max(150),
+  regency: z.string().trim().min(1).max(32),
+  address: z.string().trim().min(1).max(500),
+  isPrimary: z.boolean().default(false),
+});
+
+function readSession(request: Request) {
+  const cookie = (request.headers.get('cookie') || '').split(';').map((part) => part.trim()).find((part) => part.startsWith('pasok_session=') || part.startsWith('session_token='));
+  const token = cookie ? cookie.slice(cookie.indexOf('=') + 1) : null;
+  return token ? verifySessionToken(token) : null;
+}
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(request: Request): Promise<NextResponse> {
+  const session = readSession(request);
+  if (!session) return NextResponse.json({ success: false, message: 'Sesi diperlukan.' }, { status: 401 });
   try {
-    const { searchParams } = new URL(request.url);
-    const tenantId = searchParams.get('tenantId');
-    const regency = searchParams.get('regency');
-
-    let sql = `
-      SELECT
-        id,
-        tenant_id as tenantId,
-        outlet_name as name,
-        regency,
-        address,
-        is_primary as isPrimary,
-        created_at as createdAt
-      FROM business_outlets
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (tenantId) {
-      sql += ' AND tenant_id = ?';
-      params.push(tenantId);
-    }
-
-    if (regency && regency !== 'ALL' && regency !== 'SEMUA') {
-      sql += ' AND regency = ?';
-      params.push(regency);
-    }
-
-    sql += ' ORDER BY is_primary DESC, outlet_name ASC';
-
-    const res = await query<any>(sql, params);
-    return NextResponse.json({
-      success: true,
-      data: res.rows || [],
+    const data = await withTenantContext(session, async (client) => {
+      const [rows] = await client.query<OutletRow[]>(
+        `SELECT id, outlet_name AS name, regency, address, is_primary AS isPrimary, CAST(created_at AS CHAR) AS createdAt
+         FROM business_outlets
+         WHERE tenant_id = ?
+         ORDER BY is_primary DESC, outlet_name ASC`,
+        [session.tenantId]
+      );
+      return rows;
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Gagal memuat data gerai.';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json({ success: true, data });
+  } catch {
+    return NextResponse.json({ success: false, message: 'Data gerai tidak tersedia.' }, { status: 503 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
+  const session = readSession(request);
+  if (!session) return NextResponse.json({ success: false, message: 'Sesi diperlukan.' }, { status: 401 });
   try {
-    const body = await request.json();
-    const { tenantId, name, regency, address, isPrimary } = body;
-
-    if (!name || !regency || !address) {
-      return NextResponse.json(
-        { success: false, error: 'Nama gerai, wilayah, dan alamat wajib diisi.' },
-        { status: 400 }
+    const body: unknown = await request.json();
+    const parsed = OutletInputSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ success: false, message: 'Data gerai tidak valid.' }, { status: 400 });
+    await withTenantContext(session, async (client) => {
+      await client.query(
+        `INSERT INTO business_outlets (id, tenant_id, outlet_name, regency, address, is_primary, created_at)
+         VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
+        [session.tenantId, parsed.data.name, parsed.data.regency, parsed.data.address, parsed.data.isPrimary ? 1 : 0]
       );
-    }
-
-    const targetTenantId = tenantId || '10000000-0000-0000-0000-000000000001';
-
-    await query(
-      `INSERT INTO business_outlets (id, tenant_id, outlet_name, regency, address, is_primary, created_at)
-       VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
-      [targetTenantId, name, regency, address, isPrimary ? 1 : 0]
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: 'Gerai berhasil didaftarkan.',
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Gagal menambahkan gerai.';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json({ success: true, message: 'Gerai berhasil didaftarkan.' });
+  } catch {
+    return NextResponse.json({ success: false, message: 'Gerai tidak dapat disimpan.' }, { status: 503 });
   }
 }

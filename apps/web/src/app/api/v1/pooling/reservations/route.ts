@@ -17,23 +17,31 @@ const poolingService = new PoolingService();
  * @returns Respon JSON rincian reservasi dan instruksi pembayaran VA Escrow.
  */
 export async function POST(request: Request): Promise<NextResponse> {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const sessionCookie = cookieHeader
+    .split('; ')
+    .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
+    ?.split('=')[1];
+  const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: { code: 'UNAUTHORIZED', message: 'Sesi diperlukan untuk membuat reservasi.' } },
+      { status: 401 }
+    );
+  }
   try {
-    const cookieHeader = request.headers.get('cookie') || '';
     const body = await request.json();
-    const sessionCookie = cookieHeader
-      .split('; ')
-      .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
-      ?.split('=')[1];
-
-    const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
     const context: SecurityContext = {
-      tenantId: session?.tenantId || (body.buyerTenantId as string) || '00000000-0000-0000-0000-000000000000',
-      userId: session?.userId || '00000000-0000-0000-0000-000000000000',
-      role: session?.role || 'BUYER',
-      isSuperAdmin: session?.role === 'SUPER_ADMIN',
+      tenantId: session.tenantId,
+      userId: session.userId,
+      role: session.role,
+      isSuperAdmin: session.isSuperAdmin,
     };
 
-    const result = await poolingService.createReservation(context, body);
+    const result = await poolingService.createReservation(context, {
+      ...body,
+      buyerTenantId: session.tenantId,
+    });
 
     return NextResponse.json(
       {
@@ -68,19 +76,24 @@ export async function POST(request: Request): Promise<NextResponse> {
  * @returns Respon JSON array kampanye aktif.
  */
 export async function GET(request: Request): Promise<NextResponse> {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const sessionCookie = cookieHeader
+    .split('; ')
+    .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
+    ?.split('=')[1];
+  const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: { code: 'UNAUTHORIZED', message: 'Sesi diperlukan untuk melihat kampanye.' } },
+      { status: 401 }
+    );
+  }
   try {
-    const cookieHeader = request.headers.get('cookie') || '';
-    const sessionCookie = cookieHeader
-      .split('; ')
-      .find((row) => row.startsWith('session_token='))
-      ?.split('=')[1];
-
-    const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
     const context: SecurityContext = {
-      tenantId: session?.tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: session?.userId || '00000000-0000-0000-0000-000000000000',
-      role: session?.role || 'BUYER',
-      isSuperAdmin: session?.role === 'SUPER_ADMIN',
+      tenantId: session.tenantId,
+      userId: session.userId,
+      role: session.role,
+      isSuperAdmin: session.isSuperAdmin,
     };
 
     const campaigns = await poolingService.listActiveCampaigns(context);

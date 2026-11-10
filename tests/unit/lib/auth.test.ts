@@ -19,10 +19,12 @@ describe('Modul Autentikasi & Keamanan (Argon2id & JWT)', () => {
       tenantId: '123e4567-e89b-12d3-a456-426614174000',
       userId: '223e4567-e89b-12d3-a456-426614174000',
       role: 'OWNER',
+      macroRole: 'HOREKA',
+      microRole: 'OWNER',
       isSuperAdmin: false,
       email: 'owner@horekajogja.id',
       businessName: 'Gudeg Yu Djum Cabang Sleman',
-    };
+    } as const;
 
     const token = issueSessionToken(payload);
     expect(typeof token).toBe('string');

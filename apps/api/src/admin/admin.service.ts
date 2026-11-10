@@ -21,17 +21,12 @@ export class AdminService {
    * @returns Array profil organisasi penyewa.
    */
   public async getTenants() {
-    try {
-      const res = await query(
-        `SELECT id, name, type, kyb_status, created_at, updated_at
-         FROM tenants
-         ORDER BY created_at DESC`
-      );
-      if (res.rows && res.rows.length > 0) return res.rows;
-    } catch {
-      return this.getFallbackTenants();
-    }
-    return this.getFallbackTenants();
+    const res = await query(
+      `SELECT id, business_name AS name, tenant_type AS type, kyb_status, created_at, updated_at
+       FROM tenants
+       ORDER BY created_at DESC`
+    );
+    return res.rows || [];
   }
 
   /**
@@ -39,14 +34,19 @@ export class AdminService {
    * @returns Ringkasan saldo escrow dan volume transaksi.
    */
   public async getEscrowReconciliation() {
+    const res = await query(
+      `SELECT
+         COALESCE(SUM(locked_amount_rp), 0) AS totalEscrowLockedRp,
+         COALESCE(SUM(disbursed_amount_rp), 0) AS totalDisbursedH1Rp,
+         COALESCE(SUM(CASE WHEN status = 'HELD_DISPUTE' THEN locked_amount_rp ELSE 0 END), 0) AS totalDisputedHeldRp,
+         COUNT(DISTINCT escrow_account_number) AS activeVirtualAccountsCount,
+         MAX(escrow_account_number) AS bpdDiySettlementAccount,
+         CASE WHEN COUNT(CASE WHEN status = 'HELD_DISPUTE' THEN 1 END) = 0 THEN 'BALANCED' ELSE 'REVIEW_REQUIRED' END AS reconciliationStatus
+       FROM escrow_settlements`
+    );
     return {
-      totalEscrowLockedRp: 142500000,
-      totalDisbursedH1Rp: 890000000,
-      totalDisputedHeldRp: 12500000,
-      activeVirtualAccountsCount: 68,
-      bpdDiySettlementAccount: '001.211.009888.1',
+      ...(res.rows?.[0] || {}),
       lastReconciledAt: new Date().toISOString(),
-      reconciliationStatus: 'BALANCED',
     };
   }
 
@@ -55,32 +55,20 @@ export class AdminService {
    * @returns Daftar kuota panen dan sisa kapasitas.
    */
   public async getPlatformQuotas() {
-    return [
-      {
-        regency: 'KULON_PROGO',
-        commodity: 'Bawang Merah Srikayangan',
-        targetQuotaKg: 5000,
-        allocatedQuotaKg: 4250,
-        fulfillmentPercentage: 85.0,
-        participatingKitchens: 42,
-      },
-      {
-        regency: 'SLEMAN',
-        commodity: 'Cabai Rawit Merah & Sayur Daun',
-        targetQuotaKg: 2500,
-        allocatedQuotaKg: 2450,
-        fulfillmentPercentage: 98.0,
-        participatingKitchens: 38,
-      },
-      {
-        regency: 'BANTUL',
-        commodity: 'Daging Sapi Segar Dingin RPH',
-        targetQuotaKg: 1500,
-        allocatedQuotaKg: 1200,
-        fulfillmentPercentage: 80.0,
-        participatingKitchens: 25,
-      },
-    ];
+    const res = await query(
+      `SELECT t.regency,
+              pc.commodity_name AS commodity,
+              SUM(pc.target_quota_kg) AS targetQuotaKg,
+              SUM(pc.allocated_quota_kg) AS allocatedQuotaKg,
+              ROUND(100 * SUM(pc.allocated_quota_kg) / NULLIF(SUM(pc.target_quota_kg), 0), 1) AS fulfillmentPercentage,
+              COUNT(DISTINCT pr.buyer_tenant_id) AS participatingKitchens
+       FROM pooling_campaigns pc
+       JOIN tenants t ON t.id = pc.supplier_tenant_id
+       LEFT JOIN pool_reservations pr ON pr.campaign_id = pc.id
+       GROUP BY t.regency, pc.commodity_name
+       ORDER BY t.regency, pc.commodity_name`
+    );
+    return res.rows || [];
   }
 
   /**
@@ -91,63 +79,23 @@ export class AdminService {
   public async processKybReview(dto: ReviewKybDto) {
     const newStatus = dto.decision === 'APPROVED' ? 'VERIFIED' : 'REJECTED';
 
-    try {
-      await query(
-        `UPDATE kyb_documents
-         SET status = ?,
-             rejection_reason = ?,
-             updated_at = NOW()
-         WHERE id = ?`,
-        [newStatus, dto.rejectionReason || null, dto.documentId]
-      );
-
-      await query(
-        `UPDATE tenants
-         SET kyb_status = ?,
-             updated_at = NOW()
-         WHERE id = ?`,
-        [newStatus, dto.tenantId]
-      );
-    } catch {
-      return {
-        documentId: dto.documentId,
-        tenantId: dto.tenantId,
-        status: newStatus,
-        reviewedAt: new Date().toISOString(),
-      };
-    }
-
+    await query(
+      `UPDATE kyb_documents
+       SET status = ?, rejection_reason = ?, updated_at = NOW()
+       WHERE id = ?`,
+      [newStatus, dto.rejectionReason || null, dto.documentId]
+    );
+    await query(
+      `UPDATE tenants
+       SET kyb_status = ?, updated_at = NOW()
+       WHERE id = ?`,
+      [newStatus, dto.tenantId]
+    );
     return {
       documentId: dto.documentId,
       tenantId: dto.tenantId,
       status: newStatus,
       reviewedAt: new Date().toISOString(),
     };
-  }
 
-  private getFallbackTenants() {
-    return [
-      {
-        id: '00000000-0000-0000-0000-000000000001',
-        name: 'Restoran Mataram Rasa Nusantara',
-        type: 'HOREKA',
-        kyb_status: 'VERIFIED',
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '00000000-0000-0000-0000-000000000002',
-        name: 'Gapoktan Srikayangan Kulon Progo',
-        type: 'GAPOKTAN',
-        kyb_status: 'VERIFIED',
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '00000000-0000-0000-0000-000000000003',
-        name: 'Sentra Hub Logistik Bantul',
-        type: 'HUB_OPERATOR',
-        kyb_status: 'VERIFIED',
-        created_at: new Date().toISOString(),
-      },
-    ];
-  }
 }

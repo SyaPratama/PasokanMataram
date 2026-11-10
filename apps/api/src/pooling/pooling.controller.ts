@@ -9,7 +9,6 @@ import {
   Get,
   Post,
   Body,
-  Headers,
   HttpException,
   HttpStatus,
   Inject,
@@ -18,8 +17,10 @@ import {
 import type { SecurityContext } from '@pasok/domain';
 import { PoolingService } from './pooling.service';
 import { Roles } from '../common/roles.decorator';
+import { SecurityContextParam } from '../common/security-context.decorator';
 
 @Controller('pooling')
+@Roles('HOREKA')
 export class PoolingController {
   private readonly poolingService: PoolingService;
 
@@ -33,13 +34,7 @@ export class PoolingController {
    * @returns Array kampanye aktif.
    */
   @Get('campaigns')
-  public async getCampaigns(@Headers('x-tenant-id') tenantId?: string) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
+  public async getCampaigns(@SecurityContextParam() context: SecurityContext) {
 
     try {
       const campaigns = await this.poolingService.listCampaigns(context);
@@ -62,16 +57,9 @@ export class PoolingController {
   @Post('reservations')
   public async makeReservation(
     @Body() body: Record<string, unknown>,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const buyerTenantId =
-      (body.buyerTenantId as string) || tenantId || '00000000-0000-0000-0000-000000000000';
-    const context: SecurityContext = {
-      tenantId: buyerTenantId,
-      userId: '00000000-0000-0000-0000-000000000000',
-      role: 'BUYER',
-      isSuperAdmin: false,
-    };
+    const buyerTenantId = context.tenantId;
 
     try {
       const result = await this.poolingService.reserveQuota(context, {

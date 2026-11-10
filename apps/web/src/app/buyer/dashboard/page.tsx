@@ -16,13 +16,31 @@ import {
   CookingPot,
   Sparkles,
 } from 'lucide-react';
+import { z } from 'zod';
 import { Button } from '../../../components/ui/button';
 import { StatusBadge } from '../../../components/shared/status-badge';
 import { KybBlockerModal } from '../../../components/shared/kyb-blocker-modal';
-import { MOCK_STANDING_ORDERS, type MockStandingOrder } from '../../../lib/mock-data';
-import { canAccessFinancials } from '@pasok/security/tokens';
+import type { StandingOrder as MockStandingOrder } from '../../../types/models';
+import { canAccessFinancials } from '@pasok/security/edge';
 import type { MicroRole } from '@pasok/domain';
 
+const OrderResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(z.object({
+    id: z.string(),
+    commodity: z.string(),
+    deliveryAddress: z.string(),
+    quantityKg: z.number(),
+    pricePerKg: z.number(),
+    totalAmountRp: z.number(),
+    status: z.string(),
+    createdAt: z.string(),
+  })),
+});
+
+function toStandingOrderStatus(status: string): MockStandingOrder['status'] {
+  return status === 'PAID' || status === 'ALLOCATED' ? 'CONFIRMED' : status === 'RECEIVED' ? 'ACTIVE' : status;
+}
 interface TenantIdentity {
   tenantId: string;
   businessName: string;
@@ -30,10 +48,12 @@ interface TenantIdentity {
   regency: string;
   kybStatus: string;
   macroRole: string;
+  microRole?: string;
 }
 
 export default function BuyerDashboardPage() {
-  const [orders, setOrders] = React.useState<MockStandingOrder[]>(MOCK_STANDING_ORDERS);
+  const [orders, setOrders] = React.useState<MockStandingOrder[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = React.useState(true);
   const [currentRole, setCurrentRole] = React.useState<MicroRole>('HEAD_CHEF');
   const [kybModalOpen, setKybModalOpen] = React.useState(false);
   const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
@@ -41,23 +61,23 @@ export default function BuyerDashboardPage() {
 
   React.useEffect(() => {
     fetch('/api/v1/orders')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-          const mapped: MockStandingOrder[] = data.data.map((o: any, idx: number) => ({
-            id: o.id || `SO-${idx + 1}`,
-            commodityName: o.commodity || 'Cabai Merah Keriting',
-            outletName: o.deliveryAddress || 'Dapur Pusat Sleman',
-            quantityKg: Number(o.quantityKg) || 25,
-            unitPriceRp: Number(o.pricePerKg) || 48000,
-            deliveryWindow: 'Subuh 04:30 - 05:30 WIB',
-            status: (o.status === 'PAID' || o.status === 'ALLOCATED' ? 'CONFIRMED' : o.status === 'RECEIVED' ? 'ACTIVE' : 'PENDING') as any,
-            driverName: 'Slamet - Armada Subuh Bantul',
-          }));
-          setOrders(mapped);
-        }
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Data pesanan tidak tersedia.');
+        const parsed = OrderResponseSchema.safeParse(await response.json());
+        if (!parsed.success || !parsed.data.success) throw new Error('Respons pesanan tidak valid.');
+        setOrders(parsed.data.data.map((order) => ({
+          id: order.id,
+          commodityName: order.commodity,
+          outletName: order.deliveryAddress,
+          quantityKg: order.quantityKg,
+          unitPriceRp: order.pricePerKg,
+          totalRp: order.totalAmountRp,
+          deliveryWindow: 'Waktu pengiriman belum tercatat',
+          status: toStandingOrderStatus(order.status),
+        })));
       })
-      .catch(() => {});
+      .catch(() => setOrders([]))
+      .finally(() => setIsLoadingOrders(false));
   }, []);
   React.useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -71,8 +91,11 @@ export default function BuyerDashboardPage() {
           const res = await fetch('/api/v1/tenant/current');
           if (res.ok) {
             const data = await res.json();
-            if (data.success) {
+            if (data.success && data.data) {
               setTenantIdentity(data.data);
+              if (data.data.microRole) {
+                setCurrentRole(data.data.microRole as MicroRole);
+              }
             }
           }
         } catch {
@@ -140,7 +163,7 @@ export default function BuyerDashboardPage() {
           <p className="text-xs text-gelap/85 mt-1">
             {hasFinancialAccess
               ? 'Pantau perputaran dana komoditas, standing orders gerai, dan status pembayaran.'
-              : 'Pantau ketersediaan stok bahan segar, jadwal subuh 04:30 WIB, dan alokasi pool kuota.'}
+              : 'Pantau ketersediaan stok bahan segar dan alokasi pool kuota.'}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -172,10 +195,10 @@ export default function BuyerDashboardPage() {
               </div>
             </div>
             <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight tabular-nums">
-              Rp 24.500.000
+              {orders.length > 0 ? `Rp ${orders.reduce((sum, o) => sum + (o.totalRp || 0), 0).toLocaleString('id-ID')}` : 'Tidak Ada'}
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
-              Rekening Pembayaran Aktif
+              Data rekening belum tersedia
             </div>
           </div>
         ) : (
@@ -187,10 +210,10 @@ export default function BuyerDashboardPage() {
               </div>
             </div>
             <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight">
-              320 <span className="text-xs font-medium text-gelap/80">Kilogram</span>
+              {orders.length > 0 ? `${orders.reduce((sum, o) => sum + (o.quantityKg || 0), 0)} Kilogram` : 'Tidak Ada'}
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
-              Cukup untuk operasional 4 hari
+              {orders.length > 0 ? 'Stok Dapur Terjadwal' : 'Tidak Ada'}
             </div>
           </div>
         )}
@@ -204,10 +227,10 @@ export default function BuyerDashboardPage() {
               </div>
             </div>
             <div className="text-xl sm:text-2xl font-bold text-sekunder font-heading whitespace-nowrap tracking-tight tabular-nums">
-              Rp 1.840.000
+              Tidak tersedia
             </div>
             <div className="text-[11px] text-gelap/85 flex items-center font-medium">
-              <span className="text-green-700 font-bold mr-1">&darr; 24.5%</span> vs Pasar Eceran
+              Belum ada data pembanding harga
             </div>
           </div>
         ) : (
@@ -219,10 +242,10 @@ export default function BuyerDashboardPage() {
               </div>
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gelap font-heading whitespace-nowrap tracking-tight">
-              8 <span className="text-xs font-medium text-gelap/80">Menu Terhubung</span>
+              Tidak tersedia
             </div>
             <div className="text-[11px] text-gelap/85 font-medium">
-              Akurasi biaya porsi: 98.4%
+              Data resep COGS belum tersedia
             </div>
           </div>
         )}
@@ -235,12 +258,10 @@ export default function BuyerDashboardPage() {
             </div>
           </div>
           <div className="text-xl font-bold text-gelap font-heading">
-            Besok Subuh
+            {orders.length > 0 ? 'Belum ada jadwal pengiriman' : 'Tidak Ada'}
           </div>
           <div className="text-[11px] text-gelap/85 font-medium flex items-center gap-1.5">
-            <span>Est. 04:30 WIB</span>
-            <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
-            <span>85 kg muatan</span>
+            Waktu pengiriman belum tercatat
           </div>
         </div>
 
@@ -264,14 +285,14 @@ export default function BuyerDashboardPage() {
         <div className="p-4 sm:p-5 border-b border-netral-border/70 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-gelap font-heading">
-              {hasFinancialAccess ? 'Purchase Orders Berjalan' : 'Daftar Penerimaan Bahan Baku Subuh'}
+              Daftar Pesanan &amp; Reservasi Berjalan
             </h2>
             <p className="text-[11px] text-gelap/85 mt-0.5">
-              Jadwal Pengiriman Bahan Baku Rutin dari ekosistem supplier pangan DIY via Direct Dispatch &amp; Cross-Dock Hub.
+              Daftar reservasi dan pesanan komoditas pangan dari supplier terdaftar.
             </p>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primer-light text-primer whitespace-nowrap shrink-0">
-            {orders.length} Batch Aktif
+            {orders.length} Pesanan
           </span>
         </div>
 
@@ -279,40 +300,59 @@ export default function BuyerDashboardPage() {
           <table className="w-full text-xs text-left">
             <thead className="bg-netral-canvas/60 text-gelap/85 font-semibold border-b border-netral-border">
               <tr>
-                <th className="p-3.5">ID PO</th>
-                <th className="p-3.5">Komoditas & Varietas</th>
-                <th className="p-3.5">Gerai Tujuan</th>
+                <th className="p-3.5">ID Pesanan</th>
+                <th className="p-3.5">Komoditas</th>
+                <th className="p-3.5">Alamat Pengiriman</th>
                 <th className="p-3.5">Volume</th>
                 {hasFinancialAccess && <th className="p-3.5">Total Biaya</th>}
-                <th className="p-3.5">Status Pengantaran</th>
+                <th className="p-3.5">Status Pesanan</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-netral-border/60 text-gelap">
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-netral-canvas/30 transition-colors">
-                  <td className="p-3.5 font-mono font-bold text-primer">
-                    {order.id}
-                  </td>
-                  <td className="p-3.5">
-                    <div className="font-semibold">{order.commodityName}</div>
-                    <div className="text-[10px] text-gelap/85">Sentra Produsen DIY</div>
-                  </td>
-                  <td className="p-3.5">
-                    <div>{order.outletName}</div>
-                  </td>
-                  <td className="p-3.5 font-semibold">
-                    {order.quantityKg} kg
-                  </td>
-                  {hasFinancialAccess && (
-                    <td className="p-3.5 font-mono font-bold text-primer">
-                      Rp {order.totalRp.toLocaleString('id-ID')}
-                    </td>
-                  )}
-                  <td className="p-3.5">
-                    <StatusBadge status={order.status === 'SIAP_KIRIM' ? 'VERIFIED' : 'PENDING_VERIFICATION'} />
+              {isLoadingOrders ? (
+                [1, 2, 3].map((i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="p-3.5"><div className="h-4 w-16 bg-netral-border/40 rounded" /></td>
+                    <td className="p-3.5"><div className="h-4 w-32 bg-netral-border/40 rounded" /></td>
+                    <td className="p-3.5"><div className="h-4 w-24 bg-netral-border/40 rounded" /></td>
+                    <td className="p-3.5"><div className="h-4 w-12 bg-netral-border/40 rounded" /></td>
+                    {hasFinancialAccess && <td className="p-3.5"><div className="h-4 w-20 bg-netral-border/40 rounded" /></td>}
+                    <td className="p-3.5"><div className="h-4 w-16 bg-netral-border/40 rounded" /></td>
+                  </tr>
+                ))
+              ) : orders.length === 0 ? (
+                <tr>
+                  <td colSpan={hasFinancialAccess ? 6 : 5} className="p-8 text-center text-gelap/60 text-xs">
+                    Belum ada data pesanan aktif.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-netral-canvas/30 transition-colors">
+                    <td className="p-3.5 font-mono font-bold text-primer">
+                      {order.id || '-'}
+                    </td>
+                    <td className="p-3.5">
+                      <div className="font-semibold">{order.commodityName || 'Tidak Ada'}</div>
+                      <div className="text-[10px] text-gelap/85">{order.deliveryWindow}</div>
+                    </td>
+                    <td className="p-3.5">
+                      <div>{order.outletName || 'Tidak Ada'}</div>
+                    </td>
+                    <td className="p-3.5 font-semibold">
+                      {order.quantityKg} kg
+                    </td>
+                    {hasFinancialAccess && (
+                      <td className="p-3.5 font-mono font-bold text-primer">
+                        Rp {(order.totalRp || 0).toLocaleString('id-ID')}
+                      </td>
+                    )}
+                    <td className="p-3.5">
+                      <StatusBadge status={order.status === 'CONFIRMED' || order.status === 'ACTIVE' ? 'VERIFIED' : 'PENDING_VERIFICATION'} />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { MOCK_COMMODITY_FORECASTS } from '../../lib/mock-forecast-data';
 import type { CommodityForecast, ForecastHorizon } from '../../types/forecast';
 import { ForecastInteractiveChart } from '../../components/forecast/forecast-interactive-chart';
 import { ForecastInsightCards } from '../../components/forecast/forecast-insight-cards';
@@ -39,12 +38,8 @@ export function PublicForecastSimulator() {
   const [sortBy, setSortBy] = React.useState<string>('default');
   const [horizon, setHorizon] = React.useState<ForecastHorizon>(30);
 
-  const [commodities, setCommodities] = React.useState<readonly CommodityForecast[]>(
-    MOCK_COMMODITY_FORECASTS
-  );
-  const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>(
-    MOCK_COMMODITY_FORECASTS[0]?.id || ''
-  );
+  const [commodities, setCommodities] = React.useState<readonly CommodityForecast[]>([]);
+  const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>('');
 
   const [rainfallAnomaly, setRainfallAnomaly] = React.useState<number>(0);
   const [fuelPriceHike, setFuelPriceHike] = React.useState<number>(0);
@@ -73,26 +68,8 @@ export function PublicForecastSimulator() {
       } catch {}
 
       if (isMounted) {
-        let fallback = [...MOCK_COMMODITY_FORECASTS];
-        if (searchQuery.trim()) {
-          const q = searchQuery.trim().toLowerCase();
-          fallback = fallback.filter(
-            (c) =>
-              c.name.toLowerCase().includes(q) ||
-              c.originRegion.toLowerCase().includes(q) ||
-              c.category.toLowerCase().includes(q)
-          );
-        }
-        if (regionFilter !== 'SEMUA') {
-          const r = regionFilter.toLowerCase().replace('_', ' ');
-          fallback = fallback.filter((c) => c.originRegion.toLowerCase().includes(r));
-        }
-        if (sortBy === 'price_asc') {
-          fallback.sort((a, b) => a.currentPrice - b.currentPrice);
-        } else if (sortBy === 'price_desc') {
-          fallback.sort((a, b) => b.currentPrice - a.currentPrice);
-        }
-        setCommodities(fallback);
+        setCommodities([]);
+        setSelectedCommodityId('');
       }
     }
 
@@ -514,7 +491,12 @@ export function PublicForecastSimulator() {
 
           <ForecastInsightCards commodity={activeCommodity} userType="PUBLIC" />
         </>
-      ) : null}
+      ) : (
+        <div className="p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
+          <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
+          <p className="text-xs text-gelap/60">Tidak ada data komoditas yang dipilih atau tersedia.</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { StatusBadge } from '../../../components/shared/status-badge';
-import { MOCK_HARVEST_COMMITMENTS, type MockHarvestCommitment } from '../../../lib/mock-data';
+import type { HarvestCommitment as MockHarvestCommitment } from '../../../types/models';
 
 interface TenantIdentity {
   tenantId: string;
@@ -28,7 +28,8 @@ interface TenantIdentity {
 }
 
 export default function SupplierDashboardPage() {
-  const [commitments, setCommitments] = React.useState<MockHarvestCommitment[]>(MOCK_HARVEST_COMMITMENTS);
+  const [commitments, setCommitments] = React.useState<MockHarvestCommitment[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [tenantIdentity, setTenantIdentity] = React.useState<TenantIdentity | null>(null);
   const [loadingTenant, setLoadingTenant] = React.useState(true);
 
@@ -38,18 +39,26 @@ export default function SupplierDashboardPage() {
       .then((data) => {
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           const mapped: MockHarvestCommitment[] = data.data.map((c: any, idx: number) => ({
-            id: c.id || `HC-2026-${idx + 1}`,
-            commodityName: c.commodity || 'Cabai Merah Keriting',
-            harvestDate: 'Panen Subuh Terjadwal',
-            estimatedYieldKg: Number(c.targetQuotaKg) || 500,
-            allocatedHubKg: Number(c.currentCollectedKg) || 320,
-            hubDestination: 'Sentra Hub Transit Bantul',
+            id: c.id || '',
+            commodityName: c.commodity || '',
+            variety: '',
+            estimatedHarvestDate: '',
+            totalYieldKg: Number(c.targetQuotaKg) || 0,
+            allocatedQuotaKg: Number(c.currentCollectedKg) || 0,
+            dropPointHub: '',
             status: (c.status === 'OPEN' ? 'ALLOCATED' : c.status === 'FULL' ? 'VERIFIED' : 'PENDING') as any,
           }));
           setCommitments(mapped);
+        } else {
+          setCommitments([]);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setCommitments([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   React.useEffect(() => {
@@ -229,45 +238,65 @@ export default function SupplierDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-netral-border/50 text-gelap">
-              {commitments.map((item) => (
-                <tr key={item.id} className="hover:bg-netral-canvas/40 transition-colors">
-                  <td className="py-3.5 px-4 font-mono font-bold text-[11px] text-primer">
-                    {item.id}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-semibold text-gelap">{item.commodityName}</div>
-                    <div className="text-[11px] text-gelap/60">{item.variety}</div>
-                  </td>
-                  <td className="py-3.5 px-4 text-gelap/80 font-medium">
-                    {item.estimatedHarvestDate}
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-medium text-gelap/70">
-                    {item.totalYieldKg.toLocaleString('id-ID')} kg
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-bold text-primer">
-                    {item.allocatedQuotaKg.toLocaleString('id-ID')} kg
-                  </td>
-                  <td className="py-3.5 px-4 text-gelap/70">
-                    <div className="flex items-center">
-                      <MapPin className="w-3 h-3 mr-1 text-sekunder flex-shrink-0" />
-                      <span>{item.dropPointHub}</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-center">
-                    <span
-                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        item.status === 'TERKUNCI'
-                          ? 'bg-sekunder-light text-sekunder border border-sekunder/20'
-                          : item.status === 'SIAP_SERAH'
-                          ? 'bg-primer-light text-primer border border-primer/20'
-                          : 'bg-netral-canvas text-gelap/70 border border-netral-border'
-                      }`}
-                    >
-                      {item.status.replace('_', ' ')}
-                    </span>
+              {isLoading ? (
+                [1, 2, 3].map((i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="py-3.5 px-4"><div className="h-4 w-20 bg-netral-border/40 rounded" /></td>
+                    <td className="py-3.5 px-4"><div className="h-4 w-32 bg-netral-border/40 rounded" /></td>
+                    <td className="py-3.5 px-4"><div className="h-4 w-24 bg-netral-border/40 rounded" /></td>
+                    <td className="py-3.5 px-4 text-right"><div className="h-4 w-16 bg-netral-border/40 rounded ml-auto" /></td>
+                    <td className="py-3.5 px-4 text-right"><div className="h-4 w-16 bg-netral-border/40 rounded ml-auto" /></td>
+                    <td className="py-3.5 px-4"><div className="h-4 w-28 bg-netral-border/40 rounded" /></td>
+                    <td className="py-3.5 px-4 text-center"><div className="h-4 w-16 bg-netral-border/40 rounded mx-auto" /></td>
+                  </tr>
+                ))
+              ) : commitments.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-8 px-4 text-center text-gelap/60 text-xs">
+                    Tidak Ada
                   </td>
                 </tr>
-              ))}
+              ) : (
+                commitments.map((item) => (
+                  <tr key={item.id} className="hover:bg-netral-canvas/40 transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-bold text-[11px] text-primer">
+                      {item.id}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-gelap">{item.commodityName}</div>
+                      <div className="text-[11px] text-gelap/60">{item.variety || 'Hasil Tani'}</div>
+                    </td>
+                    <td className="py-3.5 px-4 text-gelap/80 font-medium">
+                      {item.estimatedHarvestDate || '-'}
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-medium text-gelap/70">
+                      {(item.totalYieldKg || 0).toLocaleString('id-ID')} kg
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-bold text-primer">
+                      {(item.allocatedQuotaKg || 0).toLocaleString('id-ID')} kg
+                    </td>
+                    <td className="py-3.5 px-4 text-gelap/70">
+                      <div className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1 text-sekunder flex-shrink-0" />
+                        <span>{item.dropPointHub || 'Sentra Hub'}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          item.status === 'TERKUNCI'
+                            ? 'bg-sekunder-light text-sekunder border border-sekunder/20'
+                            : item.status === 'SIAP_SERAH'
+                            ? 'bg-primer-light text-primer border border-primer/20'
+                            : 'bg-netral-canvas text-gelap/70 border border-netral-border'
+                        }`}
+                      >
+                        {(item.status || 'PENDING').replace('_', ' ')}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

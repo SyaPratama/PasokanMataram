@@ -19,17 +19,15 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
   const webAppDir = path.join(rootDir, 'apps/web/src/app');
   const webLibDir = path.join(rootDir, 'apps/web/src/lib');
 
-  it('memvalidasi keberadaan dataset tiruan mandiri (hermetic mock data) di apps/web/src/lib/mock-data.ts', () => {
-    const mockDataPath = path.join(webLibDir, 'mock-data.ts');
-    expect(fs.existsSync(mockDataPath)).toBe(true);
+  it('memvalidasi keberadaan tipe domain mandiri di apps/web/src/types/models.ts', () => {
+    const modelsPath = path.join(rootDir, 'apps/web/src/types/models.ts');
+    expect(fs.existsSync(modelsPath)).toBe(true);
 
-    const content = fs.readFileSync(mockDataPath, 'utf-8');
-    expect(content).toContain('export const MOCK_OUTLETS');
-    expect(content).toContain('export const MOCK_TENANTS_KYB');
-    expect(content).toContain('export const MOCK_STANDING_ORDERS');
-    expect(content).toContain('export const MOCK_HARVEST_COMMITMENTS');
-    expect(content).toContain('Dapur Pusat Malioboro');
-    expect(content).toContain('Gapoktan Srikayangan Makmur');
+    const content = fs.readFileSync(modelsPath, 'utf-8');
+    expect(content).toContain('export interface Outlet');
+    expect(content).toContain('export interface TenantKyb');
+    expect(content).toContain('export interface StandingOrder');
+    expect(content).toContain('export interface HarvestCommitment');
   });
 
   it('memvalidasi halaman Login multi-role di apps/web/src/app/(auth)/login/page.tsx', () => {
@@ -110,7 +108,7 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(fs.existsSync(dashboardPath)).toBe(true);
 
     const content = fs.readFileSync(dashboardPath, 'utf-8');
-    expect(content).toContain('MOCK_STANDING_ORDERS');
+    expect(content).toContain('StandingOrder');
     expect(content).toContain('Jadwal Pengiriman Bahan Baku Rutin');
     expect(content).toContain('Hemat Pooling Bulan Ini');
     expect(content).toContain('Jadwal Drop Terdekat');
@@ -128,7 +126,7 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(layoutContent).toContain('Pak Subardi');
 
     const dashboardContent = fs.readFileSync(supplierDashboardPath, 'utf-8');
-    expect(dashboardContent).toContain('MOCK_HARVEST_COMMITMENTS');
+    expect(dashboardContent).toContain('HarvestCommitment');
     expect(dashboardContent).toContain('Komitmen Jadwal Panen & Alokasi Pasok Sentra Hub');
     expect(dashboardContent).toContain('Dana Escrow Tertampung');
     expect(dashboardContent).toContain('520/SK-DISTAN/KP/2024');
@@ -139,8 +137,6 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(fs.existsSync(adminPath)).toBe(true);
 
     const content = fs.readFileSync(adminPath, 'utf-8');
-    expect(content).toContain('MOCK_TENANTS_KYB');
-    expect(content).toContain('mapMockToQueueItem');
     expect(content).toContain('statusFilter');
     expect(content).toContain('PENDING_VERIFICATION');
     expect(content).toContain('VERIFIED');

@@ -167,7 +167,7 @@ export const StandingOrderSchema = z.object({
   frequency: z.string().min(3),
   dailyVolumeKg: z.number().positive(),
   unitPrice: z.number().positive(),
-  totalWeeklyIdr: z.number().positive(),
+  totalRp: z.number().positive(),
   deliveryTime: z.string().min(4),
   status: z.enum(['UNVERIFIED', 'PENDING_VERIFICATION', 'VERIFIED', 'REJECTED']),
 });

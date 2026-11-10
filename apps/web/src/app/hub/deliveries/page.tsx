@@ -17,58 +17,13 @@ interface ColdDelivery {
   status: 'SCHEDULED' | 'LOADING' | 'ON_ROUTE' | 'COMPLETED';
 }
 
-const MOCK_DELIVERIES: ColdDelivery[] = [
-  {
-    id: 'CDL-01',
-    windowTitle: 'Jendela 1: Rantai Dingin Subuh (Malioboro & Kraton)',
-    departureTime: '03:30 WIB',
-    truckId: 'Isuzu Elf Cold Box AB 8123 YK',
-    driverName: 'Pak Joko Sutrisno',
-    routeZone: 'Kota Yogyakarta Sektor Barat & Tengah',
-    destinationCount: 6,
-    temperatureCelsius: 8.2,
-    status: 'COMPLETED',
-  },
-  {
-    id: 'CDL-02',
-    windowTitle: 'Jendela 2: Jalur Cepat Kaliurang & Gejayan',
-    departureTime: '04:15 WIB',
-    truckId: 'Mitsubishi Canter Freezer AB 9022 PK',
-    driverName: 'Mas Danang Triyono',
-    routeZone: 'Sleman Timur & Koridor Kampus UGM',
-    destinationCount: 8,
-    temperatureCelsius: 7.8,
-    status: 'ON_ROUTE',
-  },
-  {
-    id: 'CDL-03',
-    windowTitle: 'Jendela 3: Koridor Kuliner Parangtritis & Ringroad Selatan',
-    departureTime: '05:00 WIB',
-    truckId: 'Daihatsu GranMax Reefer AB 7611 BZ',
-    driverName: 'Pak Hendro Wibowo',
-    routeZone: 'Bantul Utara & Sewon',
-    destinationCount: 5,
-    temperatureCelsius: 8.5,
-    status: 'LOADING',
-  },
-  {
-    id: 'CDL-04',
-    windowTitle: 'Jendela 4: Distribusi Buffer Kulon Progo & Bandara YIA',
-    departureTime: '06:00 WIB',
-    truckId: 'Hino Dutro Cool Box AB 8844 KT',
-    driverName: 'Mas Fajar Prasetya',
-    routeZone: 'Sentolo, Wates, & Aerotropolis',
-    destinationCount: 4,
-    temperatureCelsius: 8.0,
-    status: 'SCHEDULED',
-  },
-];
 
 /**
  * Halaman Manajemen Jadwal Distribusi Truk Rantai Dingin Subuh.
  * Mengatur 4 jendela waktu keberangkatan dari Hub Transit Sewon Bantul se-DIY.
  */
 export default function HubDeliveriesPage() {
+  const deliveries: ColdDelivery[] = [];
   return (
     <div className="space-y-6">
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -93,7 +48,13 @@ export default function HubDeliveriesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {MOCK_DELIVERIES.map((del) => (
+        {deliveries.length === 0 ? (
+          <div className="col-span-full p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
+            <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
+            <p className="text-xs text-gelap/60">Belum ada pengantaran armada rantai dingin aktif saat ini.</p>
+          </div>
+        ) : (
+          deliveries.map((del) => (
           <div
             key={del.id}
             className="bg-white p-5 rounded-2xl border border-netral-border/80 shadow-2xs space-y-4"
@@ -162,7 +123,7 @@ export default function HubDeliveriesPage() {
               </Button>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

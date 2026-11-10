@@ -11,7 +11,6 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import { MOCK_COMMODITY_FORECASTS } from '../../apps/web/src/lib/mock-forecast-data';
 
 describe('Minggu 2.0 - Clean Semantic Routing & AI Price Forecasting Verification', () => {
   const rootDir = path.resolve(__dirname, '../../');
@@ -113,22 +112,15 @@ describe('Minggu 2.0 - Clean Semantic Routing & AI Price Forecasting Verificatio
     }
   });
 
-  it('memvalidasi kelengkapan dataset tiruan 6 komoditas unggulan DIY untuk prakiraan AI', () => {
-    expect(MOCK_COMMODITY_FORECASTS).toHaveLength(6);
+  it('memvalidasi kelengkapan skema seeding komoditas unggulan DIY untuk prakiraan AI', () => {
+    const seedPath = path.join(rootDir, 'packages/database/src/schema/03-seed-data.sql');
+    expect(fs.existsSync(seedPath)).toBe(true);
 
-    for (const c of MOCK_COMMODITY_FORECASTS) {
-      expect(c.id).toBeDefined();
-      expect(c.name).toBeDefined();
-      expect(c.currentPrice).toBeGreaterThan(0);
-      expect(c.predictedPrice7d).toBeGreaterThan(0);
-      expect(c.predictedPrice30d).toBeGreaterThan(0);
-      expect(c.predictedPrice90d).toBeGreaterThan(0);
-      expect(c.confidenceScore).toBeGreaterThanOrEqual(90);
-      expect(c.optimalBuyWindow).toBeDefined();
-      expect(c.weatherAnomalyRisk).toBeDefined();
-      expect(c.modelMetadata.algorithm).toContain('PasokML');
-      expect(c.historicalAndProjected.length).toBeGreaterThan(14);
-    }
+    const sqlContent = fs.readFileSync(seedPath, 'utf-8');
+    expect(sqlContent).toContain('Bawang Merah Srikayangan');
+    expect(sqlContent).toContain('Cabai Rawit Merah');
+    expect(sqlContent).toContain('Cabai Merah Keriting');
+    expect(sqlContent).toContain('Beras Pandan Wangi');
   });
 
   it('memvalidasi etalase publik prediksi harga di /prediksi-harga', () => {

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Building2, ChevronDown } from 'lucide-react';
-import { MOCK_OUTLETS, type MockOutlet } from '../../lib/mock-data';
+import type { Outlet as MockOutlet } from '../../types/models';
 
 /**
  * Properti untuk pemilih konteks gerai cabang HoReKa.
@@ -23,7 +23,7 @@ export interface OutletContextSelectorProps {
 export function OutletContextSelector({
   activeOutletId,
   onSelectOutlet,
-  outlets = MOCK_OUTLETS,
+  outlets = [],
 }: OutletContextSelectorProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -63,10 +63,10 @@ export function OutletContextSelector({
         <div className="min-w-0 pr-2">
           <div className="text-xs font-bold text-gelap truncate flex items-center">
             <Building2 className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">{activeOutlet?.name}</span>
+            <span className="truncate">{activeOutlet?.name || 'Belum Ada Gerai'}</span>
           </div>
           <div className="text-[10px] text-gelap/85 truncate pl-5">
-            {activeOutlet?.regency.replace('_', ' ')}
+            {activeOutlet?.regency ? activeOutlet.regency.replace('_', ' ') : 'D.I. Yogyakarta'}
           </div>
         </div>
         <ChevronDown
@@ -83,31 +83,35 @@ export function OutletContextSelector({
           aria-label="Daftar gerai cabang"
           className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-netral-border rounded-xl shadow-lg z-30 py-1 max-h-48 overflow-y-auto custom-scrollbar"
         >
-          {outlets.map((outlet) => {
-            const isSelected = outlet.id === activeOutletId;
-            return (
-              <button
-                key={outlet.id}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => {
-                  onSelectOutlet?.(outlet.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-3 py-2.5 text-xs flex flex-col hover:bg-netral-canvas min-h-[44px] justify-center transition-colors ${
-                  isSelected ? 'bg-primer-light/40 font-bold text-primer' : 'text-gelap'
-                }`}
-              >
-                <span className="truncate">{outlet.name}</span>
-                <span className="text-[10px] text-gelap/85 flex items-center gap-1">
-                  <span>{outlet.isMain ? 'Pusat' : 'Cabang'}</span>
-                  <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
-                  <span>{outlet.regency.replace('_', ' ')}</span>
-                </span>
-              </button>
-            );
-          })}
+          {outlets.length === 0 ? (
+            <div className="p-3 text-xs text-gelap/60 text-center">Belum ada gerai terdaftar</div>
+          ) : (
+            outlets.map((outlet) => {
+              const isSelected = outlet.id === activeOutletId;
+              return (
+                <button
+                  key={outlet.id}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onSelectOutlet?.(outlet.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2.5 text-xs flex flex-col hover:bg-netral-canvas min-h-[44px] justify-center transition-colors ${
+                    isSelected ? 'bg-primer-light/40 font-bold text-primer' : 'text-gelap'
+                  }`}
+                >
+                  <span className="truncate">{outlet.name}</span>
+                  <span className="text-[10px] text-gelap/85 flex items-center gap-1">
+                    <span>{outlet.isMain ? 'Pusat' : 'Cabang'}</span>
+                    <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
+                    <span>{outlet.regency ? outlet.regency.replace('_', ' ') : 'D.I. Yogyakarta'}</span>
+                  </span>
+                </button>
+              );
+            })
+          )}
         </div>
       )}
     </div>

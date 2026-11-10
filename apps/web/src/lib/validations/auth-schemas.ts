@@ -10,6 +10,7 @@ import { kybRulesConfig, diyRegenciesConfig } from '../../config';
 export const RegisterBusinessSchema = z.object({
   businessName: z.string().min(kybRulesConfig.businessNameMinLength, 'Nama usaha minimal 3 karakter').max(kybRulesConfig.businessNameMaxLength),
   tenantType: z.enum(['HOREKA_BUYER', 'GAPOKTAN_SUPPLIER']),
+  macroRole: z.enum(['HOREKA', 'GAPOKTAN']).optional(),
   regency: z.enum(diyRegenciesConfig),
   ownerName: z.string().min(kybRulesConfig.contactPersonMinLength, 'Nama penanggung jawab minimal 3 karakter'),
   email: z.string().email('Format email tidak valid'),

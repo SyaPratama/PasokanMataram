@@ -1,54 +1,58 @@
-import type { Metadata } from 'next';
+'use client';
+
+import * as React from 'react';
 import { Plus, Clock } from 'lucide-react';
-import { StatusBadge } from '../../../components/shared/status-badge';
+import { z } from 'zod';
 
-export const metadata: Metadata = {
-  title: 'Alokasi Pasok Hub Sentolo | Portal Supplier PasokMataram',
-  description: 'Komitmen jadwal setor pasokan ke Sentra Hub Transit Kulon Progo.',
-};
+const AllocationResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(z.object({
+    id: z.string(),
+    commodity: z.string(),
+    startsAt: z.string(),
+    endsAt: z.string(),
+    allocatedKg: z.number(),
+    targetQuotaKg: z.number(),
+    pricePerKg: z.number(),
+    status: z.string(),
+  })),
+});
+type Allocation = z.infer<typeof AllocationResponseSchema>['data'][number];
 
-/**
- * Halaman Alokasi Pasok Hub untuk Gapoktan dengan dukungan kartu responsif mobile dan tabel desktop.
- */
+function formatDate(value: string): string {
+  return value.slice(0, 10);
+}
+
+function formatTime(value: string): string {
+  return value.slice(11, 16) || 'Waktu belum ditetapkan';
+}
+
+
 export default function SupplierAllocationsPage() {
-  const allocations = [
-    {
-      id: 'ALO-KLP-0881',
-      commodity: 'Bawang Merah Srikayangan Super',
-      harvestDate: 'Jumat, 10 Okt 2026',
-      dropOffTime: '18:00 - 20:00 WIB',
-      hubDestination: 'Sentra Hub Kulon Progo (Sentolo)',
-      allocatedKg: 500,
-      targetAcceptedKg: 490,
-      agreedPricePerKg: 31000,
-      totalPaymentIdr: 15190000,
-      status: 'VERIFIED' as const,
-    },
-    {
-      id: 'ALO-KLP-0882',
-      commodity: 'Cabai Rawit Merah Panjatan',
-      harvestDate: 'Sabtu, 11 Okt 2026',
-      dropOffTime: '17:30 - 19:30 WIB',
-      hubDestination: 'Sentra Hub Kulon Progo (Sentolo)',
-      allocatedKg: 250,
-      targetAcceptedKg: 245,
-      agreedPricePerKg: 46500,
-      totalPaymentIdr: 11392500,
-      status: 'VERIFIED' as const,
-    },
-    {
-      id: 'ALO-KLP-0883',
-      commodity: 'Cabai Keriting Merah',
-      harvestDate: 'Senin, 13 Okt 2026',
-      dropOffTime: '18:00 - 20:00 WIB',
-      hubDestination: 'Sentra Hub Kulon Progo (Sentolo)',
-      allocatedKg: 300,
-      targetAcceptedKg: 295,
-      agreedPricePerKg: 38000,
-      totalPaymentIdr: 11210000,
-      status: 'PENDING_VERIFICATION' as const,
-    },
-  ];
+  const [allocations, setAllocations] = React.useState<Allocation[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch('/api/v1/supplier/allocations')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Alokasi supplier tidak tersedia.');
+        const parsed = AllocationResponseSchema.safeParse(await response.json());
+        if (!parsed.success || !parsed.data.success) throw new Error('Respons alokasi tidak valid.');
+        setAllocations(parsed.data.data);
+      })
+      .catch((error: unknown) => {
+        setLoadError(error instanceof Error ? error.message : 'Alokasi supplier tidak tersedia.');
+        setAllocations([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const renderStatus = (status: string) => (
+    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primer-light text-primer border border-primer/20">
+      {status}
+    </span>
+  );
 
   return (
     <div className="space-y-6">
@@ -80,6 +84,13 @@ export default function SupplierAllocationsPage() {
           </span>
         </div>
 
+        {isLoading ? (
+          <div className="p-10 text-center text-sm text-gelap-muted animate-pulse">Memuat alokasi tersimpan...</div>
+        ) : allocations.length === 0 ? (
+          <div className="p-10 text-center text-sm text-gelap-muted">{loadError || 'Belum ada alokasi pasokan tersimpan.'}</div>
+        ) : (
+          <>
+ 
         <div className="block sm:hidden divide-y divide-netral-border/60">
           {allocations.map((item) => (
             <div key={item.id} className="p-4 space-y-3">
@@ -88,21 +99,21 @@ export default function SupplierAllocationsPage() {
                   <div className="font-bold text-sm text-gelap">{item.commodity}</div>
                   <div className="text-xs text-gelap-muted font-mono mt-0.5">{item.id}</div>
                 </div>
-                <StatusBadge status={item.status} />
+                {renderStatus(item.status)}
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                 <div className="space-y-0.5">
                   <span className="text-gelap-muted block">Jadwal Setor:</span>
-                  <span className="font-semibold text-gelap block">{item.harvestDate}</span>
+                  <span className="font-semibold text-gelap block">{formatDate(item.startsAt)}</span>
                   <span className="text-primer font-mono flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {item.dropOffTime}
+                    {formatTime(item.endsAt)}
                   </span>
                 </div>
                 <div className="space-y-0.5">
-                  <span className="text-gelap-muted block">Tujuan Hub:</span>
-                  <span className="font-medium text-gelap block">{item.hubDestination}</span>
+                  <span className="text-gelap-muted block">Target Kuota:</span>
+                  <span className="font-medium text-gelap block">{item.targetQuotaKg} kg</span>
                 </div>
               </div>
 
@@ -112,9 +123,9 @@ export default function SupplierAllocationsPage() {
                   <span className="font-mono font-bold text-gelap">{item.allocatedKg} kg</span>
                 </div>
                 <div>
-                  <span className="text-gelap-muted">Total Escrow: </span>
+                  <span className="text-gelap-muted">Total Nilai Pasokan: </span>
                   <span className="font-mono font-bold text-primer">
-                    Rp {item.totalPaymentIdr.toLocaleString('id-ID')}
+                    Rp {(item.allocatedKg * item.pricePerKg).toLocaleString('id-ID')}
                   </span>
                 </div>
               </div>
@@ -128,10 +139,10 @@ export default function SupplierAllocationsPage() {
               <tr className="bg-netral-canvas/60 border-b border-netral-border text-gelap-muted font-semibold uppercase tracking-wider text-xs">
                 <th className="py-3 px-4">Komoditas & No. Alokasi</th>
                 <th className="py-3 px-4">Jadwal Setor Hub</th>
-                <th className="py-3 px-4">Tujuan Hub</th>
+                <th className="py-3 px-4">Target Kuota</th>
                 <th className="py-3 px-4 text-right">Kuota Pasok</th>
                 <th className="py-3 px-4 text-right">Harga Kontrak</th>
-                <th className="py-3 px-4 text-right">Total Nilai Escrow</th>
+                <th className="py-3 px-4 text-right">Total Nilai Pasokan</th>
                 <th className="py-3 px-4 text-center">Status</th>
               </tr>
             </thead>
@@ -143,32 +154,34 @@ export default function SupplierAllocationsPage() {
                     <div className="text-xs text-gelap-muted font-mono mt-0.5">{item.id}</div>
                   </td>
                   <td className="py-3.5 px-4">
-                    <div className="font-semibold text-gelap">{item.harvestDate}</div>
+                    <div className="font-semibold text-gelap">{formatDate(item.startsAt)}</div>
                     <div className="text-xs text-primer font-mono flex items-center gap-1 mt-0.5">
                       <Clock className="w-3 h-3" />
-                      {item.dropOffTime}
+                      {formatTime(item.endsAt)}
                     </div>
                   </td>
                   <td className="py-3.5 px-4 text-gelap-muted">
-                    {item.hubDestination}
+                    {item.targetQuotaKg} kg
                   </td>
                   <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-gelap">
                     {item.allocatedKg} kg
                   </td>
                   <td className="py-3.5 px-4 text-right font-mono tabular-nums text-gelap-muted">
-                    Rp {item.agreedPricePerKg.toLocaleString('id-ID')}
+                    Rp {item.pricePerKg.toLocaleString('id-ID')}
                   </td>
                   <td className="py-3.5 px-4 text-right font-mono tabular-nums font-bold text-primer">
-                    Rp {item.totalPaymentIdr.toLocaleString('id-ID')}
+                    Rp {(item.allocatedKg * item.pricePerKg).toLocaleString('id-ID')}
                   </td>
                   <td className="py-3.5 px-4 text-center">
-                    <StatusBadge status={item.status} />
+                    {renderStatus(item.status)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+          </>
+          )}
       </div>
     </div>
   );

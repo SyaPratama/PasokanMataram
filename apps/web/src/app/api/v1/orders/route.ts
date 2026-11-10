@@ -1,80 +1,90 @@
-/**
- * @file apps/web/src/app/api/v1/orders/route.ts
- * @description Dynamic orders API reading and writing directly to MySQL pool_reservations table
- */
-
 import { NextResponse } from 'next/server';
-import { query } from '@pasok/database';
+import type { RowDataPacket } from 'mysql2';
+import { withTenantContext } from '@pasok/database';
+import { verifySessionToken } from '@/lib/auth';
+
+interface OrderRow extends RowDataPacket {
+  readonly id: string;
+  readonly campaignId: string;
+  readonly commodity: string;
+  readonly supplierName: string;
+  readonly buyerName: string;
+  readonly quantityKg: number;
+  readonly pricePerKg: number;
+  readonly totalAmountRp: number;
+  readonly status: string;
+  readonly deliveryAddress: string;
+  readonly vaNumber: string | null;
+  readonly paymentReference: string | null;
+  readonly createdAt: string;
+}
+
+function readSession(request: Request) {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const cookie = cookieHeader
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith('pasok_session=') || part.startsWith('session_token='));
+  const token = cookie ? cookie.slice(cookie.indexOf('=') + 1) : null;
+  return token ? verifySessionToken(token) : null;
+}
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(request: Request): Promise<NextResponse> {
+  const session = readSession(request);
+  if (!session) return NextResponse.json({ success: false, message: 'Sesi diperlukan.' }, { status: 401 });
   try {
-    const { searchParams } = new URL(request.url);
-    const buyerTenantId = searchParams.get('buyerTenantId');
-    const status = searchParams.get('status');
-
-    let sql = `
-      SELECT
-        r.id,
-        r.campaign_id as campaignId,
-        p.commodity_name as commodity,
-        t_supplier.business_name as supplierName,
-        t_buyer.business_name as buyerName,
-        CAST(r.quantity_kg AS SIGNED) as quantityKg,
-        CAST(r.price_per_kg AS SIGNED) as pricePerKg,
-        CAST(r.total_amount_rp AS SIGNED) as totalAmountRp,
-        r.status,
-        r.delivery_address as deliveryAddress,
-        r.va_number as vaNumber,
-        r.payment_reference as paymentReference,
-        r.created_at as createdAt
-      FROM pool_reservations r
-      JOIN pooling_campaigns p ON p.id = r.campaign_id
-      JOIN tenants t_supplier ON t_supplier.id = p.supplier_tenant_id
-      JOIN tenants t_buyer ON t_buyer.id = r.buyer_tenant_id
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (buyerTenantId) {
-      sql += ' AND r.buyer_tenant_id = ?';
-      params.push(buyerTenantId);
-    }
-
-    if (status) {
-      sql += ' AND r.status = ?';
-      params.push(status);
-    }
-
-    sql += ' ORDER BY r.created_at DESC';
-
-    const res = await query<any>(sql, params);
-    const rows = res.rows || [];
-
-    const data = rows.map((r: any) => ({
-      id: `ORD-${r.id.slice(0, 8).toUpperCase()}`,
-      uuid: r.id,
-      commodity: r.commodity,
-      supplierName: r.supplierName,
-      buyerName: r.buyerName,
-      quantityKg: Number(r.quantityKg) || 0,
-      pricePerKg: Number(r.pricePerKg) || 0,
-      totalAmountRp: Number(r.totalAmountRp) || 0,
-      status: r.status,
-      deliveryAddress: r.deliveryAddress,
-      vaNumber: r.vaNumber,
-      paymentReference: r.paymentReference,
-      createdAt: r.createdAt,
-    }));
-
+    const status = new URL(request.url).searchParams.get('status');
+    const data = await withTenantContext(session, async (client) => {
+      const params: unknown[] = [session.tenantId];
+      const statusClause = status ? ' AND r.status = ?' : '';
+      if (status) params.push(status);
+      const [rows] = await client.query<OrderRow[]>(
+        `SELECT r.id,
+                r.campaign_id AS campaignId,
+                p.commodity_name AS commodity,
+                supplier.business_name AS supplierName,
+                buyer.business_name AS buyerName,
+                CAST(r.quantity_kg AS SIGNED) AS quantityKg,
+                CAST(r.price_per_kg AS SIGNED) AS pricePerKg,
+                CAST(r.total_amount_rp AS SIGNED) AS totalAmountRp,
+                r.status,
+                r.delivery_address AS deliveryAddress,
+                r.va_number AS vaNumber,
+                r.payment_reference AS paymentReference,
+                CAST(r.created_at AS CHAR) AS createdAt
+         FROM pool_reservations r
+         JOIN pooling_campaigns p ON p.id = r.campaign_id
+         JOIN tenants supplier ON supplier.id = p.supplier_tenant_id
+         JOIN tenants buyer ON buyer.id = r.buyer_tenant_id
+         WHERE r.buyer_tenant_id = ?${statusClause}
+         ORDER BY r.created_at DESC
+         LIMIT 100`,
+        params
+      );
+      return rows;
+    });
     return NextResponse.json({
       success: true,
-      data,
-      count: data.length,
+      data: data.map((row) => ({
+        id: `ORD-${row.id.slice(0, 8).toUpperCase()}`,
+        uuid: row.id,
+        campaignId: row.campaignId,
+        commodity: row.commodity,
+        supplierName: row.supplierName,
+        buyerName: row.buyerName,
+        quantityKg: Number(row.quantityKg),
+        pricePerKg: Number(row.pricePerKg),
+        totalAmountRp: Number(row.totalAmountRp),
+        status: row.status,
+        deliveryAddress: row.deliveryAddress,
+        vaNumber: row.vaNumber,
+        paymentReference: row.paymentReference,
+        createdAt: row.createdAt,
+      })),
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Gagal memuat daftar pesanan.';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false, message: 'Data pesanan tidak tersedia.' }, { status: 503 });
   }
 }

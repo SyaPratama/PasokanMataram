@@ -9,7 +9,6 @@ import {
   Post,
   Body,
   Query,
-  Headers,
   HttpException,
   HttpStatus,
   Inject,
@@ -18,7 +17,10 @@ import {
 import type { SecurityContext, CommodityCategory } from '@pasok/domain';
 import { LogisticsService } from './logistics.service';
 import type { QcDisputeInput } from '@pasok/logistics-hub-service';
+import { Roles } from '../common/roles.decorator';
+import { SecurityContextParam } from '../common/security-context.decorator';
 
+@Roles('HUB_OPERATOR')
 @Controller('logistics')
 export class LogisticsController {
   private readonly logisticsService: LogisticsService;
@@ -57,17 +59,12 @@ export class LogisticsController {
   @Post('weighing')
   public async postWeighing(
     @Body() body: Record<string, unknown>,
-    @Query('hubId') hubIdQuery?: string,
-    @Headers('x-hub-id') hubIdHeader?: string,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext,
+    @Query('hubId') hubId?: string
   ) {
-    const hubId = hubIdQuery || hubIdHeader || 'HUB-BANTUL-01';
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: (body.operatorId as string) || 'OPERATOR_QC',
-      role: 'HUB_OPERATOR',
-      isSuperAdmin: false,
-    };
+    if (!hubId) {
+      throw new HttpException('Parameter hubId diperlukan.', HttpStatus.BAD_REQUEST);
+    }
 
     try {
       const result = await this.logisticsService.recordWeighing(context, body, hubId);
@@ -90,14 +87,8 @@ export class LogisticsController {
   @Post('qc-dispute')
   public async submitDispute(
     @Body() body: QcDisputeInput,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const context: SecurityContext = {
-      tenantId: tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: 'OPERATOR_QC',
-      role: 'HUB_OPERATOR',
-      isSuperAdmin: false,
-    };
 
     try {
       const result = await this.logisticsService.fileQcDispute(context, body);

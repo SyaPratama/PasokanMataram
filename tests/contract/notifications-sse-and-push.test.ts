@@ -13,6 +13,13 @@ import { NotificationsController } from '../../apps/api/src/notifications/notifi
 import { GET as streamBffRoute } from '../../apps/web/src/app/api/v1/notifications/stream/route';
 import { GET as listBffRoute, PATCH as patchBffRoute } from '../../apps/web/src/app/api/v1/notifications/route';
 import { POST as subscribeBffRoute, DELETE as unsubscribeBffRoute } from '../../apps/web/src/app/api/v1/notifications/subscriptions/route';
+const testContext = {
+  tenantId: '10000000-0000-0000-0000-000000000001',
+  userId: '30000000-0000-0000-0000-000000000003',
+  role: 'BUYER',
+  isSuperAdmin: false,
+} as const;
+
 
 /**
  * Creates a mock Request object for testing Next.js API routes.
@@ -93,20 +100,20 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
         return;
       }
       const service = new NotificationsService();
-      const unreadInitial = await service.getUnreadCount('tnt_sandbox_tenant');
+      const unreadInitial = await service.getUnreadCount(testContext);
       expect(unreadInitial).toBeGreaterThanOrEqual(0);
 
-      const items = await service.getNotifications('tnt_sandbox_tenant');
+      const items = await service.getNotifications(testContext);
       const unreadItem = items.find((i) => !i.isRead);
       if (unreadItem) {
-        const ok = await service.markAsRead('tnt_sandbox_tenant', unreadItem.id);
+        const ok = await service.markAsRead(testContext, unreadItem.id);
         expect(ok).toBe(true);
       }
 
-      const allCount = await service.markAllAsRead('tnt_sandbox_tenant');
+      const allCount = await service.markAllAsRead(testContext);
       expect(allCount).toBeGreaterThanOrEqual(0);
 
-      const unreadFinal = await service.getUnreadCount('tnt_sandbox_tenant');
+      const unreadFinal = await service.getUnreadCount(testContext);
       expect(unreadFinal).toBe(0);
     });
 
@@ -124,10 +131,10 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
         },
       };
 
-      const saved = await service.registerPushSubscription('tnt_sandbox_tenant', 'usr_test_1', sub);
+      const saved = await service.registerPushSubscription(testContext, sub);
       expect(saved).toBe(true);
 
-      const removed = await service.deletePushSubscription('tnt_sandbox_tenant', sub.endpoint);
+      const removed = await service.deletePushSubscription(testContext, sub.endpoint);
       expect(removed).toBe(true);
     });
   });
@@ -139,11 +146,11 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
         return;
       }
       const controller = new NotificationsController();
-      const listRes = await controller.getNotifications('tnt_sandbox_tenant');
+      const listRes = await controller.getNotifications(testContext);
       expect(listRes.success).toBe(true);
       expect(Array.isArray(listRes.data)).toBe(true);
 
-      const countRes = await controller.getUnreadCount('tnt_sandbox_tenant');
+      const countRes = await controller.getUnreadCount(testContext);
       expect(countRes.success).toBe(true);
       expect(typeof countRes.data.count).toBe('number');
     });
@@ -180,7 +187,7 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
       expect(patchRes.status).toBe(401);
     });
 
-    it('melayani pendaftaran dan penghapusan Web Push subscription via BFF', async () => {
+    it('menolak pendaftaran dan penghapusan Web Push tanpa sesi', async () => {
       const postReq = new Request('http://localhost:3000/api/v1/notifications/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -190,7 +197,7 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
         }),
       });
       const postRes = await subscribeBffRoute(postReq);
-      expect(postRes.status).toBe(200);
+      expect(postRes.status).toBe(401);
 
       const delReq = new Request('http://localhost:3000/api/v1/notifications/subscriptions', {
         method: 'DELETE',
@@ -198,7 +205,7 @@ describe('Notifications, SSE Streaming & PWA Web Push Contracts', () => {
         body: JSON.stringify({ endpoint: 'https://push.example.com/endpoint/test' }),
       });
       const delRes = await unsubscribeBffRoute(delReq);
-      expect(delRes.status).toBe(200);
+      expect(delRes.status).toBe(401);
     });
   });
 

@@ -1,14 +1,13 @@
 /**
  * @file apps/web/src/app/api/v1/forecast/route.ts
  * @description Endpoint publik pembacaan prakiraan tren harga pasokan komoditas pangan DIY.
- * Mendukung pembacaan real-time dari database PostgreSQL 16 dengan fallback mock hermetis,
- * filter pencarian kata kunci, pemilihan wilayah kabupaten/kota, dan penyortiran harga.
+ * Membaca prakiraan real-time dari basis data MySQL 8.0.
+ * Filter pencarian kata kunci, wilayah kabupaten/kota, dan penyortiran harga.
  * Mematuhi Prinsip I, IV, VII, dan XII Konstitusi PasokMataram.
  */
 
 import { NextResponse } from 'next/server';
 import { query } from '@pasok/database';
-import { MOCK_COMMODITY_FORECASTS } from '@/lib/mock-forecast-data';
 import type { CommodityForecast, PriceDataPoint } from '@/types/forecast';
 
 interface ForecastDbRow {
@@ -39,8 +38,7 @@ interface ForecastDbRow {
 }
 
 /**
- * Mengambil data prakiraan harga komoditas dari database dengan fallback hermetis.
- * @returns Larik data CommodityForecast.
+ * Mengambil data prakiraan harga komoditas dari basis data.
  */
 async function loadForecastData(): Promise<CommodityForecast[]> {
   try {
@@ -78,7 +76,7 @@ async function loadForecastData(): Promise<CommodityForecast[]> {
     );
 
     if (res.rows.length === 0) {
-      return [...MOCK_COMMODITY_FORECASTS];
+      return [];
     }
 
     return res.rows.map((r) => {
@@ -121,8 +119,8 @@ async function loadForecastData(): Promise<CommodityForecast[]> {
         historicalAndProjected: curve,
       };
     });
-  } catch {
-    return [...MOCK_COMMODITY_FORECASTS];
+  } catch (error: unknown) {
+    throw error;
   }
 }
 
