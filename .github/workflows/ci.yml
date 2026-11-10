@@ -17,7 +17,7 @@ concurrency:
 env:
   NODE_VERSION: '22.x'
   CI: 'true'
-
+  JWT_SECRET: 'test-jwt-secret-minimum-32-characters-for-ci-tests!!'
 jobs:
   lint-and-typecheck:
     name: Code Quality & Typecheck
