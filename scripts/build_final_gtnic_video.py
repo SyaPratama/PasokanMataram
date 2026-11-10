@@ -3,7 +3,7 @@
 scripts/build_final_gtnic_video.py
 Full automated builder for PasokMataram GTNIC 2026 video walkthrough (3-5 minutes, 1080p).
 Includes:
-1. Natural Indonesian neural voice dubbing matching Rasya's pitch profile (-2Hz, ~95Hz baritone).
+1. Voice cloning from the supplied Rasya reference recording through OmniVoice.
 2. Native camera footage & original voice for Rasya Putra Pratama and Ibnu Sabil.
 3. Smooth, elegant Rhodes piano ambient backsound bed (-18dB, non-stiff).
 4. 18 comprehensive segments with high-resolution production screenshots across 5 personas.
@@ -17,12 +17,19 @@ import wave
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import imageio_ffmpeg
-import edge_tts
+import soundfile as sf
+import torch
+from omnivoice import OmniVoice
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 PICS_DIR = r"C:\Users\inira\OneDrive\Pictures"
 TMP_DIR = "tmp_gtnic_build"
 OUT_FILE = "docs/PasokMataram_Video_Walkthrough_GTNIC_2026.mp4"
+
+VOICE_REFERENCE = os.getenv("GTNIC_VOICE_REFERENCE", os.path.join(PICS_DIR, "suara_tama.aac"))
+VOICE_MODEL = os.getenv("GTNIC_VOICE_MODEL", "k2-fsa/OmniVoice")
+VOICE_DEVICE = os.getenv("GTNIC_VOICE_DEVICE", "cpu")
+VOICE_REF_TEXT = os.getenv("GTNIC_VOICE_REF_TEXT")
 
 os.makedirs(TMP_DIR, exist_ok=True)
 os.makedirs("docs", exist_ok=True)
@@ -153,20 +160,42 @@ def render_video_overlay(name, role, campus, out_path):
     overlay.save(out_path)
     return out_path
 
-async def generate_voice_dubbing(idx, text, out_wav):
-    mp3_tmp = os.path.join(TMP_DIR, f"dub_raw_{idx:02d}.mp3")
-    if not os.path.exists(out_wav):
-        # id-ID-ArdiNeural matched to Rasya's ~95Hz pitch profile
-        comm = edge_tts.Communicate(text, "id-ID-ArdiNeural", rate="+3%", pitch="-2Hz")
-        await comm.save(mp3_tmp)
-        # Convert to 48000Hz stereo WAV
-        subprocess.run([
-            FFMPEG, "-y", "-i", mp3_tmp,
-            "-ar", "48000", "-ac", "2",
-            out_wav
-        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if os.path.exists(mp3_tmp):
-            os.remove(mp3_tmp)
+def prepare_voice_reference():
+    if not os.path.exists(VOICE_REFERENCE):
+        raise FileNotFoundError(f"Voice reference not found: {VOICE_REFERENCE}")
+    if VOICE_REFERENCE.lower().endswith(".wav"):
+        return VOICE_REFERENCE
+    reference_wav = os.path.join(TMP_DIR, "voice_reference.wav")
+    subprocess.run(
+        [FFMPEG, "-y", "-i", VOICE_REFERENCE, "-ar", "24000", "-ac", "1", reference_wav],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return reference_wav
+
+
+def load_voice_cloner():
+    print(f"Loading OmniVoice checkpoint: {VOICE_MODEL}")
+    return OmniVoice.from_pretrained(VOICE_MODEL, device_map=VOICE_DEVICE, dtype=torch.float16)
+
+
+def create_voice_clone_prompt(model, reference_wav):
+    print("Transcribing voice reference once for reusable clone prompt")
+    return model.create_voice_clone_prompt(ref_audio=reference_wav, ref_text=VOICE_REF_TEXT)
+
+
+def generate_voice_dubbing(model, clone_prompt, text, out_wav):
+    if os.path.exists(out_wav):
+        return
+    audio = model.generate(
+        text=text,
+        language="id",
+        voice_clone_prompt=clone_prompt,
+        num_step=16,
+        speed=1.0,
+    )
+    sf.write(out_wav, audio[0], model.sampling_rate)
 
 def get_audio_duration(audio_file):
     probe = subprocess.run([
@@ -364,7 +393,10 @@ async def async_main():
          "Karya Terpadu Web Development & AI Application GTNIC 2026\nOleh Tim Abang Tukang Bakso (Rasya Putra Pratama & Ibnu Sabil, Universitas Teknologi Yogyakarta)\nTerima kasih kepada Dewan Juri dan Panitia GTNIC 2026!"),
     ]
 
-    print("\n--- Generating Voice Dubbing Tracks ---")
+    print("\n--- Loading verified voice clone checkpoint ---")
+    voice_reference_wav = prepare_voice_reference()
+    voice_cloner = load_voice_cloner()
+    voice_clone_prompt = create_voice_clone_prompt(voice_cloner, voice_reference_wav)
     clip_files = []
     concat_list_path = os.path.join(TMP_DIR, "concat_list.txt")
     total_duration = 0.0
@@ -375,9 +407,9 @@ async def async_main():
 
         if clip_type == "slide":
             _, dub_idx, sc_path, tag, title, sub = seg
-            dub_wav = os.path.join(TMP_DIR, f"dub_{dub_idx:02d}.wav")
-            print(f"[{idx+1}/{len(raw_segments)}] Generating dubbing & slide for: {title[:40]}...")
-            await generate_voice_dubbing(dub_idx, DUB_TEXTS[dub_idx], dub_wav)
+            dub_wav = os.path.join(TMP_DIR, f"clone_{dub_idx:02d}.wav")
+            print(f"[{idx+1}/{len(raw_segments)}] Generating cloned voice & slide for: {title[:40]}...")
+            generate_voice_dubbing(voice_cloner, voice_clone_prompt, DUB_TEXTS[dub_idx], dub_wav)
             dub_dur = get_audio_duration(dub_wav)
             slide_dur = dub_dur + 1.2 # pleasant padding
             total_duration += slide_dur
