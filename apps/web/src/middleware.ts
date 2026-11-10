@@ -6,7 +6,6 @@ import {
   resolveUserHomeRoute,
   isRouteAllowedForRole,
 } from '@pasok/security/edge';
-import type { MacroRole, MicroRole, UserId, TenantId } from '@pasok/domain';
 
 /**
  * Next.js Edge Middleware untuk Smart Edge Resolver, Proteksi Lintas Portal, dan Mode Pemeliharaan.
@@ -103,22 +102,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     claims = decodeSessionClaimsEdge(sessionCookie);
   }
 
-  const isSandbox =
-    process.env.NODE_ENV !== 'production' &&
-    (request.nextUrl.searchParams.get('sandbox') === 'true' ||
-      request.cookies.get('pasok_sandbox_mode')?.value === 'true');
-  const sandboxPersona = request.nextUrl.searchParams.get('persona') || 'BUYER';
-
-  if (!claims && isSandbox) {
-    claims = {
-      userId: 'usr_sandbox_preview' as UserId,
-      tenantId: 'tenant_sandbox_preview' as TenantId,
-      macroRole: sandboxPersona === 'SUPPLIER' ? 'GAPOKTAN' : sandboxPersona === 'ADMIN' ? 'SUPER_ADMIN' : 'HOREKA',
-      microRole: sandboxPersona === 'SUPPLIER' ? 'CHAIRPERSON' : sandboxPersona === 'ADMIN' ? 'SUPER_ADMIN' : 'OWNER',
-      isSuperAdmin: sandboxPersona === 'ADMIN',
-      email: 'sandbox@pasokmataram.id',
-    };
-  }
   if (pathname === '/login') {
     return NextResponse.next();
   }

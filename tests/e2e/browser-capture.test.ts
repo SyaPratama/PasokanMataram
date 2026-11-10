@@ -121,14 +121,19 @@ describe('Browser & Web Capture Automated Test', () => {
     expect(html).toContain('Pemasok Gapoktan');
   });
 
-  it('berhasil memvalidasi komponen legalitas KYB di dashboard (GET /buyer/legalitas)', async () => {
-    const response = await fetch(`${BASE_URL}/buyer/legalitas?sandbox=true&persona=BUYER`);
-    expect(response.status).toBe(200);
+  it('menolak sandbox query sebagai bypass autentikasi pada halaman legalitas', async () => {
+    const response = await fetch(`${BASE_URL}/buyer/legalitas?sandbox=true&persona=BUYER`, { redirect: 'manual' });
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/login');
+  });
 
-    const html = await response.text();
-    expect(html).toContain('Legalitas');
-    expect(html).toContain('KYB');
-    expect(html).toContain('PDF atau WebP');
+  it('menolak header sandbox pada endpoint review KYB tanpa sesi admin', async () => {
+    const response = await fetch(`${BASE_URL}/api/v1/admin/kyb/review`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-pasok-sandbox-mode': 'true' },
+      body: JSON.stringify({ tenantId: '10000000-0000-0000-0000-000000000001', decision: 'APPROVED' }),
+    });
+    expect(response.status).toBe(401);
   });
 
   it('berhasil memastikan bundle CSS PostCSS dimuat di seluruh halaman', async () => {
