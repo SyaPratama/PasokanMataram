@@ -188,11 +188,13 @@ def create_voice_clone_prompt(model, reference_wav):
 def generate_voice_dubbing(model, clone_prompt, text, out_wav):
     if os.path.exists(out_wav):
         return
+    duration = max(3.0, min(20.0, len(text.split()) / 2.3 + 0.8))
     audio = model.generate(
         text=text,
         language="id",
         voice_clone_prompt=clone_prompt,
-        num_step=16,
+        duration=duration,
+        num_step=8,
         speed=1.0,
     )
     sf.write(out_wav, audio[0], model.sampling_rate)
