@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import mysql from 'mysql2/promise';
+import type { RowDataPacket } from 'mysql2';
 import { databaseConfig, migrationsConfig } from '@pasok/config';
 import { withDbRetry } from './client';
 
@@ -13,6 +14,10 @@ export interface MigrationResult {
   file: string;
   status: 'applied' | 'skipped' | 'failed';
   error?: string;
+}
+
+interface MigrationRow extends RowDataPacket {
+  filename: string;
 }
 
 /**
@@ -30,10 +35,11 @@ export async function runMigrations(): Promise<MigrationResult[]> {
     connectionLimit: 1,
   });
 
-  const connection = await withDbRetry(() => pool.getConnection());
+  let connection: mysql.PoolConnection | undefined;
   const results: MigrationResult[] = [];
 
   try {
+    connection = await withDbRetry(() => pool.getConnection());
     await connection.query(`SELECT GET_LOCK(?, 10)`, [migrationsConfig.lockId.toString()]);
 
     await connection.query(`
@@ -44,10 +50,10 @@ export async function runMigrations(): Promise<MigrationResult[]> {
       ) ENGINE=InnoDB;
     `);
 
-    const [appliedRows] = await connection.query<any[]>(
+    const [appliedRows] = await connection.query<MigrationRow[]>(
       `SELECT filename FROM ${migrationsConfig.trackingTable}`
     );
-    const appliedFiles = new Set(appliedRows.map((r: any) => r.filename));
+    const appliedFiles = new Set(appliedRows.map((r) => r.filename));
 
     for (const file of migrationsConfig.migrationFiles) {
       if (appliedFiles.has(file)) {
@@ -81,11 +87,13 @@ export async function runMigrations(): Promise<MigrationResult[]> {
 
     return results;
   } finally {
-    try {
-      await connection.query(`SELECT RELEASE_LOCK(?)`, [migrationsConfig.lockId.toString()]);
-    } catch {
+    if (connection) {
+      try {
+        await connection.query(`SELECT RELEASE_LOCK(?)`, [migrationsConfig.lockId.toString()]);
+      } catch {
+      }
+      connection.release();
     }
-    connection.release();
     await pool.end();
   }
 }

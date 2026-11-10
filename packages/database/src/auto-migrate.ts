@@ -52,6 +52,7 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
         multipleStatements: true,
       })
     );
+    connection = rootConnection;
 
     log(`[Auto-Migration] Creating database "${config.database}" if not exists...`);
     await rootConnection.query(
@@ -59,6 +60,7 @@ export async function autoMigrate(silent = false): Promise<AutoMigrationResult> 
     );
 
     await rootConnection.end();
+    connection = null;
 
     connection = await withDbRetry(() => mysql.createConnection(config));
 

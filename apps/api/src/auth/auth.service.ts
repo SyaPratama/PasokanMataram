@@ -11,7 +11,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { storageConfig, authConfig, appConfig } from '@pasok/config';
 import { lazyAsync, type TenantId, type SecurityContext } from '@pasok/domain';
-import { pool, query } from '@pasok/database';
+import { getClient, query } from '@pasok/database';
 
 export interface RegisterBusinessDto {
   businessName: string;
@@ -118,7 +118,7 @@ export class AuthService {
     }
 
     try {
-      const connection = await pool.getConnection();
+      const connection = await getClient();
       connection.release();
       
       const storage = await getStorageClient();

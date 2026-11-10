@@ -10,6 +10,8 @@ import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mysql from 'mysql2/promise';
+import type { RowDataPacket } from 'mysql2';
+import { withDbRetry } from '../src/client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,6 +24,21 @@ interface SeedConfig {
   database: string;
 }
 
+interface CountRow extends RowDataPacket {
+  count: number | string;
+}
+
+interface CommoditySeedRow extends RowDataPacket {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+}
+
+interface ForecastHorizonSeedRow extends RowDataPacket {
+  id: string;
+}
+
 const config: SeedConfig = {
   host: process.env.DB_HOST || '127.0.0.1',
   port: parseInt(process.env.DB_PORT || '3306', 10),
@@ -29,7 +46,6 @@ const config: SeedConfig = {
   password: process.env.DB_PASSWORD || 'Tama123',
   database: process.env.DB_NAME || 'pasokmataram_db',
 };
-import { withDbRetry } from '../src/client';
 
 async function seedDatabase() {
   console.log('--- PasokMataram Database Seeding ---');
@@ -47,18 +63,14 @@ async function seedDatabase() {
     );
     console.log('Connected to MySQL server successfully.\n');
 
-    const [rows] = await withDbRetry(() =>
-      connection!.query<any[]>(
-        "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
-      )
+    const [rows] = await connection.query<CountRow[]>(
+      "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
     );
-    const tableExists = Array.isArray(rows) && rows[0]?.count > 0;
+    const tableExists = Array.isArray(rows) && Number(rows[0]?.count) > 0;
 
     if (tableExists) {
-      const [countRows] = await withDbRetry(() =>
-        connection!.query<any[]>('SELECT COUNT(*) as count FROM tenants')
-      );
-      const tenantCount = Array.isArray(countRows) ? countRows[0]?.count : 0;
+      const [countRows] = await connection.query<CountRow[]>('SELECT COUNT(*) as count FROM tenants');
+      const tenantCount = Array.isArray(countRows) ? Number(countRows[0]?.count) : 0;
 
       if (tenantCount > 0 && process.env.DB_FORCE_RESET !== 'true') {
         console.log(`[PRODUCTION SAFETY GATE] Active data detected (${tenantCount} tenants found).`);
@@ -94,7 +106,7 @@ async function seedDatabase() {
     if (existsSync(taxonomyFile)) {
       const sql = readFileSync(taxonomyFile, 'utf-8').trim();
       if (sql) {
-        await withDbRetry(() => connection!.query(sql));
+        await connection.query(sql);
         console.log('  Applied 02-seed-taxonomy.sql');
       }
     }
@@ -103,7 +115,7 @@ async function seedDatabase() {
     if (existsSync(seedDataFile)) {
       const sql = readFileSync(seedDataFile, 'utf-8').trim();
       if (sql) {
-        await withDbRetry(() => connection!.query(sql));
+        await connection.query(sql);
         console.log('  Applied 03-seed-data.sql');
       }
     }
@@ -145,7 +157,7 @@ async function seedDatabase() {
     }
 
     console.log('  Seeding commodity forecasts & 4NF horizons...');
-    const [comms] = await connection.query<any[]>('SELECT id, code, name, category FROM commodities');
+    const [comms] = await connection.query<CommoditySeedRow[]>('SELECT id, code, name, category FROM commodities');
     if (Array.isArray(comms) && comms.length > 0) {
       for (const c of comms) {
         const basePrice = c.code.includes('BERAS') ? 14800 : c.code.includes('CABAI') ? 48000 : c.code.includes('BAWANG') ? 36000 : 25000;
@@ -171,26 +183,21 @@ async function seedDatabase() {
         ];
         for (const h of horizons) {
           const pred = Math.round(basePrice * h.mult);
-          const [existing] = await withDbRetry(() =>
-            connection!.query<any[]>(
-              'SELECT id FROM forecast_horizons WHERE forecast_id = ? AND horizon_days = ?',
-              [forecastId, h.days]
-            )
+          const [existing] = await connection.query<ForecastHorizonSeedRow[]>(
+            'SELECT id FROM forecast_horizons WHERE forecast_id = ? AND horizon_days = ?',
+            [forecastId, h.days]
           );
-          if (!Array.isArray(existing) || existing.length === 0) {
-            await withDbRetry(() =>
-              connection!.query(
-                `INSERT INTO forecast_horizons (id, forecast_id, horizon_days, predicted_price, confidence_lower, confidence_upper, created_at)
-                 VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
-                [forecastId, h.days, pred, Math.round(pred * 0.95), Math.round(pred * 1.05)]
-              )
+          const forecastHorizon = existing[0];
+          if (!forecastHorizon) {
+            await connection.query(
+              `INSERT INTO forecast_horizons (id, forecast_id, horizon_days, predicted_price, confidence_lower, confidence_upper, created_at)
+               VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
+              [forecastId, h.days, pred, Math.round(pred * 0.95), Math.round(pred * 1.05)]
             );
           } else {
-            await withDbRetry(() =>
-              connection!.query(
-                `UPDATE forecast_horizons SET predicted_price = ?, confidence_lower = ?, confidence_upper = ? WHERE id = ?`,
-                [pred, Math.round(pred * 0.95), Math.round(pred * 1.05), existing[0].id]
-              )
+            await connection.query(
+              `UPDATE forecast_horizons SET predicted_price = ?, confidence_lower = ?, confidence_upper = ? WHERE id = ?`,
+              [pred, Math.round(pred * 0.95), Math.round(pred * 1.05), forecastHorizon.id]
             );
           }
         }
@@ -199,7 +206,7 @@ async function seedDatabase() {
     console.log('\n[SUCCESS] Comprehensive 26-table seeding finished successfully!\n');
   } catch (error: unknown) {
     console.error('\n[ERROR] Seeding failed:', error);
-    process.exit(1);
+    throw error;
   } finally {
     if (connection) {
       await connection.end();
@@ -207,4 +214,6 @@ async function seedDatabase() {
   }
 }
 
-seedDatabase().catch(console.error);
+seedDatabase().catch(() => {
+  process.exitCode = 1;
+});

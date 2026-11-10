@@ -38,7 +38,8 @@ function getJwtSecret(): string {
     const envLocalPath = path.resolve(__dirname, '../../apps/web/.env.local');
     if (fs.existsSync(envLocalPath)) {
       const match = fs.readFileSync(envLocalPath, 'utf-8').match(/^JWT_SECRET=(.+)$/m);
-      if (match) return match[1].trim();
+      const secret = match?.[1];
+      if (secret) return secret.trim();
     }
   } catch {}
   return 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars';
@@ -145,11 +146,12 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
 
         // Cari tombol accordion spesifikasi
         const accordionButtons = await page.$$('button[aria-expanded]');
-        if (accordionButtons.length > 0) {
-          const firstAccordion = accordionButtons[0];
-          await firstAccordion.click();
-          await page.waitForFunction(() => true);
+        const firstAccordion = accordionButtons[0];
+        if (!firstAccordion) {
+          throw new Error('Expected an accordion button.');
         }
+        await firstAccordion.click();
+        await page.waitForFunction(() => true);
 
         const shot = path.join(CAPTURE_DIR, '03-dropdown-accordion-expanded.png');
         await page.screenshot({ path: shot, fullPage: false });
@@ -172,7 +174,12 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         expect(buttons.length).toBeGreaterThanOrEqual(2);
 
         // Klik Gapoktan button
-        await buttons[1].click();
+        const gapoktanButton = buttons[1];
+        const horekaButton = buttons[0];
+        if (!gapoktanButton || !horekaButton) {
+          throw new Error('Expected both intent buttons.');
+        }
+        await gapoktanButton.click();
         await page.waitForFunction(() => {
           const btns = document.querySelectorAll('button[aria-pressed]');
           return btns[1]?.getAttribute('aria-pressed') === 'true';
@@ -183,7 +190,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         expect(fs.existsSync(shotGapoktan)).toBe(true);
 
         // Klik kembali ke HoReKa button
-        await buttons[0].click();
+        await horekaButton.click();
         await page.waitForFunction(() => {
           const btns = document.querySelectorAll('button[aria-pressed]');
           return btns[0]?.getAttribute('aria-pressed') === 'true';
