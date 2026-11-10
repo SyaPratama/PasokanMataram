@@ -29,7 +29,7 @@ describe.skipIf(isCI)('Authenticated User - Pooling Flow', () => {
   });
 
   test('Login dengan demo credentials', async () => {
-    await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle0' });
     await page.waitForSelector('#login-email', { timeout: 10000 });
     
     await page.type('#login-email', 'buyer@demo.com');
