@@ -642,14 +642,9 @@ pm2 describe pasokmataram-api | grep env
 
 ### 3. Database Connection Pooling
 
-Already configured in `packages/database/src/client.ts`:
-```typescript
-export const pool = mysql.createPool({
-  connectionLimit: 10,
-  waitForConnections: true,
-  queueLimit: 0,
-});
-```
+`getClient()` wraps `pool.getConnection()` with bounded exponential backoff and jitter (`dbRetry` defaults: 5 retries, 100 ms base delay, 2,000 ms cap). Migration and seed scripts retry connection creation only; they do not replay SQL statements.
+
+`GET /health/db` returns HTTP 200 when MySQL responds and HTTP 503 after retry exhaustion.
 
 ### 4. Redis Caching
 

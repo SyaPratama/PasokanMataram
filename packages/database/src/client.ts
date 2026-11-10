@@ -1,23 +1,12 @@
+import type { ExecuteValues, RowDataPacket } from 'mysql2';
 import mysql from 'mysql2/promise';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { databaseConfig, isDevelopment } from '@pasok/config';
 import type { SecurityContext } from '@pasok/domain';
 /**
  * Execute async operation with exponential backoff retry.
  * Config via @pasok/config dbRetry (maxRetries, baseDelayMs, maxDelayMs).
  */
-function getPromiseResolver<T = void>() {
-  if (typeof Promise.withResolvers === 'function') {
-    return Promise.withResolvers<T>();
-  }
-  let resolve!: (value: T | PromiseLike<T>) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
-
 export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
   const { maxRetries, baseDelayMs, maxDelayMs } = databaseConfig.dbRetry;
   let attempt = 0;
@@ -30,13 +19,12 @@ export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
       }
       const backoff = Math.min(baseDelayMs * 2 ** (attempt - 1), maxDelayMs);
       const jitter = Math.floor(Math.random() * (backoff * 0.2));
-      const delayMs = backoff + jitter;
-      const { promise, resolve } = getPromiseResolver<void>();
-      setTimeout(resolve, delayMs);
-      await promise;
+      const delayMs = Math.min(backoff + jitter, maxDelayMs);
+      await sleep(delayMs);
     }
   }
 }
+
 
 /**
  * Mendapatkan koneksi MySQL dari connection pool dengan mekanisme retry otomatis.
@@ -81,19 +69,24 @@ export const pool = mysql.createPool({
  * Menggunakan strict typing tanpa 'any'.
  * @param text Perintah SQL kueri.
  * @param params Parameter kueri.
- * @returns Hasil kueri PostgreSQL.
+ * @returns Hasil kueri MySQL.
  */
-export async function query<R = any>(
+export async function query<R = RowDataPacket>(
   text: string,
   params?: readonly unknown[]
 ): Promise<{ rows: R[]; rowCount: number }> {
   const start = Date.now();
-  const [rows] = await pool.execute(text, params as any[]);
-  const duration = Date.now() - start;
-  if (isDevelopment && duration > databaseConfig.slowQueryThresholdMs) {
-    console.warn(`[SLOW QUERY] ${duration}ms: ${text.slice(0, 80)}...`);
+  const client = await getClient();
+  try {
+    const [rows] = await client.execute(text, params as ExecuteValues[] | undefined);
+    const duration = Date.now() - start;
+    if (isDevelopment && duration > databaseConfig.slowQueryThresholdMs) {
+      console.warn(`[SLOW QUERY] ${duration}ms: ${text.slice(0, 80)}...`);
+    }
+    return { rows: rows as R[], rowCount: Array.isArray(rows) ? rows.length : 0 };
+  } finally {
+    client.release();
   }
-  return { rows: rows as R[], rowCount: Array.isArray(rows) ? rows.length : 0 };
 }
 
 /**

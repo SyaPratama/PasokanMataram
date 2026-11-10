@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { withDbRetry } from '@pasok/database';
-import { DbHealthController } from '../../../apps/api/src/health/dbHealth';
-import { ServiceUnavailableException } from '@nestjs/common';
+import { RequestMethod } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { HealthModule } from '../../../apps/api/src/health/health.module';
 import * as dbModule from '@pasok/database';
 
 describe('withDbRetry & DbHealthController Resilience', () => {
@@ -38,24 +39,30 @@ describe('withDbRetry & DbHealthController Resilience', () => {
     expect(fn).toHaveBeenCalledTimes(6);
   });
 
-  it('DbHealthController mengembalikan 200 OK saat database sehat', async () => {
-    const spy = vi.spyOn(dbModule, 'query').mockResolvedValueOnce({
-      rows: [{ '1': 1 }],
-      rowCount: 1,
-    } as unknown as { rows: Record<string, unknown>[]; rowCount: number });
+  it('GET /health/db returns 200 or 503 outside the API prefix', async () => {
+    const spy = vi.spyOn(dbModule, 'query').mockResolvedValue({ rows: [], rowCount: 1 });
+    const app = await NestFactory.create(HealthModule, { logger: false });
+    app.setGlobalPrefix('api/v1', {
+      exclude: [{ path: 'health/db', method: RequestMethod.GET }],
+    });
+    await app.listen(0, '127.0.0.1');
 
-    const controller = new DbHealthController();
-    const result = await controller.check();
+    try {
+      const url = await app.getUrl();
+      const healthy = await fetch(`${url}/health/db`);
+      expect(healthy.status).toBe(200);
+      expect(await healthy.json()).toEqual({ status: 'OK', database: 'HEALTHY' });
 
-    expect(result).toEqual({ status: 'OK', database: 'HEALTHY' });
-    spy.mockRestore();
-  });
-  it('DbHealthController melempar ServiceUnavailableException (503) saat retry habis', async () => {
-    const spy = vi.spyOn(dbModule, 'withDbRetry').mockRejectedValueOnce(new Error('Connection timeout'));
+      const prefixed = await fetch(`${url}/api/v1/health/db`);
+      expect(prefixed.status).toBe(404);
 
-    const controller = new DbHealthController();
-    await expect(controller.check()).rejects.toThrow(ServiceUnavailableException);
-
-    spy.mockRestore();
+      spy.mockRejectedValueOnce(new Error('Connection timeout'));
+      const unavailable = await fetch(`${url}/health/db`);
+      expect(unavailable.status).toBe(503);
+      expect(await unavailable.json()).toEqual({ status: 'ERROR', database: 'UNAVAILABLE' });
+    } finally {
+      spy.mockRestore();
+      await app.close();
+    }
   });
 });

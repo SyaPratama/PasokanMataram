@@ -25,7 +25,8 @@ function getJwtSecret(): string {
     const envLocalPath = path.resolve(__dirname, '../../apps/web/.env.local');
     if (fs.existsSync(envLocalPath)) {
       const match = fs.readFileSync(envLocalPath, 'utf-8').match(/^JWT_SECRET=(.+)$/m);
-      if (match) return match[1].trim();
+      const secret = match?.[1];
+      if (secret) return secret.trim();
     }
   } catch {}
   return 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars';

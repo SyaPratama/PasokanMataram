@@ -6,7 +6,7 @@
 
 import 'reflect-metadata';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
@@ -31,7 +31,9 @@ async function bootstrap(): Promise<void> {
 
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+    exclude: [{ path: 'health/db', method: RequestMethod.GET }],
+  });
   const rawOrigins = process.env.CORS_ALLOWED_ORIGINS;
   const allowedOrigins = rawOrigins
     ? rawOrigins.split(',').map((o) => o.trim())

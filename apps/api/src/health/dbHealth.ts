@@ -5,7 +5,7 @@
 
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { Public } from '../common/public.decorator';
-import { query, withDbRetry } from '@pasok/database';
+import { query } from '@pasok/database';
 
 /**
  * Controller providing dedicated database health probe at /health/db.
@@ -20,7 +20,7 @@ export class DbHealthController {
   @Get('db')
   public async check(): Promise<{ status: string; database: string }> {
     try {
-      await withDbRetry(() => query('SELECT 1'));
+      await query('SELECT 1');
       return { status: 'OK', database: 'HEALTHY' };
     } catch {
       throw new ServiceUnavailableException({ status: 'ERROR', database: 'UNAVAILABLE' });
