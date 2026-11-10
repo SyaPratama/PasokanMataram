@@ -8,7 +8,7 @@ import { verifySessionToken } from '@pasok/security/edge';
 import type { UserSessionClaims } from '@pasok/security/edge';
 import type { NextRequest } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * Verifikasi JWT dari cookie atau Authorization header.
@@ -20,8 +20,7 @@ export async function verifyRequestAuth(request: NextRequest): Promise<UserSessi
   const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
   
   const token = cookieToken || bearerToken;
-  if (!token) return null;
-  
+  if (!token || !JWT_SECRET) return null;
   return verifySessionToken(token, JWT_SECRET);
 }
 

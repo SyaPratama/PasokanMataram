@@ -13,11 +13,9 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (!requiredRoles || requiredRoles.length === 0) return true;
+    const classRoles = this.reflector.get<string[]>(ROLES_KEY, context.getClass()) ?? [];
+    const handlerRoles = this.reflector.get<string[]>(ROLES_KEY, context.getHandler()) ?? [];
+    if (classRoles.length === 0 && handlerRoles.length === 0) return true;
 
     const request = context.switchToHttp().getRequest();
     const user: UserSessionClaims | undefined = request.securityContext;
@@ -25,11 +23,12 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Authentication required');
     }
 
-    const hasRole = requiredRoles.some(role => user.macroRole === role);
-    if (!hasRole) {
-      throw new ForbiddenException(`Requires one of: ${requiredRoles.join(', ')}`);
+    if (classRoles.length > 0 && !classRoles.includes(user.macroRole)) {
+      throw new ForbiddenException(`Requires macro role: ${classRoles.join(', ')}`);
     }
-
+    if (handlerRoles.length > 0 && !handlerRoles.some((role) => user.macroRole === role || user.microRole === role)) {
+      throw new ForbiddenException(`Requires role: ${handlerRoles.join(', ')}`);
+    }
     return true;
   }
 }

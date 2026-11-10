@@ -17,58 +17,13 @@ interface CommodityQuota {
   status: 'ACTIVE' | 'NEAR_CAPACITY' | 'COMPLETED';
 }
 
-const MOCK_QUOTAS: CommodityQuota[] = [
-  {
-    id: 'QTA-BAP-01',
-    name: 'Bawang Merah',
-    variety: 'Srikayangan Super (Grade A)',
-    regency: 'Kulon Progo',
-    totalQuotaTon: 25.0,
-    allocatedTon: 21.5,
-    floorPriceRpPerKg: 28000,
-    ceilingPriceRpPerKg: 34000,
-    status: 'NEAR_CAPACITY',
-  },
-  {
-    id: 'QTA-CRM-02',
-    name: 'Cabai Rawit Merah',
-    variety: 'Panjatan Pedas Tinggi (Grade A)',
-    regency: 'Kulon Progo',
-    totalQuotaTon: 15.0,
-    allocatedTon: 10.2,
-    floorPriceRpPerKg: 42000,
-    ceilingPriceRpPerKg: 52000,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'QTA-BRS-03',
-    name: 'Beras Premium',
-    variety: 'Rojolele Delanggu & Menthik Wangi',
-    regency: 'Sleman',
-    totalQuotaTon: 50.0,
-    allocatedTon: 38.0,
-    floorPriceRpPerKg: 14500,
-    ceilingPriceRpPerKg: 16500,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'QTA-BAP-04',
-    name: 'Bawang Merah',
-    variety: 'Bawangan Bantul Lokal',
-    regency: 'Bantul',
-    totalQuotaTon: 18.0,
-    allocatedTon: 18.0,
-    floorPriceRpPerKg: 27000,
-    ceilingPriceRpPerKg: 32500,
-    status: 'COMPLETED',
-  },
-];
 
 /**
  * Halaman Manajemen Kuota & Penetapan Floor Price Pangan DIY.
  * Dikelola oleh Konsorsium PasokMataram untuk menjaga stabilitas inflasi cabai & bawang merah.
  */
 export default function AdminQuotasPage() {
+  const quotas: CommodityQuota[] = [];
   return (
     <div className="space-y-6">
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -87,7 +42,13 @@ export default function AdminQuotasPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {MOCK_QUOTAS.map((qta) => {
+        {quotas.length === 0 ? (
+          <div className="col-span-full p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
+            <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
+            <p className="text-xs text-gelap/60">Belum ada data kuota agregat yang aktif saat ini.</p>
+          </div>
+        ) : (
+          quotas.map((qta) => {
           const percent = Math.round((qta.allocatedTon / qta.totalQuotaTon) * 100);
           return (
             <div
@@ -147,7 +108,7 @@ export default function AdminQuotasPage() {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );

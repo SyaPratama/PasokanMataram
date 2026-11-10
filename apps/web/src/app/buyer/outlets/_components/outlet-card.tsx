@@ -1,7 +1,12 @@
 import * as React from 'react';
 import { Building2, Phone, UserCheck, Package, ExternalLink } from 'lucide-react';
 import { GeoRegencyTag } from '../../../../components/shared/geo-regency-tag';
-import type { MockOutlet } from '../../../../lib/mock-data';
+import type { Outlet as MockOutlet } from '../../../../types/models';
+import type { DIYRegency } from '../../../../types/tenant';
+const DIY_REGENCIES: readonly DIYRegency[] = ['SLEMAN', 'BANTUL', 'KULON_PROGO', 'GUNUNGKIDUL', 'KOTA_YOGYAKARTA'];
+function isDIYRegency(value: string): value is DIYRegency {
+  return DIY_REGENCIES.some((regency) => regency === value);
+}
 
 interface OutletCardProps {
   outlet: MockOutlet;
@@ -26,7 +31,7 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
                 {outlet.name}
               </h3>
               <div className="mt-1">
-                <GeoRegencyTag regency={outlet.regency} />
+                {isDIYRegency(outlet.regency) ? <GeoRegencyTag regency={outlet.regency} /> : <span className="text-xs text-gelap/80">{outlet.regency}</span>}
               </div>
             </div>
           </div>
@@ -41,25 +46,37 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
           {outlet.streetAddress}
         </p>
 
-        <div className="pt-2.5 space-y-1.5 text-xs text-gelap/80 border-t border-netral-border/40">
-          <div className="flex items-center text-[11px]">
-            <UserCheck className="w-3.5 h-3.5 mr-1.5 text-sekunder flex-shrink-0" />
-            <span className="font-semibold text-gelap truncate">{outlet.contactPerson}</span>
+        {(outlet.contactPerson || outlet.phone || (typeof outlet.latitude === 'number' && typeof outlet.longitude === 'number')) ? (
+          <div className="pt-2.5 space-y-1.5 text-xs text-gelap/80 border-t border-netral-border/40">
+            {outlet.contactPerson && (
+              <div className="flex items-center text-[11px]">
+                <UserCheck className="w-3.5 h-3.5 mr-1.5 text-sekunder flex-shrink-0" />
+                <span className="font-semibold text-gelap truncate">{outlet.contactPerson}</span>
+              </div>
+            )}
+            {outlet.phone && (
+              <div className="flex items-center text-[11px] text-gelap/70">
+                <Phone className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0" />
+                <span>{outlet.phone}</span>
+              </div>
+            )}
+            {typeof outlet.latitude === 'number' && typeof outlet.longitude === 'number' && (
+              <div className="text-[10px] text-gelap/50 pt-0.5 font-mono">
+                Koordinat: {outlet.latitude.toFixed(4)}, {outlet.longitude.toFixed(4)}
+              </div>
+            )}
           </div>
-          <div className="flex items-center text-[11px] text-gelap/70">
-            <Phone className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0" />
-            <span>{outlet.phone}</span>
+        ) : (
+          <div className="pt-2.5 text-[11px] text-gelap/60 border-t border-netral-border/40">
+            Detail narahubung belum tercatat
           </div>
-          <div className="text-[10px] text-gelap/50 pt-0.5 font-mono">
-            GPS: {outlet.latitude.toFixed(4)}, {outlet.longitude.toFixed(4)}
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="pt-3 border-t border-netral-border/60 flex items-center justify-between text-xs">
         <div className="flex items-center text-[11px] text-gelap/70">
           <Package className="w-3.5 h-3.5 mr-1 text-sekunder" />
-          <span><strong>{outlet.activeOrdersCount}</strong> PO Berjalan</span>
+          <span>{typeof outlet.activeOrdersCount === 'number' ? `${outlet.activeOrdersCount} PO tercatat` : 'Status PO belum tercatat'}</span>
         </div>
         <button
           type="button"

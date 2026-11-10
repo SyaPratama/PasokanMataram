@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   RefreshCw,
 } from 'lucide-react';
-import { MOCK_COMMODITY_FORECASTS } from '../../../lib/mock-forecast-data';
 import type { CommodityForecast, ForecastHorizon } from '../../../types/forecast';
 import { ForecastInteractiveChart } from '../../../components/forecast/forecast-interactive-chart';
 import { ForecastInsightCards } from '../../../components/forecast/forecast-insight-cards';
@@ -21,11 +20,9 @@ import { ForecastInsightCards } from '../../../components/forecast/forecast-insi
  * Membantu kelompok tani menentukan jadwal petik optimal dan memprediksi nilai tampung di Hub Transit.
  */
 export default function SupplierForecastPage() {
-  const [forecastList, setForecastList] = React.useState<CommodityForecast[]>([...MOCK_COMMODITY_FORECASTS]);
-  const defaultCommodity = (forecastList[0] || MOCK_COMMODITY_FORECASTS[0]) as CommodityForecast;
-  const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>(
-    defaultCommodity.id
-  );
+  const [forecastList, setForecastList] = React.useState<CommodityForecast[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedCommodityId, setSelectedCommodityId] = React.useState<string>('');
   const [horizon, setHorizon] = React.useState<ForecastHorizon>(30);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
 
@@ -35,14 +32,21 @@ export default function SupplierForecastPage() {
       .then((resData) => {
         if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
           setForecastList(resData.data);
+          setSelectedCommodityId(resData.data[0].id);
+        } else {
+          setForecastList([]);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setForecastList([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
-  const selectedCommodity: CommodityForecast =
-    forecastList.find((c) => c.id === selectedCommodityId) ||
-    defaultCommodity;
+  const selectedCommodity: CommodityForecast | undefined =
+    forecastList.find((c) => c.id === selectedCommodityId) || forecastList[0];
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -54,6 +58,25 @@ export default function SupplierForecastPage() {
     if (trend === 'DOWN') return <TrendingDown className="w-4 h-4 text-status-danger" />;
     return <Minus className="w-4 h-4 text-gelap/60" />;
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="p-8 bg-white rounded-2xl border border-netral-border/80 animate-pulse h-64" />
+      </div>
+    );
+  }
+
+  if (forecastList.length === 0 || !selectedCommodity) {
+    return (
+      <div className="space-y-6">
+        <div className="p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
+          <h2 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada Data Prakiraan</h2>
+          <p className="text-xs text-gelap/60">Tidak ada data proyeksi harga panen yang tersedia saat ini.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -83,7 +106,7 @@ export default function SupplierForecastPage() {
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {MOCK_COMMODITY_FORECASTS.map((item) => {
+        {forecastList.map((item) => {
           const isSelected = item.id === selectedCommodityId;
           return (
             <button

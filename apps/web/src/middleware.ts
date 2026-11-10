@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import {
   verifySessionToken,
-  decodeSessionClaimsEdge,
   resolveUserHomeRoute,
   isRouteAllowedForRole,
 } from '@pasok/security/edge';
@@ -87,20 +86,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   const sessionCookie = request.cookies.get('pasok_session')?.value || request.cookies.get('auth_token')?.value;
-  const jwtSecret = process.env.JWT_SECRET || 'yOMMDA2WVBqXOsGuL8liOcWBhHTyVkL8WTPnfevbpDR';
-  let claims = sessionCookie ? await verifySessionToken(sessionCookie, jwtSecret) : null;
-  if (!claims && sessionCookie) {
-    claims = await verifySessionToken(sessionCookie, 'yOMMDA2WVBqXOsGuL8liOcWBhHTyVkL8WTPnfevbpDR');
-  }
-  if (!claims && sessionCookie) {
-    claims = await verifySessionToken(sessionCookie, 'pasokmataram-super-secret-jwt-key-min-32-chars');
-  }
-  if (!claims && sessionCookie) {
-    claims = await verifySessionToken(sessionCookie, 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars');
-  }
-  if (!claims && sessionCookie && process.env.NODE_ENV !== 'production') {
-    claims = decodeSessionClaimsEdge(sessionCookie);
-  }
+  const jwtSecret = process.env.JWT_SECRET;
+  const claims = sessionCookie && jwtSecret ? await verifySessionToken(sessionCookie, jwtSecret) : null;
 
   if (pathname === '/login') {
     return NextResponse.next();

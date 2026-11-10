@@ -47,38 +47,6 @@ export default function RegisterPage() {
     }));
   };
 
-  /**
-   * Helper untuk membuat token mock JWT berbasis Base64 Web API native.
-   */
-  const createMockClientJwt = (claims: {
-    userId: string;
-    tenantId: string;
-    macroRole: string;
-    microRole: string;
-    email: string;
-    isSuperAdmin?: boolean;
-  }) => {
-    try {
-      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_');
-      const payload = btoa(
-        JSON.stringify({
-          ...claims,
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 7 * 86400,
-        })
-      )
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_');
-      return `${header}.${payload}.mock_sig_${Date.now()}`;
-    } catch {
-      return `mock.session.${claims.microRole}`;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -110,23 +78,9 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (data.success && data.data) {
-        const { tenantId, userId, role, kybStatus, sessionToken } = data.data;
+        const { kybStatus } = data.data;
 
         if (typeof document !== 'undefined') {
-          const token = sessionToken || data.sessionToken;
-          if (token) {
-            document.cookie = `pasok_session=${token}; path=/; max-age=604800; SameSite=Lax`;
-          } else if (process.env.NODE_ENV !== 'production') {
-            const mockToken = createMockClientJwt({
-              userId,
-              tenantId,
-              macroRole: intent,
-              microRole: intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON',
-              email: formData.email || 'mitra@pasokmataram.id',
-              isSuperAdmin: false,
-            });
-            document.cookie = `pasok_session=${mockToken}; path=/; max-age=604800; SameSite=Lax`;
-          }
           document.cookie = `pasok_session_role=${intent === 'HOREKA' ? 'OWNER' : 'CHAIRPERSON'}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_macro_role=${intent}; path=/; max-age=604800; SameSite=Lax`;
           document.cookie = `pasok_kyb_status=${kybStatus || 'KYB_PENDING'}; path=/; max-age=604800; SameSite=Lax`;

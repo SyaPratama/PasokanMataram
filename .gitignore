@@ -47,6 +47,10 @@ service-account*.json
 .DS_Store
 Thumbs.db
 
+
+# Office and temporary lock files
+~$*
+*.tmp
 # Test Screenshots Artifacts
 /tests/screenshots/*
 !/tests/screenshots/.gitignore

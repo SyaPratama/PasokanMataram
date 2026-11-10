@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
+import { z } from 'zod';
 import {
   LayoutDashboard,
   Store,
@@ -20,7 +21,16 @@ import {
   OutletContextSelector,
   type NavGroup,
 } from '../../components/dashboard-shell';
-import { MOCK_OUTLETS } from '../../lib/mock-data';
+import type { Outlet } from '../../types/models';
+import type { KybStatus } from '../../types/tenant';
+
+const OutletSchema = z.object({ id: z.string(), name: z.string(), regency: z.string(), address: z.string(), isPrimary: z.union([z.boolean(), z.number()]).transform(Boolean) });
+const OutletResponseSchema = z.object({ success: z.boolean(), data: z.array(OutletSchema) });
+const TenantResponseSchema = z.object({ success: z.boolean(), data: z.object({ businessName: z.string(), macroRole: z.string(), kybStatus: z.string() }).optional() });
+function toKybStatus(value: string): KybStatus {
+  if (value === 'KYB_PENDING' || value === 'PENDING_VERIFICATION' || value === 'VERIFIED' || value === 'REJECTED') return value;
+  return 'UNVERIFIED';
+}
 
 /**
  * Properti untuk shell tata letak portal pembeli HoReKa.
@@ -35,31 +45,37 @@ interface BuyerLayoutProps {
  */
 export default function BuyerLayout({ children }: BuyerLayoutProps) {
   const pathname = usePathname();
-  const [activeOutletId, setActiveOutletId] = React.useState<string>(
-    MOCK_OUTLETS[0]?.id || 'out-001'
-  );
-  const [userRole, setUserRole] = React.useState<string>('HEAD_CHEF');
-  const [businessName, setBusinessName] = React.useState<string>('Restoran Bale Raos');
-  const [userName, setUserName] = React.useState<string>('Ibu Sri Rejeki');
+  const [outlets, setOutlets] = React.useState<Outlet[]>([]);
+  const [activeOutletId, setActiveOutletId] = React.useState<string>('');
+  const [userRole, setUserRole] = React.useState('Peran belum tersedia');
+  const [businessName, setBusinessName] = React.useState('Tenant belum tersedia');
+  const [userName] = React.useState('Pengguna belum tersedia');
+  const [kybStatus, setKybStatus] = React.useState<KybStatus>('UNVERIFIED');
 
   React.useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const match = document.cookie.match(/pasok_session_role=([^;]+)/);
-      if (match && match[1]) {
-        setUserRole(match[1]);
-      }
-      const bMatch = document.cookie.match(/pasok_business_name=([^;]+)/);
-      if (bMatch && bMatch[1]) {
-        setBusinessName(decodeURIComponent(bMatch[1]));
-      }
-      const uMatch = document.cookie.match(/pasok_user_name=([^;]+)/);
-      if (uMatch && uMatch[1]) {
-        setUserName(decodeURIComponent(uMatch[1]));
-      }
-    }
+    fetch('/api/v1/outlets')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Gerai tidak tersedia.');
+        const parsed = OutletResponseSchema.safeParse(await response.json());
+        if (!parsed.success || !parsed.data.success) throw new Error('Respons gerai tidak valid.');
+        const mapped: Outlet[] = parsed.data.data.map((outlet) => ({ id: outlet.id, name: outlet.name, regency: outlet.regency, streetAddress: outlet.address, isPrimary: outlet.isPrimary }));
+        setOutlets(mapped);
+        setActiveOutletId(mapped[0]?.id || '');
+      })
+      .catch(() => setOutlets([]));
+    fetch('/api/v1/tenant/current')
+      .then(async (response) => {
+        if (!response.ok) return;
+        const parsed = TenantResponseSchema.safeParse(await response.json());
+        if (parsed.success && parsed.data.data) {
+          setBusinessName(parsed.data.data.businessName);
+          setUserRole(parsed.data.data.macroRole);
+          setKybStatus(toKybStatus(parsed.data.data.kybStatus));
+        }
+      })
+      .catch(() => undefined);
   }, []);
-  const activeOutlet =
-    MOCK_OUTLETS.find((o) => o.id === activeOutletId) || MOCK_OUTLETS[0];
+  const activeOutlet = outlets.find((outlet) => outlet.id === activeOutletId) || outlets[0];
 
   const navGroups: readonly NavGroup[] = [
     {
@@ -180,12 +196,13 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
         <OutletContextSelector
           activeOutletId={activeOutletId}
           onSelectOutlet={setActiveOutletId}
+          outlets={outlets}
         />
       }
       navGroups={navGroups}
       tenantProfile={{
         tenantName: businessName,
-        statusBadge: 'VERIFIED',
+        statusBadge: kybStatus,
         userName: userName,
         roleTitle: userRole,
         logoutHref: '/login',
@@ -198,12 +215,12 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
             </span>
             <span className="w-1 h-1 rounded-full bg-netral-border inline-block mx-1.5" aria-hidden="true" />
             <span>
-              Gerai Terpilih: <strong className="text-primer">{activeOutlet?.name}</strong>
+              Gerai Terpilih: <strong className="text-primer">{activeOutlet?.name || 'Belum Ada Gerai'}</strong>
             </span>
           </>
         ),
-        badgeText: 'Akun Kemitraan Sah',
-        notificationAriaLabel: 'Notifikasi Pengadaan Subuh',
+        badgeText: kybStatus === 'VERIFIED' ? 'Mitra Terverifikasi' : 'Verifikasi Tertunda',
+        notificationAriaLabel: 'Notifikasi pengadaan',
       }}
     >
       {children}

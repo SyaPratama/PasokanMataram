@@ -33,65 +33,6 @@ interface PoolItem {
   certifications: string[];
 }
 
-const INITIAL_POOLS: PoolItem[] = [
-  {
-    id: 'POOL-BWR-SRI-09',
-    campaignUuid: '11111111-2222-3333-4444-555555555551',
-    commodity: 'Bawang Merah Srikayangan Super A',
-    targetQuotaKg: 1000,
-    currentCollectedKg: 850,
-    participantsCount: 38,
-    closingHoursLeft: 4,
-    normalPricePerKg: 36000,
-    pooledPricePerKg: 31000,
-    savingPercent: 13.8,
-    status: 'OPEN',
-    grade: 'Super A (Diameter >2.5 cm)',
-    moistureContent: '75%',
-    storageZone: 'Ambient Berventilasi',
-    targetTemp: '25-28C',
-    allowedShrinkage: 'Maksimal 5.0% (SNI)',
-    certifications: ['Prima 3 DIY', 'Bebas Residu'],
-  },
-  {
-    id: 'POOL-CBI-PAN-05',
-    campaignUuid: '11111111-2222-3333-4444-555555555552',
-    commodity: 'Cabai Rawit Merah Panjatan Segar',
-    targetQuotaKg: 500,
-    currentCollectedKg: 490,
-    participantsCount: 22,
-    closingHoursLeft: 2,
-    normalPricePerKg: 54000,
-    pooledPricePerKg: 46500,
-    savingPercent: 13.9,
-    status: 'NEARING_TARGET',
-    grade: 'Petik Segar Panjatan Pilihan',
-    moistureContent: '80%',
-    storageZone: 'Chilled Berventilasi',
-    targetTemp: '8-12C',
-    allowedShrinkage: 'Maksimal 4.0%',
-    certifications: ['Gapoktan Kulon Progo', 'Halal BPJPH'],
-  },
-  {
-    id: 'POOL-BRS-SEY-12',
-    campaignUuid: '11111111-2222-3333-4444-555555555553',
-    commodity: 'Beras Premium Pandan Wangi Seyegan',
-    targetQuotaKg: 2000,
-    currentCollectedKg: 2000,
-    participantsCount: 45,
-    closingHoursLeft: 0,
-    normalPricePerKg: 17000,
-    pooledPricePerKg: 14800,
-    savingPercent: 12.9,
-    status: 'LOCKED',
-    grade: 'Premium Pecah Kulit <5%',
-    moistureContent: '14%',
-    storageZone: 'Kering Berventilasi',
-    targetTemp: '20-30C',
-    allowedShrinkage: 'Maksimal 0.2%',
-    certifications: ['Kementan RI', 'SNI Beras 6128:2020'],
-  },
-];
 
 const MINIMUM_TRANSACTION_VALUE = 500000;
 
@@ -99,7 +40,8 @@ const MINIMUM_TRANSACTION_VALUE = 500000;
  * Halaman Pooling Kuota Pasokan Bersama Dapur Se-DIY dengan dialog alokasi, validasi MTV, dan akordeon mutu komoditas.
  */
 export default function BuyerPoolingPage() {
-  const [pools, setPools] = React.useState<PoolItem[]>(INITIAL_POOLS);
+  const [pools, setPools] = React.useState<PoolItem[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [selectedPool, setSelectedPool] = React.useState<PoolItem | null>(null);
   const [orderKg, setOrderKg] = React.useState<number>(20);
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
@@ -117,9 +59,16 @@ export default function BuyerPoolingPage() {
       .then((resData) => {
         if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
           setPools(resData.data);
+        } else {
+          setPools([]);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setPools([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
     if (typeof document !== 'undefined') {
       const match = document.cookie.match(/pasok_kyb_status=([^;]+)/);
@@ -282,7 +231,21 @@ export default function BuyerPoolingPage() {
       )}
 
       <div className="space-y-4">
-        {pools.map((pool) => {
+        {isLoading ? (
+          [1, 2].map((i) => (
+            <div key={i} className="p-6 rounded-2xl bg-white border-2 border-netral-border/80 shadow-xs animate-pulse space-y-4">
+              <div className="h-6 w-48 bg-netral-border/40 rounded" />
+              <div className="h-8 w-3/4 bg-netral-border/40 rounded" />
+              <div className="h-4 w-full bg-netral-border/30 rounded" />
+            </div>
+          ))
+        ) : pools.length === 0 ? (
+          <div className="p-12 text-center bg-white rounded-2xl border-2 border-netral-border/80 shadow-xs">
+            <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
+            <p className="text-xs text-gelap/60">Tidak ada kuota pooling panen yang aktif saat ini.</p>
+          </div>
+        ) : (
+          pools.map((pool) => {
           const progressPercent = Math.min(100, Math.round((pool.currentCollectedKg / pool.targetQuotaKg) * 100));
           const isLocked = pool.status === 'LOCKED';
           return (
@@ -368,7 +331,7 @@ export default function BuyerPoolingPage() {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {selectedPool && (

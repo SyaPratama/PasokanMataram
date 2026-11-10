@@ -17,36 +17,13 @@ interface QuarantineItem {
   status: 'IN_QUARANTINE' | 'RE_SORTED' | 'RETURNED';
 }
 
-const MOCK_QUARANTINE: QuarantineItem[] = [
-  {
-    id: 'QRN-20261010-01',
-    manifestId: 'MNF-BTL-20261009-004',
-    supplier: 'Kelompok Tani Panjatan Maju',
-    commodity: 'Cabai Rawit Merah (Campuran B)',
-    weightKg: 85,
-    reason: 'Kadar air melebihi batas toleransi (terbaca 16.4%, syarat maksimal 14.0%)',
-    moistureActual: 16.4,
-    quarantineZone: 'Kamar Kering B1',
-    status: 'IN_QUARANTINE',
-  },
-  {
-    id: 'QRN-20261009-02',
-    manifestId: 'MNF-SLM-20261009-002',
-    supplier: 'Gapoktan Prambanan Sejahtera',
-    commodity: 'Bawang Merah Lokal Grade B',
-    weightKg: 120,
-    reason: 'Persentase umbi busuk/basah melebihi 7% dari sampel acak per karung',
-    moistureActual: 14.8,
-    quarantineZone: 'Area Sortasi Remediasi C2',
-    status: 'RE_SORTED',
-  },
-];
 
 /**
  * Halaman Karantina & Penanganan Deviasi Mutu Komoditas Hub.
  * Mengisolasi bahan pangan yang tidak lolos toleransi &plusmn;5% atau kadar air standar.
  */
 export default function HubQuarantinePage() {
+  const quarantineItems: QuarantineItem[] = [];
   return (
     <div className="space-y-6">
       <div className="border-b border-netral-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -93,7 +70,7 @@ export default function HubQuarantinePage() {
             </p>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-status-danger-light text-status-danger whitespace-nowrap shrink-0">
-            {MOCK_QUARANTINE.length} Batch Tertahan
+            {quarantineItems.length} Batch Tertahan
           </span>
         </div>
 
@@ -110,31 +87,39 @@ export default function HubQuarantinePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-netral-border/60 text-gelap">
-              {MOCK_QUARANTINE.map((item) => (
-                <tr key={item.id} className="hover:bg-netral-canvas/30 transition-colors">
-                  <td className="p-3.5 font-mono font-bold text-primer">{item.id}</td>
-                  <td className="p-3.5">
-                    <div className="font-semibold">{item.commodity}</div>
-                    <div className="text-[11px] text-gelap/60">{item.supplier}</div>
-                  </td>
-                  <td className="p-3.5 font-mono font-bold">{item.weightKg} kg</td>
-                  <td className="p-3.5 max-w-xs">
-                    <p className="text-[11px] text-status-danger font-medium">{item.reason}</p>
-                    <span className="text-[10px] text-gelap/60">Kadar air: {item.moistureActual}%</span>
-                  </td>
-                  <td className="p-3.5 font-medium text-gelap/70">{item.quarantineZone}</td>
-                  <td className="p-3.5">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => alert(`Memulai proses sortasi ulang untuk batch ${item.id}`)}
-                      className="text-xs"
-                    >
-                      Sortasi Ulang
-                    </Button>
+              {quarantineItems.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 px-4 text-center text-gelap/60 text-xs">
+                    Tidak Ada
                   </td>
                 </tr>
-              ))}
+              ) : (
+                quarantineItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-netral-canvas/30 transition-colors">
+                    <td className="p-3.5 font-mono font-bold text-primer">{item.id}</td>
+                    <td className="p-3.5">
+                      <div className="font-semibold">{item.commodity}</div>
+                      <div className="text-[11px] text-gelap/60">{item.supplier}</div>
+                    </td>
+                    <td className="p-3.5 font-mono font-bold">{item.weightKg} kg</td>
+                    <td className="p-3.5 max-w-xs">
+                      <p className="text-[11px] text-status-danger font-medium">{item.reason}</p>
+                      <span className="text-[10px] text-gelap/60">Kadar air: {item.moistureActual}%</span>
+                    </td>
+                    <td className="p-3.5 font-medium text-gelap/70">{item.quarantineZone}</td>
+                    <td className="p-3.5">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => alert(`Memulai proses sortasi ulang untuk batch ${item.id}`)}
+                        className="text-xs"
+                      >
+                        Sortasi Ulang
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

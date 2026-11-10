@@ -3,14 +3,12 @@
  * @description Pengujian kontrak API integrasi FastAPI ML dan fallback deterministik.
  */
 
-import { describe, it, expect } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   MlSimulationInputSchema,
   MlCommodityForecastResponseSchema,
-  MlForecastListResponseSchema,
 } from '../../packages/domain/src';
 import {
-  generateDeterministicForecast,
   adaptMlToDomainForecast,
   fetchMlSingleForecast,
   fetchMlForecastList,
@@ -18,7 +16,64 @@ import {
 } from '../../apps/web/src/lib/ml-forecast-client';
 import { GET, POST } from '../../apps/web/src/app/api/v1/forecast/ml/route';
 
-describe('FastAPI ML Integration & Hermetic Fallback Contracts', () => {
+const forecastFixture = {
+  commodity_id: 'commodity-bawang-merah',
+  commodity_code: 'BAWANG_MERAH',
+  name: 'Bawang Merah Srikayangan',
+  category: 'Hortikultura',
+  origin_region: 'Kulon Progo',
+  unit: 'kg',
+  current_price: 36000,
+  predicted_prices_7d: [36100, 36200, 36300, 36400, 36500, 36600, 36700],
+  predicted_price_7d: 36700,
+  trend: 'UP',
+  trend_percentage: 1.94,
+  confidence_score: 0.93,
+  optimal_buy_window: {
+    start_date: '2026-11-10',
+    end_date: '2026-11-17',
+    target_price: 36000,
+    recommended_action: 'KUNCI_KONTRAK',
+    explanation: 'Kunci kontrak untuk menjaga harga.',
+  },
+  weather_impact: {
+    risk_level: 'SEDANG',
+    description: 'Anomali hujan terpantau.',
+    rainfall_forecast_mm: 120,
+    bmkg_source: 'BMKG DIY',
+  },
+  model_metadata: {
+    algorithm: 'LightGBM Direct Multi-Horizon',
+    mape_accuracy: 3.6,
+    last_trained: '2026-11-01',
+    horizon_days: 7,
+  },
+  curve: [
+    { date: '2026-11-09', price: 35900, is_projected: false, confidence_lower: null, confidence_upper: null },
+    { date: '2026-11-10', price: 36000, is_projected: false, confidence_lower: null, confidence_upper: null },
+  ],
+};
+
+const listFixture = { success: true, count: 1, data: [forecastFixture] };
+
+function response(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+describe('FastAPI ML Integration Contracts', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      return String(input).includes('/commodities') ? response(listFixture) : response(forecastFixture);
+    }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   describe('Zod Schema Validations', () => {
     it('memvalidasi dan mentransformasi payload simulasi skenario input', () => {
       const validCamelCase = {
@@ -60,60 +115,40 @@ describe('FastAPI ML Integration & Hermetic Fallback Contracts', () => {
     });
   });
 
-  describe('Deterministic Hermetic Fallback Engine', () => {
-    it('menghasilkan prakiraan deterministik yang valid saat ML service luring', () => {
-      const result = generateDeterministicForecast('BAWANG_MERAH', 35000, 20, 10);
-      expect(result.commodity_code).toBe('BAWANG_MERAH');
-      expect(result.current_price).toBe(35000);
-      expect(result.predicted_prices_7d.length).toBe(7);
-      expect(result.curve.length).toBe(22);
-      expect(result.model_metadata.horizon_days).toBe(7);
-
-      const parsed = MlCommodityForecastResponseSchema.safeParse(result);
-      expect(parsed.success).toBe(true);
+  describe('Client Adapter', () => {
+    it('validates and adapts a successful commodity response', () => {
+      const parsed = MlCommodityForecastResponseSchema.parse(forecastFixture);
+      const adapted = adaptMlToDomainForecast(parsed);
+      expect(adapted.name).toBe('Bawang Merah Srikayangan');
+      expect(adapted.currentPrice).toBe(36000);
+      expect(adapted.predictedPrice7d).toBe(36700);
+      expect(adapted.historicalAndProjected).toHaveLength(2);
     });
 
-    it('mengadaptasi respons ML ke struktur domain antarmuka PasokMataram', () => {
-      const ml = generateDeterministicForecast('CABAI_RAWIT_MERAH', 48000, 30, 15);
-      const adapted = adaptMlToDomainForecast(ml);
-
-      expect(adapted.name).toBe(ml.name);
-      expect(adapted.currentPrice).toBe(48000);
-      expect(adapted.predictedPrice7d).toBe(ml.predicted_price_7d);
-      expect(adapted.historicalAndProjected.length).toBe(22);
-      expect(adapted.optimalBuyWindow.recommendedAction).toBeDefined();
-    });
-  });
-
-  describe('Client Adapter Hermetic Behavior', () => {
-    it('fetchMlSingleForecast mengembalikan fallback berstatus HERMETIC_FALLBACK saat offline', async () => {
-      const res = await fetchMlSingleForecast('BAWANG_MERAH');
-      expect(['FASTAPI_ML', 'HERMETIC_FALLBACK']).toContain(res.source);
-      expect(res.data.commodity_code).toBe('BAWANG_MERAH');
-    });
-
-    it('fetchMlForecastList mengembalikan daftar komoditas tanpa exception', async () => {
-      const res = await fetchMlForecastList();
-      expect(['FASTAPI_ML', 'HERMETIC_FALLBACK']).toContain(res.source);
-      expect(res.data.data.length).toBeGreaterThan(0);
-    });
-
-    it('simulateMlScenario menghitung skenario simulasi tanpa exception', async () => {
-      const res = await simulateMlScenario({
+    it('reads successful FastAPI responses without synthetic fallback', async () => {
+      const single = await fetchMlSingleForecast('BAWANG_MERAH');
+      const list = await fetchMlForecastList();
+      const simulation = await simulateMlScenario({
         commodity_code: 'BAWANG_MERAH',
         current_price: 36000,
         rainfall_anomaly_percent: 25,
         fuel_price_hike_percent: 10,
       });
+      expect(single.source).toBe('FASTAPI_ML');
+      expect(list.data.data).toHaveLength(1);
+      expect(simulation.data.current_price).toBe(36000);
+    });
 
-      expect(['FASTAPI_ML', 'HERMETIC_FALLBACK']).toContain(res.source);
-      expect(res.data.current_price).toBe(36000);
-      expect(res.data.predicted_prices_7d.length).toBe(7);
+    it('fails closed when FastAPI is unavailable', async () => {
+      vi.stubGlobal('fetch', vi.fn(async () => response({ error: 'offline' }, 503)));
+      await expect(fetchMlSingleForecast('BAWANG_MERAH')).rejects.toThrow(
+        'Prakiraan komoditas tidak tersedia.'
+      );
     });
   });
 
   describe('Next.js Route Handler /api/v1/forecast/ml', () => {
-    it('GET /api/v1/forecast/ml mengembalikan daftar prakiraan hermetis', async () => {
+    it('GET /api/v1/forecast/ml mengembalikan daftar dari FastAPI', async () => {
       const req = new Request('http://localhost:3000/api/v1/forecast/ml');
       const res = await GET(req);
       expect(res.status).toBe(200);

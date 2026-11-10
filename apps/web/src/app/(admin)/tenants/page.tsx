@@ -6,7 +6,6 @@ import { StatusBadge } from '../../../components/shared/status-badge';
 import { KybAuditSkeleton } from './_components/kyb-audit-skeleton';
 import { KybAuditPanel, type KybAuditDetail } from './_components/kyb-audit-panel';
 import { KybActionModal } from './_components/kyb-action-modal';
-import { MOCK_TENANTS_KYB, type MockTenantKyb } from '../../../lib/mock-data';
 import { ShieldCheck, RefreshCw, ChevronLeft, ChevronRight, AlertCircle, FileText, CheckCircle2, Search } from 'lucide-react';
 import { Input } from '../../../components/ui/input';
 
@@ -34,41 +33,17 @@ interface PaginationMeta {
 
 type StatusFilterTab = 'ALL' | 'PENDING_VERIFICATION' | 'VERIFIED' | 'REJECTED';
 
-/**
- * Konversi dataset tiruan ke format item antrean audit.
- */
-function mapMockToQueueItem(mock: MockTenantKyb): QueueItem {
-  return {
-    tenantId: mock.id,
-    businessName: mock.businessName,
-    tenantType: mock.tenantType === 'HOREKA' ? 'HOREKA_BUYER' : 'GAPOKTAN_SUPPLIER',
-    regency: mock.regency,
-    kybStatus:
-      mock.status === 'PENDING'
-        ? 'PENDING_VERIFICATION'
-        : mock.status === 'VERIFIED'
-          ? 'VERIFIED'
-          : 'REJECTED',
-    submittedAt: mock.submittedAt,
-    owner: {
-      fullName: mock.picName,
-      email: mock.picEmail,
-      phoneNumber: mock.picPhone,
-    },
-    documentsCount: mock.documents.length,
-  };
-}
 
 /**
  * Meja Kerja Audit Kepatuhan (KYB) Khusus Admin PasokMataram.
  * Menampilkan antrean permohonan legalitas mitra HoReKa & Gapoktan dengan verifikasi berdampingan.
  */
 export default function AdminTenantsPage() {
-  const [items, setItems] = React.useState<QueueItem[]>(() => MOCK_TENANTS_KYB.map(mapMockToQueueItem));
+  const [items, setItems] = React.useState<QueueItem[]>([]);
   const [pagination, setPagination] = React.useState<PaginationMeta>({
     currentPage: 1,
     totalPages: 1,
-    totalItems: MOCK_TENANTS_KYB.length,
+    totalItems: 0,
     limit: 25,
   });
   const [statusFilter, setStatusFilter] = React.useState<StatusFilterTab>('ALL');
@@ -105,15 +80,11 @@ export default function AdminTenantsPage() {
           return;
         }
       }
-      const mockItems = MOCK_TENANTS_KYB.map(mapMockToQueueItem);
-      const filtered = statusFilter === 'ALL' ? mockItems : mockItems.filter((i) => i.kybStatus === statusFilter);
-      setItems(filtered);
-      setPagination({ currentPage: 1, totalPages: 1, totalItems: filtered.length, limit: 25 });
+      setItems([]);
+      setPagination({ currentPage: 1, totalPages: 1, totalItems: 0, limit: 25 });
     } catch {
-      const mockItems = MOCK_TENANTS_KYB.map(mapMockToQueueItem);
-      const filtered = statusFilter === 'ALL' ? mockItems : mockItems.filter((i) => i.kybStatus === statusFilter);
-      setItems(filtered);
-      setPagination({ currentPage: 1, totalPages: 1, totalItems: filtered.length, limit: 25 });
+      setItems([]);
+      setPagination({ currentPage: 1, totalPages: 1, totalItems: 0, limit: 25 });
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +112,6 @@ export default function AdminTenantsPage() {
    * Menampilkan panel tinjau berkas split-pane.
    */
   const handleSelectTenant = (item: QueueItem) => {
-    const rawMock = MOCK_TENANTS_KYB.find((m) => m.id === item.tenantId);
     setSelectedTenant({
       tenantId: item.tenantId,
       businessName: item.businessName,
@@ -149,29 +119,7 @@ export default function AdminTenantsPage() {
       regency: item.regency,
       kybStatus: item.kybStatus,
       owner: item.owner,
-      documents: rawMock
-        ? rawMock.documents.map((doc, idx) => ({
-          documentId: `doc-${item.tenantId}-${idx}`,
-          documentType: doc.type,
-          documentNumber: doc.type === 'NIB' ? rawMock.nibNumber || '9120001234567' : rawMock.groupCertificateNumber || '520/SK/2024',
-          status: item.kybStatus,
-          fileStorageKey: doc.filename,
-          fileMimeType: doc.filename.endsWith('.pdf') ? 'application/pdf' : 'image/webp',
-          fileSizeBytes: 1420580,
-          uploadedAt: doc.uploadedAt,
-        }))
-        : [
-          {
-            documentId: `doc-${item.tenantId}`,
-            documentType: 'NIB / SK Legalitas',
-            documentNumber: '9120001234567',
-            status: item.kybStatus,
-            fileStorageKey: `kyb/${item.tenantId}/dokumen_resmi.pdf`,
-            fileMimeType: 'application/pdf',
-            fileSizeBytes: 1420580,
-            uploadedAt: item.submittedAt,
-          },
-        ],
+      documents: (item as any).documents || [],
     });
   };
 

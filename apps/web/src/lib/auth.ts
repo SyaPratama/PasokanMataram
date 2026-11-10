@@ -8,8 +8,10 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { authConfig } from '../config';
 import type { SecurityContext } from '../types/api';
-
+import { asTenantId, asUserId, isMacroRole, isMicroRole, type MacroRole, type MicroRole } from '@pasok/domain';
 export interface TokenPayload extends SecurityContext {
+  readonly macroRole: MacroRole;
+  readonly microRole: MicroRole;
   readonly email: string;
   readonly businessName: string;
 }
@@ -53,7 +55,28 @@ export function issueSessionToken(payload: TokenPayload): string {
 export function verifySessionToken(token: string): TokenPayload | null {
   try {
     const decoded = jwt.verify(token, authConfig.jwtSecret, { algorithms: ['HS256'] });
-    return decoded as TokenPayload;
+    if (typeof decoded !== 'object' || decoded === null) return null;
+    const candidate = decoded as Record<string, unknown>;
+    if (
+      typeof candidate.tenantId !== 'string' ||
+      typeof candidate.userId !== 'string' ||
+      typeof candidate.role !== 'string' ||
+      !isMacroRole(candidate.macroRole) ||
+      !isMicroRole(candidate.microRole) ||
+      typeof candidate.isSuperAdmin !== 'boolean' ||
+      typeof candidate.email !== 'string' ||
+      typeof candidate.businessName !== 'string'
+    ) return null;
+    return {
+      tenantId: asTenantId(candidate.tenantId),
+      userId: asUserId(candidate.userId),
+      role: candidate.role,
+      macroRole: candidate.macroRole as MacroRole,
+      microRole: candidate.microRole as MicroRole,
+      isSuperAdmin: candidate.isSuperAdmin,
+      email: candidate.email,
+      businessName: candidate.businessName,
+    };
   } catch {
     return null;
   }

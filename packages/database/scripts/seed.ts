@@ -27,6 +27,9 @@ interface SeedConfig {
 interface CountRow extends RowDataPacket {
   count: number | string;
 }
+interface SeedLockRow extends RowDataPacket {
+  acquired: number;
+}
 
 interface CommoditySeedRow extends RowDataPacket {
   id: string;
@@ -52,6 +55,7 @@ async function seedDatabase() {
   console.log(`Target: ${config.host}:${config.port}/${config.database}\n`);
 
   let connection: mysql.Connection | null = null;
+  let seedLockAcquired = false;
 
   try {
     connection = await withDbRetry(() =>
@@ -61,12 +65,33 @@ async function seedDatabase() {
         multipleStatements: true,
       })
     );
+    const [lockRows] = await connection.query<SeedLockRow[]>('SELECT GET_LOCK(?, 30) AS acquired', ['pasokmataram_seed']);
+    seedLockAcquired = Number(lockRows[0]?.acquired) === 1;
+    if (!seedLockAcquired) throw new Error('Could not acquire the database seed lock.');
     console.log('Connected to MySQL server successfully.\n');
 
     const [rows] = await connection.query<CountRow[]>(
       "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
     );
     const tableExists = Array.isArray(rows) && Number(rows[0]?.count) > 0;
+
+    const demoPasswordHash =
+      '$argon2id$v=19$m=65536,t=3,p=4$vnpRsVUMELfMlCGOmC5D7A$9Mbqk8n+7CSbjcy6n/dAqt2BBCcosEXI1YpCVA9dp04';
+    const demoUsers = [
+      { id: '90000000-0000-0000-0000-000000000001', tenantId: '10000000-0000-0000-0000-000000000001', email: 'buyer@demo.com', name: 'Demo Buyer Manager (HoReKa)', role: 'PROCUREMENT_MANAGER' },
+      { id: '90000000-0000-0000-0000-000000000002', tenantId: '20000000-0000-0000-0000-000000000001', email: 'supplier@demo.com', name: 'Demo Petani Gapoktan Sido Makmur', role: 'OWNER' },
+      { id: '90000000-0000-0000-0000-000000000003', tenantId: '10000000-0000-0000-0000-000000000001', email: 'hub@demo.com', name: 'Demo Operator Sentral Hub Sentolo', role: 'PROCUREMENT_MANAGER' },
+      { id: '90000000-0000-0000-0000-000000000004', tenantId: '10000000-0000-0000-0000-000000000001', email: 'admin@demo.com', name: 'Demo Super Admin Tata Kelola DIY', role: 'SUPER_ADMIN' },
+    ];
+    for (const u of demoUsers) {
+      await connection.query(
+        `INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active)
+         VALUES (?, ?, ?, ?, ?, '+6281234567890', ?, 1)
+         ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), full_name = VALUES(full_name), role = VALUES(role)`,
+        [u.id, u.tenantId, u.email, demoPasswordHash, u.name, u.role]
+      );
+    }
+    console.log('  Ensured 4 demo personas (buyer@demo.com, supplier@demo.com, hub@demo.com, admin@demo.com / password: demo123)');
 
     if (tableExists) {
       const [countRows] = await connection.query<CountRow[]>('SELECT COUNT(*) as count FROM tenants');
@@ -120,37 +145,20 @@ async function seedDatabase() {
       }
     }
 
-    const demoPasswordHash =
-      '$argon2id$v=19$m=65536,t=3,p=4$vnpRsVUMELfMlCGOmC5D7A$9Mbqk8n+7CSbjcy6n/dAqt2BBCcosEXI1YpCVA9dp04';
-    await connection.query(
-      `INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active)
-       VALUES (
-         '90000000-0000-0000-0000-000000000001',
-         '10000000-0000-0000-0000-000000000001',
-         'buyer@demo.com',
-         ?,
-         'Demo Buyer Manager',
-         '+6281234567890',
-         'PROCUREMENT_MANAGER',
-         1
-       ) ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
-      [demoPasswordHash]
-    );
-    console.log('  Ensured demo buyer (buyer@demo.com / demo123)');
-
     console.log('  Seeding 150 weather observations...');
     const regencies = ['SLEMAN', 'BANTUL', 'KULON_PROGO', 'GUNUNGKIDUL', 'KOTA_YOGYAKARTA'];
-    const now = Date.now();
+    const baseTimestamp = Date.UTC(2026, 10, 10);
     for (let day = 0; day < 30; day++) {
-      const dateStr = new Date(now - day * 86400000).toISOString().slice(0, 10);
-      for (const reg of regencies) {
-        const rainfall = Math.round(Math.random() * 80);
-        const temp = Number((24 + Math.random() * 8).toFixed(1));
-        const humidity = Number((65 + Math.random() * 25).toFixed(1));
+      const dateStr = new Date(baseTimestamp - day * 86400000).toISOString().slice(0, 10);
+      for (let rIdx = 0; rIdx < regencies.length; rIdx++) {
+        const reg = regencies[rIdx]!;
+        const rainfall = (day * 7 + rIdx * 11) % 65;
+        const temp = Number((24 + ((day * 3 + rIdx * 5) % 80) / 10).toFixed(1));
+        const humidity = Number((65 + ((day * 4 + rIdx * 7) % 250) / 10).toFixed(1));
         await connection.query(
           `INSERT INTO weather_observations (id, regency, recorded_date, rainfall_mm, temperature_celsius, humidity_percent, created_at)
            VALUES (UUID(), ?, ?, ?, ?, ?, NOW())
-           ON DUPLICATE KEY UPDATE rainfall_mm = VALUES(rainfall_mm)`,
+           ON DUPLICATE KEY UPDATE rainfall_mm = VALUES(rainfall_mm), temperature_celsius = VALUES(temperature_celsius), humidity_percent = VALUES(humidity_percent)`,
           [reg, dateStr, rainfall, temp, humidity]
         );
       }
@@ -208,6 +216,9 @@ async function seedDatabase() {
     console.error('\n[ERROR] Seeding failed:', error);
     throw error;
   } finally {
+    if (connection && seedLockAcquired) {
+      await connection.query('SELECT RELEASE_LOCK(?)', ['pasokmataram_seed']);
+    }
     if (connection) {
       await connection.end();
     }

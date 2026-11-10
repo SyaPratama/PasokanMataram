@@ -13,7 +13,6 @@ import {
   Param,
   Query,
   Body,
-  Headers,
   Sse,
   HttpException,
   HttpStatus,
@@ -23,11 +22,11 @@ import {
 } from '@nestjs/common';
 import type { Observable } from 'rxjs';
 import type {
-  CreateNotificationInput,
   WebPushSubscriptionDto,
+  SecurityContext,
 } from '@pasok/domain';
 import { NotificationsService } from './notifications.service';
-
+import { SecurityContextParam } from '../common/security-context.decorator';
 @Controller('notifications')
 export class NotificationsController {
   private readonly notificationsService: NotificationsService;
@@ -47,10 +46,8 @@ export class NotificationsController {
    * @returns Observable stream MessageEvent.
    */
   @Sse('stream')
-  public stream(
-    @Headers('x-tenant-id') tenantId?: string
-  ): Observable<MessageEvent> {
-    return this.notificationsService.getNotificationStream(tenantId);
+  public stream(@SecurityContextParam() context: SecurityContext): Observable<MessageEvent> {
+    return this.notificationsService.getNotificationStream(context.tenantId);
   }
 
   /**
@@ -62,11 +59,11 @@ export class NotificationsController {
    */
   @Get()
   public async getNotifications(
-    @Headers('x-tenant-id') tenantId?: string,
+    @SecurityContextParam() context: SecurityContext,
     @Query('limit') limit?: string,
     @Query('unread') unread?: string
   ) {
-    const items = await this.notificationsService.getNotifications(tenantId, {
+    const items = await this.notificationsService.getNotifications(context, {
       limit: limit ? parseInt(limit, 10) : 30,
       unreadOnly: unread === 'true',
     });
@@ -83,10 +80,8 @@ export class NotificationsController {
    * @returns Total angka notifikasi unread.
    */
   @Get('unread-count')
-  public async getUnreadCount(
-    @Headers('x-tenant-id') tenantId?: string
-  ) {
-    const count = await this.notificationsService.getUnreadCount(tenantId);
+  public async getUnreadCount(@SecurityContextParam() context: SecurityContext) {
+    const count = await this.notificationsService.getUnreadCount(context);
     return {
       success: true,
       data: { count },
@@ -102,12 +97,9 @@ export class NotificationsController {
   @Patch(':id/read')
   public async markAsRead(
     @Param('id') id: string,
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const ok = await this.notificationsService.markAsRead(
-      tenantId || 'tnt_sandbox_tenant',
-      id
-    );
+    const ok = await this.notificationsService.markAsRead(context, id);
     return {
       success: ok,
       message: ok
@@ -122,12 +114,8 @@ export class NotificationsController {
    * @returns Jumlah notifikasi yang diperbarui.
    */
   @Patch('read-all')
-  public async markAllAsRead(
-    @Headers('x-tenant-id') tenantId?: string
-  ) {
-    const count = await this.notificationsService.markAllAsRead(
-      tenantId || 'tnt_sandbox_tenant'
-    );
+  public async markAllAsRead(@SecurityContextParam() context: SecurityContext) {
+    const count = await this.notificationsService.markAllAsRead(context);
     return {
       success: true,
       data: { updatedCount: count },
@@ -145,14 +133,9 @@ export class NotificationsController {
   @Post('subscriptions')
   public async registerPushSubscription(
     @Body() body: WebPushSubscriptionDto,
-    @Headers('x-tenant-id') tenantId?: string,
-    @Headers('x-user-id') userId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const ok = await this.notificationsService.registerPushSubscription(
-      tenantId || 'tnt_sandbox_tenant',
-      userId || 'usr_sandbox_tester',
-      body
-    );
+    const ok = await this.notificationsService.registerPushSubscription(context, body);
     return {
       success: ok,
       message: 'Langganan Web Push PWA berhasil didaftarkan.',
@@ -168,32 +151,13 @@ export class NotificationsController {
   @Delete('subscriptions')
   public async deletePushSubscription(
     @Body() body: { endpoint: string },
-    @Headers('x-tenant-id') tenantId?: string
+    @SecurityContextParam() context: SecurityContext
   ) {
-    const ok = await this.notificationsService.deletePushSubscription(
-      tenantId || 'tnt_sandbox_tenant',
-      body.endpoint
-    );
+    const ok = await this.notificationsService.deletePushSubscription(context, body.endpoint);
     return {
       success: ok,
       message: 'Langganan Web Push berhasil dinonaktifkan.',
     };
   }
 
-  /**
-   * Memancarkan event notifikasi uji atau notifikasi sistem baru.
-   * @param body Data notifikasi yang akan disiarkan.
-   * @returns Notifikasi yang dipancarkan.
-   */
-  @Post('emit')
-  public async emitNotification(
-    @Body() body: CreateNotificationInput
-  ) {
-    const item = await this.notificationsService.emitNotification(body);
-    return {
-      success: true,
-      data: item,
-      message: 'Notifikasi berhasil disiarkan ke SSE stream dan disimpan.',
-    };
-  }
 }

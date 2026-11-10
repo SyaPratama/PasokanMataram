@@ -7,8 +7,10 @@ import { Input } from '../../../components/ui/input';
 import { OutletCard } from './_components/outlet-card';
 import { OutletSkeleton } from './_components/outlet-skeleton';
 import { AddOutletDialog } from './_components/add-outlet-dialog';
-import { MOCK_OUTLETS, type MockOutlet } from '../../../lib/mock-data';
+import type { Outlet as MockOutlet } from '../../../types/models';
 import type { DIYRegency } from '@pasok/domain';
+import { z } from 'zod';
+const OutletResponseSchema = z.object({ success: z.boolean(), data: z.array(z.object({ id: z.string(), name: z.string(), regency: z.string(), address: z.string(), isPrimary: z.union([z.boolean(), z.number()]).transform(Boolean) })) });
 
 type RegencyFilter = 'ALL' | DIYRegency;
 
@@ -17,42 +19,38 @@ type RegencyFilter = 'ALL' | DIYRegency;
  * Memungkinkan pemilik atau manajer pengadaan mendaftarkan dan memantau gerai cabang di D.I. Yogyakarta.
  */
 export default function OutletsPage() {
-  const [outlets, setOutlets] = React.useState<MockOutlet[]>(MOCK_OUTLETS);
+  const [outlets, setOutlets] = React.useState<MockOutlet[]>([]);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [regencyFilter, setRegencyFilter] = React.useState<RegencyFilter>('ALL');
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [successToast, setSuccessToast] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetch('/api/v1/outlets')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-          const mapped: MockOutlet[] = data.data.map((o: any, idx: number) => ({
-            id: o.id || `out-${idx + 1}`,
-            name: o.name || 'Gerai Cabang',
-            regency: o.regency || 'SLEMAN',
-            streetAddress: o.address || 'Jl. Kaliurang KM 5',
-            contactPerson: 'Manajer Operasional',
-            contactPhone: '+6281234567890',
-            isPrimary: Boolean(o.isPrimary),
-          }));
-          setOutlets(mapped);
-        }
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Data gerai tidak tersedia.');
+        const parsed = OutletResponseSchema.safeParse(await response.json());
+        if (!parsed.success || !parsed.data.success) throw new Error('Respons gerai tidak valid.');
+        setOutlets(parsed.data.data.map((outlet) => ({ id: outlet.id, name: outlet.name, regency: outlet.regency, streetAddress: outlet.address, isPrimary: outlet.isPrimary })));
       })
-      .catch(() => {});
+      .catch(() => setOutlets([]))
+      .finally(() => setIsLoading(false));
   }, []);
 
   /**
    * Menangani penambahan outlet baru dari dialog modal.
    */
-  const handleAddOutletSuccess = (newOutlet: MockOutlet) => {
-    setOutlets((prev) => [newOutlet, ...prev]);
-    setSuccessToast(`Gerai "${newOutlet.name}" berhasil didaftarkan ke sistem.`);
-    setTimeout(() => {
-      setSuccessToast(null);
-    }, 4000);
+  const handleAddOutletSuccess = () => {
+    fetch('/api/v1/outlets')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Data gerai tidak tersedia.');
+        const parsed = OutletResponseSchema.safeParse(await response.json());
+        if (!parsed.success || !parsed.data.success) throw new Error('Respons gerai tidak valid.');
+        setOutlets(parsed.data.data.map((outlet) => ({ id: outlet.id, name: outlet.name, regency: outlet.regency, streetAddress: outlet.address, isPrimary: outlet.isPrimary })));
+      })
+      .catch(() => setSuccessToast('Gerai tersimpan, tetapi daftar terbaru belum dapat dimuat.'));
+    setSuccessToast('Gerai berhasil didaftarkan ke sistem.');
   };
 
   /**
@@ -63,7 +61,7 @@ export default function OutletsPage() {
       const matchSearch =
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.streetAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.contactPerson.toLowerCase().includes(searchTerm.toLowerCase());
+        (item.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
       const matchRegency = regencyFilter === 'ALL' || item.regency === regencyFilter;
       return matchSearch && matchRegency;
     });

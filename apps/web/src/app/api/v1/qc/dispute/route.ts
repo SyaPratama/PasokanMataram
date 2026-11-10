@@ -33,14 +33,25 @@ const QcDisputeSchema = z.object({
  * @returns Respon JSON hasil investigasi dispute dan nominal penyesuaian dana escrow.
  */
 export async function POST(request: Request): Promise<NextResponse> {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const sessionCookie = cookieHeader
+    .split('; ')
+    .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
+    ?.split('=')[1];
+  const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: { code: 'UNAUTHORIZED', message: 'Sesi diperlukan untuk mengajukan dispute QC.' } },
+      { status: 401 }
+    );
+  }
+  if (!session.isSuperAdmin && session.microRole !== 'OPERATOR_QC' && session.microRole !== 'SUPERVISOR_HUB') {
+    return NextResponse.json(
+      { success: false, error: { code: 'FORBIDDEN', message: 'Peran tidak berwenang memproses dispute QC.' } },
+      { status: 403 }
+    );
+  }
   try {
-    const cookieHeader = request.headers.get('cookie') || '';
-    const sessionCookie = cookieHeader
-      .split('; ')
-      .find((row) => row.startsWith('pasok_session=') || row.startsWith('session_token='))
-      ?.split('=')[1];
-
-    const session = sessionCookie ? verifySessionToken(sessionCookie) : null;
     const body = await request.json();
 
     const parseResult = QcDisputeSchema.safeParse(body);
@@ -60,10 +71,10 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 
     const context: SecurityContext = {
-      tenantId: session?.tenantId || '00000000-0000-0000-0000-000000000000',
-      userId: session?.userId || 'OPERATOR_QC',
-      role: session?.role || 'HUB_OPERATOR',
-      isSuperAdmin: session?.role === 'SUPER_ADMIN',
+      tenantId: session.tenantId,
+      userId: session.userId,
+      role: session.role,
+      isSuperAdmin: session.isSuperAdmin,
     };
 
     const resolution = await logisticsHubService.processQcDispute(

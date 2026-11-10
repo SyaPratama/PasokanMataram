@@ -5,20 +5,34 @@
  */
 
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import type { RowDataPacket } from 'mysql2';
 import type { SecurityContext } from '@pasok/domain';
-import { query, withTenantContext } from '@pasok/database';
+import { withTenantContext } from '@pasok/database';
+interface SupplierMetricsRow extends RowDataPacket {
+  readonly totalRevenueRp: number | string;
+  readonly activeSkuCount: number | string;
+  readonly fulfillmentRatePercent: number | string;
+  readonly averageRating: number | string;
+  readonly reviewCount: number | string;
+  readonly nextSubuhDeliveryOrders: number | string;
+}
+
+interface SupplierProductRow extends RowDataPacket {
+  readonly id: string;
+  readonly supplier_tenant_id: string;
+  readonly commodity_name: string;
+  readonly price_per_kg: number;
+  readonly stock_kg: number;
+  readonly is_available: boolean;
+  readonly created_at: string;
+}
 
 export interface CreateProductDto {
   name: string;
-  category: string;
-  skuCode: string;
-  unit: string;
   price: number;
-  minOrderQty: number;
   stockAvailable: number;
-  leadTimeHours: number;
   isReadyStock: boolean;
-  fulfillmentType: 'POOL_GROUP_BUYING' | 'DIRECT_DISPATCH' | 'CROSS_DOCK';
 }
 
 export interface DispatchOrderDto {
@@ -38,37 +52,16 @@ export class SupplierService {
    * @returns Array produk etalase.
    */
   public async getProducts(context: SecurityContext) {
-    try {
-      return await withTenantContext(context, async (client) => {
-        const [rows] = await client.query(
-          `SELECT id, supplier_tenant_id, name, category, sku_code, unit,
-                  price, min_order_qty, stock_available, lead_time_hours,
-                  is_ready_stock, fulfillment_type, is_active, created_at
-           FROM supplier_products
-           ORDER BY created_at DESC`
-        );
-        return rows;
-      });
-    } catch {
-      return [
-        {
-          id: 'PROD-BWR-01',
-          supplier_tenant_id: context.tenantId,
-          name: 'Bawang Merah Srikayangan Super',
-          category: 'Hortikultura',
-          sku_code: 'BWR-01',
-          unit: 'kg',
-          price: 31000,
-          min_order_qty: 15,
-          stock_available: 1500,
-          lead_time_hours: 12,
-          is_ready_stock: true,
-          fulfillment_type: 'POOL_GROUP_BUYING',
-          is_active: true,
-          created_at: new Date().toISOString(),
-        },
-      ];
-    }
+    return await withTenantContext(context, async (client) => {
+      const [rows] = await client.query<SupplierProductRow[]>(
+        `SELECT id, supplier_tenant_id, commodity_name, price_per_kg, stock_kg, is_available, created_at
+         FROM supplier_products
+         WHERE supplier_tenant_id = ?
+         ORDER BY created_at DESC`,
+        [context.tenantId]
+      );
+      return rows;
+    });
   }
 
   /**
@@ -78,45 +71,22 @@ export class SupplierService {
    * @returns Entitas produk tersimpan.
    */
   public async createProduct(context: SecurityContext, dto: CreateProductDto) {
-    try {
-      return await withTenantContext(context, async (client) => {
-        const [result] = await client.query(
-          `INSERT INTO supplier_products (
-             supplier_tenant_id, name, category, sku_code, unit, price,
-             min_order_qty, stock_available, lead_time_hours, is_ready_stock, fulfillment_type
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            context.tenantId,
-            dto.name,
-            dto.category,
-            dto.skuCode,
-            dto.unit,
-            dto.price,
-            dto.minOrderQty,
-            dto.stockAvailable,
-            dto.leadTimeHours,
-            dto.isReadyStock,
-            dto.fulfillmentType,
-          ]
-        );
-        const [rows] = await client.query(
-          `SELECT id, supplier_tenant_id, name, category, sku_code, unit,
-                  price, min_order_qty, stock_available, lead_time_hours,
-                  is_ready_stock, fulfillment_type, is_active, created_at
-           FROM supplier_products WHERE id = ?`,
-          [(result as any).insertId]
-        );
-        return (rows as any[])[0];
-      });
-    } catch {
-      return {
-        id: `PROD-${Date.now().toString().slice(-6)}`,
-        supplier_tenant_id: context.tenantId,
-        ...dto,
-        is_active: true,
-        created_at: new Date().toISOString(),
-      };
-    }
+    const productId = randomUUID();
+    return await withTenantContext(context, async (client) => {
+      await client.query(
+        `INSERT INTO supplier_products (id, supplier_tenant_id, commodity_name, price_per_kg, stock_kg, is_available)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [productId, context.tenantId, dto.name, dto.price, dto.stockAvailable, dto.isReadyStock]
+      );
+      const [rows] = await client.query<SupplierProductRow[]>(
+        `SELECT id, supplier_tenant_id, commodity_name, price_per_kg, stock_kg, is_available, created_at
+         FROM supplier_products WHERE id = ? AND supplier_tenant_id = ?`,
+        [productId, context.tenantId]
+      );
+      const row = rows[0];
+      if (!row) throw new Error('Produk supplier tidak ditemukan setelah disimpan.');
+      return row;
+    });
   }
 
   /**
@@ -125,19 +95,17 @@ export class SupplierService {
    * @returns Array alokasi kuota panen.
    */
   public async getAllocations(context: SecurityContext) {
-    try {
-      return await withTenantContext(context, async (client) => {
-        const [rows] = await client.query(
-          `SELECT id, commodity_name, target_quota_kg, allocated_quota_kg,
-                  price_per_kg, status, starts_at, ends_at
-           FROM pooling_campaigns
-           ORDER BY created_at DESC`
-        );
-        return rows;
-      });
-    } catch {
-      return [];
-    }
+    return await withTenantContext(context, async (client) => {
+      const [rows] = await client.query(
+        `SELECT id, commodity_name, target_quota_kg, allocated_quota_kg,
+                price_per_kg, status, starts_at, ends_at
+         FROM pooling_campaigns
+         WHERE supplier_tenant_id = ?
+         ORDER BY created_at DESC`,
+        [context.tenantId]
+      );
+      return rows;
+    });
   }
 
   /**
@@ -146,15 +114,38 @@ export class SupplierService {
    * @returns Ringkasan metrik analitik.
    */
   public async getDashboardMetrics(context: SecurityContext) {
-    return {
-      supplierTenantId: context.tenantId,
-      totalRevenueRp: 48500000,
-      activeSkuCount: 6,
-      fulfillmentRatePercent: 99.2,
-      averageRating: 4.9,
-      reviewCount: 38,
-      nextSubuhDeliveryOrders: 14,
-    };
+    return await withTenantContext(context, async (client) => {
+      const [rows] = await client.query<SupplierMetricsRow[]>(
+        `SELECT
+           COALESCE((SELECT SUM(pr.total_amount_rp)
+             FROM pool_reservations pr
+             JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+             WHERE pc.supplier_tenant_id = ? AND pr.status IN ('PAID', 'ALLOCATED', 'RECEIVED')), 0) AS totalRevenueRp,
+           (SELECT COUNT(*) FROM supplier_products WHERE supplier_tenant_id = ? AND is_available = TRUE) AS activeSkuCount,
+           COALESCE((SELECT ROUND(100 * SUM(pr.status = 'RECEIVED') / NULLIF(COUNT(*), 0), 1)
+             FROM pool_reservations pr
+             JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+             WHERE pc.supplier_tenant_id = ?), 0) AS fulfillmentRatePercent,
+           COALESCE((SELECT AVG(r.rating) FROM b2b_reviews r WHERE r.reviewee_tenant_id = ?), 0) AS averageRating,
+           (SELECT COUNT(*) FROM b2b_reviews WHERE reviewee_tenant_id = ?) AS reviewCount,
+           (SELECT COUNT(*)
+             FROM pool_reservations pr
+             JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+             WHERE pc.supplier_tenant_id = ? AND pr.status IN ('PAID', 'ALLOCATED')) AS nextSubuhDeliveryOrders`,
+        [context.tenantId, context.tenantId, context.tenantId, context.tenantId, context.tenantId, context.tenantId]
+      );
+      const row = rows[0];
+      if (!row) throw new Error('Metrik supplier tidak tersedia.');
+      return {
+        supplierTenantId: context.tenantId,
+        totalRevenueRp: Number(row.totalRevenueRp),
+        activeSkuCount: Number(row.activeSkuCount),
+        fulfillmentRatePercent: Number(row.fulfillmentRatePercent),
+        averageRating: Number(row.averageRating),
+        reviewCount: Number(row.reviewCount),
+        nextSubuhDeliveryOrders: Number(row.nextSubuhDeliveryOrders),
+      };
+    });
   }
 
   /**
@@ -163,17 +154,7 @@ export class SupplierService {
    * @param dto Rincian keberangkatan armada.
    * @returns Manifest surat jalan pengiriman.
    */
-  public async dispatchDelivery(context: SecurityContext, dto: DispatchOrderDto) {
-    return {
-      manifestId: `DSP-${Date.now().toString().slice(-6)}`,
-      orderId: dto.orderId,
-      supplierTenantId: context.tenantId,
-      vehiclePlate: dto.vehiclePlate,
-      driverName: dto.driverName,
-      temperatureCelsius: dto.temperatureCelsius,
-      fulfillmentModel: dto.fulfillmentModel,
-      dispatchedAt: new Date().toISOString(),
-      status: 'IN_TRANSIT_SUBUH',
-    };
+  public async dispatchDelivery(_context: SecurityContext, _dto: DispatchOrderDto): Promise<never> {
+    throw new Error('Penerbitan manifest belum didukung oleh skema basis data saat ini.');
   }
 }
