@@ -26,7 +26,7 @@ PICS_DIR = r"C:\Users\inira\OneDrive\Pictures"
 TMP_DIR = "tmp_gtnic_build"
 OUT_FILE = "docs/PasokMataram_Video_Walkthrough_GTNIC_2026.mp4"
 
-VOICE_REFERENCE = os.getenv("GTNIC_VOICE_REFERENCE", os.path.join(PICS_DIR, "suara_tama.aac"))
+VOICE_REFERENCE = os.getenv("GTNIC_VOICE_REFERENCE", os.path.join(PICS_DIR, "Tama.mp4"))
 VOICE_MODEL = os.getenv("GTNIC_VOICE_MODEL", "k2-fsa/OmniVoice")
 VOICE_DEVICE = os.getenv("GTNIC_VOICE_DEVICE", "cpu")
 VOICE_REF_TEXT = os.getenv("GTNIC_VOICE_REF_TEXT")
