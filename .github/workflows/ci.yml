@@ -61,8 +61,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run vitest test suites
-        run: npx vitest run --exclude='tests/e2e/**'
+      - name: Run unit and contract Vitest suites
+        run: |
+          echo "Live browser suites under tests/e2e/** require a running app server and are verified separately."
+          npx vitest run --exclude='tests/e2e/**'
 
   build-monorepo:
     name: Monorepo Build Proof
