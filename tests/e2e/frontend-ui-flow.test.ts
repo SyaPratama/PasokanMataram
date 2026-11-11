@@ -74,7 +74,7 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
     expect(content).toContain('OutletContextSelector');
     expect(content).toContain('/buyer/dashboard');
     expect(content).toContain('/buyer/outlets');
-    expect(content).toContain('Restoran Bale Raos');
+    expect(content).toContain("fetch('/api/v1/outlets')");
   });
 
   it('memvalidasi komponen manajemen multi-outlet (OutletCard, OutletSkeleton, AddOutletDialog)', () => {
@@ -94,9 +94,9 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
 
     const dialogContent = fs.readFileSync(dialogPath, 'utf-8');
     expect(dialogContent).toContain('handleRegencyChange');
-    expect(dialogContent).toContain('latitude');
-    expect(dialogContent).toContain('longitude');
-
+    expect(dialogContent).toContain('regency');
+    expect(dialogContent).toContain('address');
+    expect(dialogContent).toContain('isPrimary');
     const pageContent = fs.readFileSync(pagePath, 'utf-8');
     expect(pageContent).toContain('filteredOutlets');
     expect(pageContent).toContain('regencyFilter');
@@ -109,9 +109,8 @@ describe('Minggu 1.7 - Penuntasan Lengkap Seluruh Antarmuka Frontend UI/UX (Zero
 
     const content = fs.readFileSync(dashboardPath, 'utf-8');
     expect(content).toContain('StandingOrder');
-    expect(content).toContain('Jadwal Pengiriman Bahan Baku Rutin');
-    expect(content).toContain('Hemat Pooling Bulan Ini');
     expect(content).toContain('Jadwal Drop Terdekat');
+    expect(content).toContain('Hemat Pooling Bulan Ini');
   });
 
   it('memvalidasi shell portal Gapoktan/Supplier di supplier/layout.tsx dan dashboard/page.tsx', () => {

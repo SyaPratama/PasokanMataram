@@ -2,231 +2,86 @@
 
 /**
  * @file packages/database/scripts/migrate.ts
- * @description Auto-migration runner for MySQL database
- * Creates database if not exists and runs all SQL migrations
+ * @description Applies the authoritative MySQL schema without destructive legacy alignment or fixture data.
  */
 
-import { readFileSync, readdirSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
 import mysql from 'mysql2/promise';
-import type { RowDataPacket } from 'mysql2';
-import { withDbRetry } from '../src/client';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-interface MigrationFile {
-  filename: string;
-  path: string;
-  order: number;
+interface MigrationConfig {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
 }
 
-interface SchemaColumn extends RowDataPacket {
-  COLUMN_NAME: string;
-  DATA_TYPE?: string;
-  IS_NULLABLE?: string;
-}
+const requiredEnvironment = (name: string): string => {
+  const value = process.env[name]?.trim();
+  if (!value) throw new Error(`${name} wajib dikonfigurasi.`);
+  return value;
+};
 
-interface CountRow extends RowDataPacket {
-  c: number;
-}
+const parsePort = (): number => {
+  const value = Number(process.env.DB_PORT || '3306');
+  if (!Number.isInteger(value) || value < 1 || value > 65535) throw new Error('DB_PORT harus berupa bilangan bulat 1-65535.');
+  return value;
+};
 
-/**
- * Automatically aligns legacy tables that were created prior to 4NF refactor
- * Ensures columns like reservation_id and UUID primary keys exist
- */
-async function alignLegacyTables(connection: mysql.Connection) {
-  try {
-    const [esCols] = await connection.query<SchemaColumn[]>(
-      "SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'escrow_settlements'"
-    );
-    if (Array.isArray(esCols) && esCols.length > 0) {
-      const colMap = new Set(esCols.map((c) => c.COLUMN_NAME));
-      if (!colMap.has('reservation_id') || colMap.has('deprecated_at')) {
-        console.log('  Aligning legacy escrow_settlements table to 4NF schema...');
-        await connection.query('DROP TABLE IF EXISTS escrow_settlements');
-      }
-    }
+const parseDatabaseName = (): string => {
+  const value = requiredEnvironment('DB_NAME');
+  if (!/^[A-Za-z0-9_]{1,64}$/.test(value)) throw new Error('DB_NAME hanya boleh berisi huruf, angka, dan underscore.');
+  return value;
+};
 
-    const [piCols] = await connection.query<SchemaColumn[]>(
-      "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'payment_invoices'"
-    );
-    if (Array.isArray(piCols) && piCols.length > 0) {
-      const colMap = new Map(piCols.map((c) => [c.COLUMN_NAME, c]));
-      if (!colMap.has('reservation_id')) {
-        const [cnt] = await connection.query<CountRow[]>('SELECT COUNT(*) as c FROM payment_invoices');
-        if ((cnt[0]?.c ?? 0) <= 8) {
-          console.log('  Aligning legacy payment_invoices table to 4NF schema...');
-          await connection.query('DROP TABLE IF EXISTS payment_invoices');
-        } else {
-          console.log('  Adding missing 4NF columns to payment_invoices...');
-          await connection.query('ALTER TABLE payment_invoices ADD COLUMN reservation_id CHAR(36) AFTER tenant_id');
-          if (!colMap.has('external_invoice_id')) {
-            await connection.query('ALTER TABLE payment_invoices ADD COLUMN external_invoice_id VARCHAR(255) UNIQUE AFTER reservation_id');
-          }
-          if (!colMap.has('provider')) {
-            await connection.query("ALTER TABLE payment_invoices ADD COLUMN provider VARCHAR(20) NOT NULL DEFAULT 'solosmartpay' AFTER currency");
-          }
-          if (colMap.get('expires_at')?.IS_NULLABLE === 'NO') {
-            await connection.query('ALTER TABLE payment_invoices MODIFY COLUMN expires_at DATETIME NULL');
-          }
-        }
-      }
-    }
+const config: MigrationConfig = {
+  host: requiredEnvironment('DB_HOST'),
+  port: parsePort(),
+  user: requiredEnvironment('DB_USER'),
+  password: requiredEnvironment('DB_PASSWORD'),
+  database: parseDatabaseName(),
+};
 
-    const [weCols] = await connection.query<SchemaColumn[]>(
-      "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'webhook_events'"
-    );
-    if (Array.isArray(weCols) && weCols.length > 0) {
-      const idCol = weCols.find((c) => c.COLUMN_NAME === 'id');
-      if (idCol && idCol.DATA_TYPE !== 'char' && idCol.DATA_TYPE !== 'varchar') {
-        console.log('  Aligning legacy webhook_events table to 4NF UUID schema...');
-        await connection.query('DROP TABLE IF EXISTS webhook_events');
-      }
-    }
-
-    const [taCols] = await connection.query<SchemaColumn[]>(
-      "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'terms_acceptances'"
-    );
-    if (Array.isArray(taCols) && taCols.length > 0) {
-      const idCol = taCols.find((c) => c.COLUMN_NAME === 'id');
-      if (idCol && idCol.DATA_TYPE !== 'char' && idCol.DATA_TYPE !== 'varchar') {
-        console.log('  Aligning legacy terms_acceptances table to 4NF UUID schema...');
-        await connection.query('DROP TABLE IF EXISTS terms_acceptances');
-      }
-    }
-  } catch (err) {
-    console.warn('  Note: Legacy table alignment check:', (err as Error).message);
-  }
-}
-
-async function runMigrations() {
-  console.log('Starting database migration...\n');
-
-  const config = {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'your_password_here',
-    database: process.env.DB_NAME || 'pasokmataram_local',
-    multipleStatements: true,
-  };
-
-  console.log(`Connecting to MySQL at ${config.host}:${config.port}...`);
-
+async function runMigrations(): Promise<void> {
+  console.log(`Applying authoritative schema to ${config.host}:${config.port}/${config.database}.`);
   let connection: mysql.Connection | null = null;
-
   try {
-    const rootConnection = await withDbRetry(() =>
-      mysql.createConnection({
-        host: config.host,
-        port: config.port,
-        user: config.user,
-        password: config.password,
-        connectTimeout: 30000,
-        multipleStatements: true,
-      })
-    );
-    connection = rootConnection;
+    connection = await mysql.createConnection({
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      password: config.password,
+      connectTimeout: 30000,
+      multipleStatements: true,
+    });
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+    await connection.query(`USE \`${config.database}\``);
 
-    console.log('Connected to MySQL server\n');
-    console.log(` Creating database "${config.database}" if not exists...`);
-    await rootConnection.query(
-      `CREATE DATABASE IF NOT EXISTS \`${config.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    );
-    console.log(`Database "${config.database}" ready\n`);
-    await rootConnection.query(`USE \`${config.database}\``);
     const candidateDirs = [
-      join(__dirname, '../src/schema'),
       join(process.cwd(), 'packages/database/src/schema'),
       join(process.cwd(), 'docker/mysql/init'),
-      join(__dirname, '../../../docker/mysql/init'),
-      join(__dirname, '../schema'),
-      join(__dirname, '../migrations'),
     ];
+    const schemaDir = candidateDirs.find((directory) => existsSync(directory));
+    if (!schemaDir) throw new Error(`Schema directory not found. Checked: ${candidateDirs.join(', ')}`);
 
-    let migrationsDir = '';
-    for (const dir of candidateDirs) {
-      if (existsSync(dir) && readdirSync(dir).some((f) => f.endsWith('.sql'))) {
-        migrationsDir = dir;
-        break;
-      }
+    const schemaFiles = readdirSync(schemaDir)
+      .filter((filename) => /^001_.*\.sql$/i.test(filename))
+      .sort();
+    if (schemaFiles.length !== 1) throw new Error(`Expected exactly one authoritative schema file in ${schemaDir}.`);
+
+    for (const filename of schemaFiles) {
+      const sql = readFileSync(join(schemaDir, filename), 'utf-8').trim();
+      if (!sql) throw new Error(`Authoritative schema file is empty: ${filename}`);
+      await connection.query(sql);
+      console.log(`Applied ${filename}.`);
     }
-
-    if (!migrationsDir) {
-      throw new Error(`Migration directory not found. Checked: ${candidateDirs.join(', ')}`);
-    }
-
-    console.log(`Loading migrations from: ${migrationsDir}\n`);
-
-    await alignLegacyTables(connection);
-    const files = readdirSync(migrationsDir)
-      .filter((f) => f.endsWith('.sql'))
-      .map((filename) => {
-        const orderMatch = filename.match(/^(\d+)/);
-        const order = orderMatch ? parseInt(orderMatch[1] ?? '999', 10) : 999;
-        return {
-          filename,
-          path: join(migrationsDir, filename),
-          order,
-        } as MigrationFile;
-      })
-      .sort((a, b) => a.order - b.order);
-
-    if (files.length === 0) {
-      console.log(`  No migration files found in ${migrationsDir}\n`);
-      return;
-    }
-
-    console.log(` Found ${files.length} migration file(s):\n`);
-
-    for (const file of files) {
-      const sql = readFileSync(file.path, 'utf-8').trim();
-      if (!sql) {
-        console.log(`  Skipping empty file: ${file.filename}\n`);
-        continue;
-      }
-
-      console.log(`  Applying migration: ${file.filename}...`);
-
-      try {
-        await connection.query(sql);
-        console.log(`Completed: ${file.filename}\n`);
-      } catch (error: unknown) {
-        const mysqlError = error as { code?: string };
-        const ignorableCodes = [
-          'ER_TABLE_EXISTS_ERROR',
-          'ER_DUP_FIELDNAME',
-          'ER_DUP_KEYNAME',
-          'ER_CANT_DROP_FIELD_OR_KEY',
-          'ER_NO_SUCH_TABLE',
-        ];
-        if (mysqlError.code && ignorableCodes.includes(mysqlError.code)) {
-          console.log(`  Already applied (${mysqlError.code}), skipping: ${file.filename}\n`);
-        } else {
-          console.error(`\nFailed applying migration ${file.filename}:`, error);
-          throw error;
-        }
-      }
-    }
-
-    console.log('All migrations completed successfully!\n');
-  } catch (error: unknown) {
-    const err = error as { message?: string; sql?: string; errors?: Error[] };
-    const detail = err.errors ? err.errors.map(e => e.message).join(', ') : (err.message || String(error));
-    console.error('\nMigration failed:', detail);
-    if (err.sql) {
-      console.error('Failed SQL:', err.sql);
-    }
-    throw error;
+    console.log('Migration completed successfully.');
   } finally {
-    if (connection) {
-      await connection.end();
-    }
+    if (connection) await connection.end();
   }
 }
 
-runMigrations().catch(() => {
+runMigrations().catch((error: unknown) => {
+  console.error('Migration failed:', error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
 });

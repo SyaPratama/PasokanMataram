@@ -2,20 +2,13 @@
 
 /**
  * @file packages/database/scripts/seed.ts
- * @description Database seeding script with Production Smart Seed Gate (4NF Compliant)
- * Populates realistic data across 26 tables for all personas and features.
+ * @description Applies reference taxonomy in production and fixture SQL only to disposable databases.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import mysql from 'mysql2/promise';
 import type { RowDataPacket } from 'mysql2';
-import { withDbRetry } from '../src/client';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 interface SeedConfig {
   host: string;
   port: number;
@@ -24,207 +17,80 @@ interface SeedConfig {
   database: string;
 }
 
-interface CountRow extends RowDataPacket {
-  count: number | string;
-}
 interface SeedLockRow extends RowDataPacket {
   acquired: number;
 }
 
-interface CommoditySeedRow extends RowDataPacket {
-  id: string;
-  code: string;
-  name: string;
-  category: string;
-}
-
-interface ForecastHorizonSeedRow extends RowDataPacket {
-  id: string;
-}
-
-const config: SeedConfig = {
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER || 'pasok_user',
-  password: process.env.DB_PASSWORD || 'Tama123',
-  database: process.env.DB_NAME || 'pasokmataram_db',
+const requiredEnvironment = (name: string): string => {
+  const value = process.env[name]?.trim();
+  if (!value) throw new Error(`${name} wajib dikonfigurasi.`);
+  return value;
 };
 
-async function seedDatabase() {
-  console.log('--- PasokMataram Database Seeding ---');
-  console.log(`Target: ${config.host}:${config.port}/${config.database}\n`);
+const parsePort = (): number => {
+  const value = Number(process.env.DB_PORT || '3306');
+  if (!Number.isInteger(value) || value < 1 || value > 65535) throw new Error('DB_PORT harus berupa bilangan bulat 1-65535.');
+  return value;
+};
 
-  let connection: mysql.Connection | null = null;
-  let seedLockAcquired = false;
+const parseDatabaseName = (): string => {
+  const value = requiredEnvironment('DB_NAME');
+  if (!/^[A-Za-z0-9_]{1,64}$/.test(value)) throw new Error('DB_NAME hanya boleh berisi huruf, angka, dan underscore.');
+  return value;
+};
 
-  try {
-    connection = await withDbRetry(() =>
-      mysql.createConnection({
-        ...config,
-        connectTimeout: 30000,
-        multipleStatements: true,
-      })
-    );
-    const [lockRows] = await connection.query<SeedLockRow[]>('SELECT GET_LOCK(?, 30) AS acquired', ['pasokmataram_seed']);
-    seedLockAcquired = Number(lockRows[0]?.acquired) === 1;
-    if (!seedLockAcquired) throw new Error('Could not acquire the database seed lock.');
-    console.log('Connected to MySQL server successfully.\n');
+const config: SeedConfig = {
+  host: requiredEnvironment('DB_HOST'),
+  port: parsePort(),
+  user: requiredEnvironment('DB_USER'),
+  password: requiredEnvironment('DB_PASSWORD'),
+  database: parseDatabaseName(),
+};
+const seedMode = process.env.DB_SEED_MODE || 'reference';
+if (seedMode !== 'reference' && seedMode !== 'fixture') {
+  throw new Error('DB_SEED_MODE harus reference atau fixture.');
+}
 
-    const [rows] = await connection.query<CountRow[]>(
-      "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'tenants'"
-    );
-    const tableExists = Array.isArray(rows) && Number(rows[0]?.count) > 0;
-
-    const demoPasswordHash =
-      '$argon2id$v=19$m=65536,t=3,p=4$vnpRsVUMELfMlCGOmC5D7A$9Mbqk8n+7CSbjcy6n/dAqt2BBCcosEXI1YpCVA9dp04';
-    const demoUsers = [
-      { id: '90000000-0000-0000-0000-000000000001', tenantId: '10000000-0000-0000-0000-000000000001', email: 'buyer@demo.com', name: 'Demo Buyer Manager (HoReKa)', role: 'PROCUREMENT_MANAGER' },
-      { id: '90000000-0000-0000-0000-000000000002', tenantId: '20000000-0000-0000-0000-000000000001', email: 'supplier@demo.com', name: 'Demo Petani Gapoktan Sido Makmur', role: 'OWNER' },
-      { id: '90000000-0000-0000-0000-000000000003', tenantId: '10000000-0000-0000-0000-000000000001', email: 'hub@demo.com', name: 'Demo Operator Sentral Hub Sentolo', role: 'PROCUREMENT_MANAGER' },
-      { id: '90000000-0000-0000-0000-000000000004', tenantId: '10000000-0000-0000-0000-000000000001', email: 'admin@demo.com', name: 'Demo Super Admin Tata Kelola DIY', role: 'SUPER_ADMIN' },
-    ];
-    for (const u of demoUsers) {
-      await connection.query(
-        `INSERT INTO users (id, tenant_id, email, password_hash, full_name, phone_number, role, is_active)
-         VALUES (?, ?, ?, ?, ?, '+6281234567890', ?, 1)
-         ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), full_name = VALUES(full_name), role = VALUES(role)`,
-        [u.id, u.tenantId, u.email, demoPasswordHash, u.name, u.role]
-      );
-    }
-    console.log('  Ensured 4 demo personas (buyer@demo.com, supplier@demo.com, hub@demo.com, admin@demo.com / password: demo123)');
-
-    if (tableExists) {
-      const [countRows] = await connection.query<CountRow[]>('SELECT COUNT(*) as count FROM tenants');
-      const tenantCount = Array.isArray(countRows) ? Number(countRows[0]?.count) : 0;
-
-      if (tenantCount > 0 && process.env.DB_FORCE_RESET !== 'true') {
-        console.log(`[PRODUCTION SAFETY GATE] Active data detected (${tenantCount} tenants found).`);
-        console.log('Skipping seed to protect live users, orders, and settlements.');
-        console.log('(To force re-seed, set DB_FORCE_RESET=true explicitly)\n');
-        return;
-      }
-    }
-    console.log('[SEED] Running initial 4NF database population...');
-
-    const candidateDirs = [
-      join(process.cwd(), 'docker/mysql/init'),
-      join(__dirname, '../../../docker/mysql/init'),
-      join(process.cwd(), 'packages/database/src/schema'),
-      join(__dirname, '../src/schema'),
-    ];
-
-    let seedDir = '';
-    for (const dir of candidateDirs) {
-      if (existsSync(join(dir, '02-seed-taxonomy.sql')) || existsSync(join(dir, '03-seed-data.sql'))) {
-        seedDir = dir;
-        break;
-      }
-    }
-
-    if (!seedDir) {
-      throw new Error(`Seed SQL directory not found. Checked: ${candidateDirs.join(', ')}`);
-    }
-
-    console.log(`Loading seed files from: ${seedDir}`);
-
-    const taxonomyFile = join(seedDir, '02-seed-taxonomy.sql');
-    if (existsSync(taxonomyFile)) {
-      const sql = readFileSync(taxonomyFile, 'utf-8').trim();
-      if (sql) {
-        await connection.query(sql);
-        console.log('  Applied 02-seed-taxonomy.sql');
-      }
-    }
-
-    const seedDataFile = join(seedDir, '03-seed-data.sql');
-    if (existsSync(seedDataFile)) {
-      const sql = readFileSync(seedDataFile, 'utf-8').trim();
-      if (sql) {
-        await connection.query(sql);
-        console.log('  Applied 03-seed-data.sql');
-      }
-    }
-
-    console.log('  Seeding 150 weather observations...');
-    const regencies = ['SLEMAN', 'BANTUL', 'KULON_PROGO', 'GUNUNGKIDUL', 'KOTA_YOGYAKARTA'];
-    const baseTimestamp = Date.UTC(2026, 10, 10);
-    for (let day = 0; day < 30; day++) {
-      const dateStr = new Date(baseTimestamp - day * 86400000).toISOString().slice(0, 10);
-      for (let rIdx = 0; rIdx < regencies.length; rIdx++) {
-        const reg = regencies[rIdx]!;
-        const rainfall = (day * 7 + rIdx * 11) % 65;
-        const temp = Number((24 + ((day * 3 + rIdx * 5) % 80) / 10).toFixed(1));
-        const humidity = Number((65 + ((day * 4 + rIdx * 7) % 250) / 10).toFixed(1));
-        await connection.query(
-          `INSERT INTO weather_observations (id, regency, recorded_date, rainfall_mm, temperature_celsius, humidity_percent, created_at)
-           VALUES (UUID(), ?, ?, ?, ?, ?, NOW())
-           ON DUPLICATE KEY UPDATE rainfall_mm = VALUES(rainfall_mm), temperature_celsius = VALUES(temperature_celsius), humidity_percent = VALUES(humidity_percent)`,
-          [reg, dateStr, rainfall, temp, humidity]
-        );
-      }
-    }
-
-    console.log('  Seeding commodity forecasts & 4NF horizons...');
-    const [comms] = await connection.query<CommoditySeedRow[]>('SELECT id, code, name, category FROM commodities');
-    if (Array.isArray(comms) && comms.length > 0) {
-      for (const c of comms) {
-        const basePrice = c.code.includes('BERAS') ? 14800 : c.code.includes('CABAI') ? 48000 : c.code.includes('BAWANG') ? 36000 : 25000;
-        const forecastId = `fc-${c.code.toLowerCase().replace(/_/g, '-')}`;
-
-        await connection.query(
-          `INSERT INTO commodity_forecasts (
-             id, commodity_id, current_price, predicted_price_7d, predicted_price_30d, predicted_price_90d,
-             trend, trend_percentage, confidence_score, mape_accuracy, optimal_buy_start, optimal_buy_end, target_price,
-             recommended_action, action_explanation, weather_risk_level, weather_risk_description,
-             rainfall_forecast_mm, historical_and_projected, algorithm, created_at, updated_at
-           ) VALUES (?, ?, ?, ?, ?, ?, 'STABLE', 2.00, 93.5, 3.6, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), ?,
-                     'BELI_SEKARANG', 'Harga stabil pasokan lancar', 'RENDAH', 'Kondisi cuaca mendukung',
-                     15, '[]', 'LightGBM Multi-Horizon v1.3', NOW(), NOW())
-           ON DUPLICATE KEY UPDATE current_price = VALUES(current_price)`,
-          [forecastId, c.id, basePrice, Math.round(basePrice * 1.02), Math.round(basePrice * 1.05), Math.round(basePrice * 1.08), basePrice]
-        );
-
-        const horizons = [
-          { days: 7, mult: 1.02 },
-          { days: 30, mult: 1.05 },
-          { days: 90, mult: 1.08 },
-        ];
-        for (const h of horizons) {
-          const pred = Math.round(basePrice * h.mult);
-          const [existing] = await connection.query<ForecastHorizonSeedRow[]>(
-            'SELECT id FROM forecast_horizons WHERE forecast_id = ? AND horizon_days = ?',
-            [forecastId, h.days]
-          );
-          const forecastHorizon = existing[0];
-          if (!forecastHorizon) {
-            await connection.query(
-              `INSERT INTO forecast_horizons (id, forecast_id, horizon_days, predicted_price, confidence_lower, confidence_upper, created_at)
-               VALUES (UUID(), ?, ?, ?, ?, ?, NOW())`,
-              [forecastId, h.days, pred, Math.round(pred * 0.95), Math.round(pred * 1.05)]
-            );
-          } else {
-            await connection.query(
-              `UPDATE forecast_horizons SET predicted_price = ?, confidence_lower = ?, confidence_upper = ? WHERE id = ?`,
-              [pred, Math.round(pred * 0.95), Math.round(pred * 1.05), forecastHorizon.id]
-            );
-          }
-        }
-      }
-    }
-    console.log('\n[SUCCESS] Comprehensive 26-table seeding finished successfully!\n');
-  } catch (error: unknown) {
-    console.error('\n[ERROR] Seeding failed:', error);
-    throw error;
-  } finally {
-    if (connection && seedLockAcquired) {
-      await connection.query('SELECT RELEASE_LOCK(?)', ['pasokmataram_seed']);
-    }
-    if (connection) {
-      await connection.end();
-    }
+function assertFixtureDatabase(): void {
+  if (process.env.NODE_ENV === 'production' || process.env.DB_DISPOSABLE !== 'true' || !/(^|_)(test|sandbox|disposable)(_|$)/i.test(config.database)) {
+    throw new Error('DB_SEED_MODE=fixture hanya boleh digunakan pada database disposable non-production.');
   }
 }
 
-seedDatabase().catch(() => {
+async function applySeedFile(connection: mysql.Connection, filename: string): Promise<void> {
+  const seedPath = join(process.cwd(), 'packages/database/src/schema', filename);
+  if (!existsSync(seedPath)) throw new Error(`Seed file tidak ditemukan: ${seedPath}`);
+  const sql = readFileSync(seedPath, 'utf-8').trim();
+  if (sql) await connection.query(sql);
+  console.log(`Applied ${filename}.`);
+}
+
+async function seedDatabase(): Promise<void> {
+  if (seedMode === 'fixture') assertFixtureDatabase();
+  console.log(`Seeding ${seedMode} data for ${config.database}.`);
+
+  let connection: mysql.Connection | null = null;
+  let seedLockAcquired = false;
+  try {
+    connection = await mysql.createConnection({ ...config, connectTimeout: 30000, multipleStatements: true });
+    const [lockRows] = await connection.query<SeedLockRow[]>('SELECT GET_LOCK(?, 30) AS acquired', ['pasokmataram_seed']);
+    seedLockAcquired = Number(lockRows[0]?.acquired) === 1;
+    if (!seedLockAcquired) throw new Error('Tidak dapat memperoleh database seed lock.');
+
+    await applySeedFile(connection, '02-seed-taxonomy.sql');
+    if (seedMode === 'fixture') {
+      await applySeedFile(connection, '03-seed-data.sql');
+      console.log('Disposable fixture seed completed.');
+    } else {
+      console.log('Reference seed completed; fixture and synthetic data were not applied.');
+    }
+  } finally {
+    if (connection && seedLockAcquired) await connection.query('SELECT RELEASE_LOCK(?)', ['pasokmataram_seed']);
+    if (connection) await connection.end();
+  }
+}
+
+seedDatabase().catch((error: unknown) => {
+  console.error('Seed failed:', error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
 });
