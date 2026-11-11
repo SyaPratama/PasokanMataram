@@ -357,13 +357,22 @@ jobs:
           REMOTE_SCRIPT
 
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
-          if ! sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
-            rm -f deploy-web-remote.sh
-            exit 1
-          fi
-          rm -f deploy-web-remote.sh
-          echo "Web deploy completed on target host."
+          trap 'rm -f deploy-web-remote.sh' EXIT
+          for i in 1 2 3 4 5; do
+            echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
+            if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
+              echo "Web deploy completed on target host."
+              exit 0
+            fi
+            if [ "$i" -lt 5 ]; then
+              delay=$((i * 15))
+              echo "Remote deploy attempt $i failed. Retrying in $delay seconds..."
+              sleep "$delay"
+            fi
+          done
+          echo "Web deploy failed after 5 attempts."
+          exit 255
       
       - name: Health check web
         run: |
@@ -466,13 +475,22 @@ jobs:
 
 
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
-          if ! sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
-            rm -f deploy-api-remote.sh
-            exit 1
-          fi
-          rm -f deploy-api-remote.sh
-          echo "API deploy completed on target host."
+          trap 'rm -f deploy-api-remote.sh' EXIT
+          for i in 1 2 3 4 5; do
+            echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
+            if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
+              echo "API deploy completed on target host."
+              exit 0
+            fi
+            if [ "$i" -lt 5 ]; then
+              delay=$((i * 15))
+              echo "Remote deploy attempt $i failed. Retrying in $delay seconds..."
+              sleep "$delay"
+            fi
+          done
+          echo "API deploy failed after 5 attempts."
+          exit 255
       
       - name: Health check API
         run: |
