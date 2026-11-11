@@ -35,13 +35,31 @@ jobs:
       
       - name: Create environment files
         run: |
-          echo "${{ secrets.ENV_DEVELOPMENT }}" > apps/web/.env.development
-          echo "${{ secrets.ENV_PRODUCTION }}" > apps/web/.env.production
+          printf '%s\n' "$ENV_DEVELOPMENT" > apps/web/.env.development
+          printf '%s\n' "$ENV_PRODUCTION" > apps/web/.env.production
+          production_jwt_secret="$(awk -F= '$1 == "JWT_SECRET" {sub(/^[^=]*=/, ""); print; exit}' apps/web/.env.production)"
+          production_jwt_secret="${production_jwt_secret#\"}"
+          production_jwt_secret="${production_jwt_secret%\"}"
+          if [ "${#production_jwt_secret}" -lt 32 ]; then
+            echo "::error::ENV_PRODUCTION must contain JWT_SECRET with at least 32 characters."
+            exit 1
+          fi
+          echo "::add-mask::$production_jwt_secret"
+          printf 'JWT_SECRET=%s\n' "$production_jwt_secret" >> "$GITHUB_ENV"
+          unset production_jwt_secret
+        env:
+          ENV_DEVELOPMENT: ${{ secrets.ENV_DEVELOPMENT }}
+          ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
+
       
       - name: Run database migrations & smart seeding
         run: |
-          if [ -z "$DB_HOST" ] || [ -z "$DB_PASSWORD" ]; then
+          if [ -z "${DB_HOST:-}" ] || [ -z "${DB_PASSWORD:-}" ]; then
             echo "::error::Database secrets (DB_HOST / DB_PASSWORD) are required for mandatory production deployment migration."
+            exit 1
+          fi
+          if [ "${#JWT_SECRET}" -lt 32 ]; then
+            echo "::error::JWT_SECRET from ENV_PRODUCTION is missing or shorter than 32 characters."
             exit 1
           fi
           npm run db:migrate
@@ -52,9 +70,15 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
+
       
       - name: Build web with Next.js standalone output
-        run: npm run build -- --filter=@pasok/web
+        run: |
+          if [ "${#JWT_SECRET}" -lt 32 ]; then
+            echo "::error::JWT_SECRET from ENV_PRODUCTION is missing or shorter than 32 characters."
+            exit 1
+          fi
+          npm run build -- --filter=@pasok/web
         env:
           NODE_ENV: production
           CI: true
