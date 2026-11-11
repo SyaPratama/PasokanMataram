@@ -20,19 +20,19 @@ jobs:
     name: Build Web (Next.js Standalone Artifacts)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Create environment files
         run: |
           printf '%s\n' "$ENV_DEVELOPMENT" > apps/web/.env.development
@@ -51,9 +51,6 @@ jobs:
           ENV_DEVELOPMENT: ${{ secrets.ENV_DEVELOPMENT }}
           ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
 
-      
-
-      
       - name: Build web with Next.js standalone output
         run: |
           if [ "${#JWT_SECRET}" -lt 32 ]; then
@@ -66,6 +63,7 @@ jobs:
           CI: true
           STANDALONE: 'true'
           NEXT_OUTPUT_STANDALONE: 'true'
+
       - name: Package web standalone build (artifacts only, no TS sources)
         run: |
           mkdir -p web-dist
@@ -130,7 +128,7 @@ jobs:
           cp web-dist/server.js web-dist/app.js
           cd web-dist
           tar -czf ../web-build.tar.gz .
-      
+
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
@@ -142,28 +140,28 @@ jobs:
     name: Build API (Bundled Artifacts)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Create environment files
         run: |
           echo "${{ secrets.ENV_DEVELOPMENT }}" > apps/api/.env.development
           echo "${{ secrets.ENV_PRODUCTION }}" > apps/api/.env.production
-      
+
       - name: Bundle API with esbuild (compiled JS only, no TS sources)
         run: |
           npx esbuild apps/api/src/main.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=apps/api/dist/main.js
-      
+
       - name: Package API build (artifacts only, no TS sources)
         run: |
           mkdir -p api-dist/dist
@@ -223,7 +221,7 @@ jobs:
           cp -r node_modules api-dist/
           cd api-dist
           tar -czf ../api-build.tar.gz .
-      
+
       - name: Upload API artifact
         uses: actions/upload-artifact@v4
         with:
@@ -238,22 +236,22 @@ jobs:
     if: github.ref == 'refs/heads/main'
     env:
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
-    
+
     steps:
       - name: Download web build
         uses: actions/download-artifact@v4
         with:
           name: web-build
-      
+
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: Configure pinned SSH host key
         run: |
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
           test -s "$HOME/.ssh/known_hosts"
-      
 
       - name: Extract web build on server
         env:
@@ -262,6 +260,10 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
+          # Non-strict by default: a rejected DB login only produces a warning and the
+          # schema/seed step is skipped. Set repository variable DB_VALIDATION_STRICT=true
+          # (Settings > Secrets and variables > Actions > Variables) to fail the deploy again.
+          DB_STRICT: ${{ vars.DB_VALIDATION_STRICT || 'false' }}
         run: |
           set -euo pipefail
           umask 077
@@ -289,54 +291,65 @@ jobs:
           MYSQL_CONFIG
           cat << 'REMOTE_SCRIPT' > deploy-web-remote.sh
           set -euo pipefail
+          DB_STRICT="${1:-false}"
+          DB_OK=1
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           DB_CONFIG="$HOME/pasokmataram-db.cnf"
           DB_ERROR="$(mktemp)"
           trap 'rm -f "$DB_CONFIG" "$DB_ERROR"' EXIT
+
+          # Any database problem: warn and skip DB steps, or stop (exit 78) in strict mode.
+          db_problem() {
+            echo "::warning::$1"
+            if [ "$DB_STRICT" = "true" ]; then
+              exit 78
+            fi
+            DB_OK=0
+          }
+
           if [ ! -f "$DB_CONFIG" ]; then
-            echo "Database option file missing on target host."
-            exit 1
-          fi
-          chmod 600 "$DB_CONFIG"
-          if ! command -v mysql >/dev/null 2>&1; then
-            echo "mysql client is required on the target host."
-            exit 78
-          fi
-          if ! mysql --defaults-extra-file="$DB_CONFIG" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>"$DB_ERROR"; then
-            case "$(cat "$DB_ERROR")" in
-              *"ERROR 1044"*) echo "Database validation failed: user lacks access to the selected database." ;;
-              *"ERROR 1045"*)
-                echo "Database validation failed: credentials or MySQL host grant rejected."
-                accepted_endpoint=""
-                for endpoint in localhost 127.0.0.1; do
-                  if mysql --defaults-extra-file="$DB_CONFIG" --host="$endpoint" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>&1; then
-                    accepted_endpoint="$endpoint"
-                    break
+            db_problem "Database option file missing on target host."
+          else
+            chmod 600 "$DB_CONFIG"
+            if ! command -v mysql >/dev/null 2>&1; then
+              db_problem "mysql client is not installed on the target host."
+            elif ! mysql --defaults-extra-file="$DB_CONFIG" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>"$DB_ERROR"; then
+              case "$(cat "$DB_ERROR")" in
+                *"ERROR 1044"*) echo "Database validation failed: user lacks access to the selected database." ;;
+                *"ERROR 1045"*)
+                  echo "Database validation failed: credentials or MySQL host grant rejected."
+                  accepted_endpoint=""
+                  for endpoint in localhost 127.0.0.1; do
+                    if mysql --defaults-extra-file="$DB_CONFIG" --host="$endpoint" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>&1; then
+                      accepted_endpoint="$endpoint"
+                      break
+                    fi
+                  done
+                  if [ -n "$accepted_endpoint" ]; then
+                    echo "Database endpoint diagnostic: credentials succeed through $accepted_endpoint; update DB_HOST to that endpoint."
+                  else
+                    echo "Database endpoint diagnostic: configured, localhost, and 127.0.0.1 endpoints all reject this user/password or its host grant."
                   fi
-                done
-                if [ -n "$accepted_endpoint" ]; then
-                  echo "Database endpoint diagnostic: credentials succeed through $accepted_endpoint; update DB_HOST to that endpoint."
-                else
-                  echo "Database endpoint diagnostic: configured, localhost, and 127.0.0.1 endpoints all reject this user/password or its host grant."
-                fi
-                ;;
-              *"ERROR 1049"*) echo "Database validation failed: database name does not exist." ;;
-              *"ERROR 2002"*|*"ERROR 2003"*) echo "Database validation failed: database host or port is unreachable." ;;
-              *) echo "Database validation failed on target host." ;;
-            esac
-            exit 78
+                  ;;
+                *"ERROR 1049"*) echo "Database validation failed: database name does not exist." ;;
+                *"ERROR 2002"*|*"ERROR 2003"*) echo "Database validation failed: database host or port is unreachable." ;;
+                *) echo "Database validation failed on target host." ;;
+              esac
+              db_problem "Database check did not pass. Schema and taxonomy will be skipped; fix the DB_* secrets or the MySQL grant."
+            fi
           fi
           rm -f "$DB_ERROR"
+
           mkdir -p "$WEB_PATH"
           if [ -f "$WEB_PATH/.htaccess" ]; then
             cp "$WEB_PATH/.htaccess" /tmp/preserved_web_htaccess 2>/dev/null || true
           fi
-          
+
           if [ -d "$WEB_PATH" ]; then
             cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
             ls -dt ${WEB_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
-          
+
           tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
           rm -f ~/web-build.tar.gz
           if [ -f /tmp/preserved_web_htaccess ]; then
@@ -345,7 +358,7 @@ jobs:
             fi
             rm -f /tmp/preserved_web_htaccess
           fi
-          
+
           if ! grep -q "ErrorDocument 404" "$WEB_PATH/.htaccess" 2>/dev/null; then
             echo "" >> "$WEB_PATH/.htaccess"
             echo "Options -Indexes" >> "$WEB_PATH/.htaccess"
@@ -362,14 +375,26 @@ jobs:
             echo "    Deny from all" >> "$WEB_PATH/.htaccess"
             echo "</FilesMatch>" >> "$WEB_PATH/.htaccess"
           fi
-          for sql_file in "$WEB_PATH/schema/001_core_enterprise_4nf_schema.sql" "$WEB_PATH/schema/02-seed-taxonomy.sql"; do
-            if [ ! -f "$sql_file" ]; then
-              echo "Required SQL file missing: $sql_file"
-              exit 1
+
+          if [ "$DB_OK" = "1" ]; then
+            for sql_file in "$WEB_PATH/schema/001_core_enterprise_4nf_schema.sql" "$WEB_PATH/schema/02-seed-taxonomy.sql"; do
+              if [ ! -f "$sql_file" ]; then
+                db_problem "Required SQL file missing: $sql_file"
+                break
+              fi
+              if ! mysql --defaults-extra-file="$DB_CONFIG" < "$sql_file"; then
+                db_problem "Applying $sql_file failed."
+                break
+              fi
+            done
+            if [ "$DB_OK" = "1" ]; then
+              echo "Target schema and taxonomy applied."
             fi
-            mysql --defaults-extra-file="$DB_CONFIG" < "$sql_file"
-          done
-          echo "Target schema and taxonomy applied."
+          fi
+          if [ "$DB_OK" != "1" ]; then
+            echo "::warning::Web files were deployed WITHOUT applying schema and taxonomy (database step skipped)."
+          fi
+
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
           if ! command -v pm2 >/dev/null 2>&1; then
             echo "pm2 is required on the target host."
@@ -388,13 +413,13 @@ jobs:
               web-build.tar.gz "$DB_CONFIG" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/; then
               echo "Artifact upload attempt $i failed."
             elif sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l -s -- $DB_STRICT" < deploy-web-remote.sh; then
               echo "Web deploy completed on target host."
               exit 0
             else
               remote_status=$?
               if [ "$remote_status" -eq 78 ]; then
-                echo "::error::Database configuration is invalid or inaccessible on the target host. Update DB secrets or the MySQL host grant."
+                echo "::error::Database configuration is invalid or inaccessible on the target host (strict mode). Update DB secrets or the MySQL host grant."
                 exit 78
               fi
             fi
@@ -406,7 +431,7 @@ jobs:
           done
           echo "Web deploy failed after 5 attempts."
           exit 255
-      
+
       - name: Health check web
         run: |
           sleep 15
@@ -419,22 +444,23 @@ jobs:
     if: github.ref == 'refs/heads/main'
     env:
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
-    
+
     steps:
       - name: Download API build
         uses: actions/download-artifact@v4
         with:
           name: api-build
-      
+
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: Configure pinned SSH host key
         run: |
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
           test -s "$HOME/.ssh/known_hosts"
-      
+
       - name: Upload API build to server
         run: |
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
@@ -451,33 +477,33 @@ jobs:
           done
           echo "Upload failed after 3 attempts."
           exit 255
-      
+
       - name: Extract API build on server
         run: |
           cat << 'REMOTE_SCRIPT' > deploy-api-remote.sh
           set -euo pipefail
           API_PATH="${{ secrets.API_DEPLOY_PATH }}"
-          
+
           mkdir -p "$API_PATH"
           if [ -f "$API_PATH/.htaccess" ]; then
             cp "$API_PATH/.htaccess" /tmp/preserved_api_htaccess 2>/dev/null || true
           fi
-          
+
           if [ -d "$API_PATH" ]; then
             cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
             ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
           fi
-          
+
           tar -xzf ~/api-build.tar.gz -C "$API_PATH"
           rm -f ~/api-build.tar.gz
-          
+
           if [ -f /tmp/preserved_api_htaccess ]; then
             if grep -q "CLOUDLINUX" /tmp/preserved_api_htaccess 2>/dev/null; then
               cat /tmp/preserved_api_htaccess > "$API_PATH/.htaccess"
             fi
             rm -f /tmp/preserved_api_htaccess
           fi
-          
+
           if ! grep -q "ErrorDocument 404" "$API_PATH/.htaccess" 2>/dev/null; then
             echo "" >> "$API_PATH/.htaccess"
             echo "Options -Indexes" >> "$API_PATH/.htaccess"
@@ -494,7 +520,7 @@ jobs:
             echo "    Deny from all" >> "$API_PATH/.htaccess"
             echo "</FilesMatch>" >> "$API_PATH/.htaccess"
           fi
-          
+
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
           if ! command -v pm2 >/dev/null 2>&1; then
             echo "pm2 is required on the target host."
@@ -502,10 +528,9 @@ jobs:
           fi
           pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api
           pm2 save
-          
+
           echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
-
 
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           trap 'rm -f deploy-api-remote.sh' EXIT
@@ -524,7 +549,7 @@ jobs:
           done
           echo "API deploy failed after 5 attempts."
           exit 255
-      
+
       - name: Health check API
         run: |
           sleep 15
@@ -535,7 +560,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-web, deploy-api]
     if: always() && github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Generate summary
         run: |
