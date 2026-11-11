@@ -305,7 +305,21 @@ jobs:
           if ! mysql --defaults-extra-file="$DB_CONFIG" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>"$DB_ERROR"; then
             case "$(cat "$DB_ERROR")" in
               *"ERROR 1044"*) echo "Database validation failed: user lacks access to the selected database." ;;
-              *"ERROR 1045"*) echo "Database validation failed: credentials or MySQL host grant rejected." ;;
+              *"ERROR 1045"*)
+                echo "Database validation failed: credentials or MySQL host grant rejected."
+                accepted_endpoint=""
+                for endpoint in localhost 127.0.0.1; do
+                  if mysql --defaults-extra-file="$DB_CONFIG" --host="$endpoint" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>&1; then
+                    accepted_endpoint="$endpoint"
+                    break
+                  fi
+                done
+                if [ -n "$accepted_endpoint" ]; then
+                  echo "Database endpoint diagnostic: credentials succeed through $accepted_endpoint; update DB_HOST to that endpoint."
+                else
+                  echo "Database endpoint diagnostic: configured, localhost, and 127.0.0.1 endpoints all reject this user/password or its host grant."
+                fi
+                ;;
               *"ERROR 1049"*) echo "Database validation failed: database name does not exist." ;;
               *"ERROR 2002"*|*"ERROR 2003"*) echo "Database validation failed: database host or port is unreachable." ;;
               *) echo "Database validation failed on target host." ;;
