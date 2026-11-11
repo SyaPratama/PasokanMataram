@@ -25,7 +25,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV CI=true
-RUN npm run build
+RUN JWT_SECRET=ci-build-only-jwt-secret-not-for-runtime npm run build
 
 FROM base AS runner
 WORKDIR /app
