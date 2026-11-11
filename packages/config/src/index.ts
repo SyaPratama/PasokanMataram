@@ -11,5 +11,4 @@ export * from './cache';
 export * from './auth';
 export * from './payment';
 export * from './business';
-export * from './migrations';
 export * from './theme';

@@ -10,5 +10,4 @@ export * from './storage';
 export * from './cache';
 export * from './auth';
 export * from './business';
-export * from './migrations';
 export * from './theme';

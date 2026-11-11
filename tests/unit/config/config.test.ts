@@ -9,7 +9,6 @@ import {
   diyRegenciesConfig,
   geoBoundsDiyConfig,
   kybRulesConfig,
-  migrationsConfig,
   themeColors,
 } from '@pasok/config';
 
@@ -62,11 +61,6 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
     expect(kybRulesConfig.maxFileSizeBytes).toBe(5 * 1024 * 1024);
   });
 
-  it('memvalidasi migrations configuration', () => {
-    expect(migrationsConfig.trackingTable).toBe('_migrations');
-    expect(migrationsConfig.migrationFiles.length).toBeGreaterThan(0);
-    expect(migrationsConfig.lockId).toBe(424242);
-  });
 
   it('memvalidasi theme colors tokens', () => {
     expect(themeColors.primer.DEFAULT).toBe('#2E5339');

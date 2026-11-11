@@ -52,24 +52,6 @@ jobs:
           ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
 
       
-      - name: Run database migrations & smart seeding
-        run: |
-          if [ -z "${DB_HOST:-}" ] || [ -z "${DB_PASSWORD:-}" ]; then
-            echo "::error::Database secrets (DB_HOST / DB_PASSWORD) are required for mandatory production deployment migration."
-            exit 1
-          fi
-          if [ "${#JWT_SECRET}" -lt 32 ]; then
-            echo "::error::JWT_SECRET from ENV_PRODUCTION is missing or shorter than 32 characters."
-            exit 1
-          fi
-          npm run db:migrate
-          npm run db:seed
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
 
       
       - name: Build web with Next.js standalone output
@@ -93,7 +75,7 @@ jobs:
           cp -r apps/web/public web-dist/apps/web/
           cp apps/web/public/.htaccess web-dist/.htaccess
           mkdir -p web-dist/schema
-          cp packages/database/src/schema/*.sql web-dist/schema/
+          cp packages/database/src/schema/001_core_enterprise_4nf_schema.sql packages/database/src/schema/02-seed-taxonomy.sql web-dist/schema/
           cat << 'SERVER_JS_EOF' > web-dist/server.js
           import fs from 'fs';
           import path from 'path';
@@ -146,8 +128,6 @@ jobs:
           import('./apps/web/server.js');
           SERVER_JS_EOF
           cp web-dist/server.js web-dist/app.js
-          cp apps/web/.env.production web-dist/.env.production 2>/dev/null || true
-          cp apps/web/.env.development web-dist/.env.development 2>/dev/null || true
           cd web-dist
           tar -czf ../web-build.tar.gz .
       
@@ -241,8 +221,6 @@ jobs:
           cp api-dist/server.js api-dist/app.js
           cp apps/api/package.json api-dist/
           cp -r node_modules api-dist/
-          cp apps/api/.env.production api-dist/.env.production 2>/dev/null || true
-          cp apps/api/.env.development api-dist/.env.development 2>/dev/null || true
           cd api-dist
           tar -czf ../api-build.tar.gz .
       
@@ -278,11 +256,20 @@ jobs:
       
       - name: Upload web build to server
         run: |
+          set -euo pipefail
+          : "${DB_HOST:?DB_HOST is required}"
+          : "${DB_USER:?DB_USER is required}"
+          : "${DB_PASSWORD:?DB_PASSWORD is required}"
+          : "${DB_NAME:?DB_NAME is required}"
+          umask 077
+          DB_CONFIG="pasokmataram-db.cnf"
+          trap 'rm -f "$DB_CONFIG"' EXIT
+          printf '[client]\nhost=%s\nport=%s\nuser=%s\npassword=%s\ndatabase=%s\n' "$DB_HOST" "$DB_PORT" "$DB_USER" "$DB_PASSWORD" "$DB_NAME" > "$DB_CONFIG"
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P "${{ env.SSH_PORT }}" $SSH_OPTS \
-              web-build.tar.gz \
+              web-build.tar.gz "$DB_CONFIG" \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/; then
               echo "Upload succeeded."
               exit 0
@@ -292,13 +279,25 @@ jobs:
           done
           echo "Upload failed after 3 attempts."
           exit 255
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
       
       - name: Extract web build on server
         run: |
           cat << 'REMOTE_SCRIPT' > deploy-web-remote.sh
-          set -e
+          set -euo pipefail
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
-          
+          DB_CONFIG="$HOME/pasokmataram-db.cnf"
+          trap 'rm -f "$DB_CONFIG"' EXIT
+          if [ ! -f "$DB_CONFIG" ]; then
+            echo "Database option file missing on target host."
+            exit 1
+          fi
+          chmod 600 "$DB_CONFIG"
           mkdir -p "$WEB_PATH"
           if [ -f "$WEB_PATH/.htaccess" ]; then
             cp "$WEB_PATH/.htaccess" /tmp/preserved_web_htaccess 2>/dev/null || true
@@ -334,54 +333,42 @@ jobs:
             echo "    Deny from all" >> "$WEB_PATH/.htaccess"
             echo "</FilesMatch>" >> "$WEB_PATH/.htaccess"
           fi
-          if [ -d "$WEB_PATH/schema" ] && [ -n "${{ secrets.DB_HOST }}" ] && [ -n "${{ secrets.DB_PASSWORD }}" ]; then
-            echo "Applying remote database migrations & seeding via SSH..."
-            DB_HOST="${{ secrets.DB_HOST }}"
-            DB_PORT="${{ secrets.DB_PORT || '3306' }}"
-            DB_USER="${{ secrets.DB_USER }}"
-            DB_PASS="${{ secrets.DB_PASSWORD }}"
-            DB_NAME="${{ secrets.DB_NAME }}"
-            if command -v mysql >/dev/null 2>&1; then
-              for sql_file in "$WEB_PATH/schema/001_core_enterprise_4nf_schema.sql" "$WEB_PATH/schema/02-seed-taxonomy.sql" "$WEB_PATH/schema/03-seed-data.sql"; do
-                if [ -f "$sql_file" ]; then
-                  echo "Applying $sql_file to $DB_NAME..."
-                  mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$sql_file"
-                fi
-              done
-              echo "Remote database migrations & seeding completed."
+          if ! command -v mysql >/dev/null 2>&1; then
+            echo "mysql client is required on the target host."
+            exit 1
+          fi
+          for sql_file in "$WEB_PATH/schema/001_core_enterprise_4nf_schema.sql" "$WEB_PATH/schema/02-seed-taxonomy.sql"; do
+            if [ ! -f "$sql_file" ]; then
+              echo "Required SQL file missing: $sql_file"
+              exit 1
             fi
-          fi
-          
+            mysql --defaults-extra-file="$DB_CONFIG" < "$sql_file"
+          done
+          echo "Target schema and taxonomy applied."
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
-          if command -v pm2 >/dev/null 2>&1; then
-            pm2 restart pasokmataram-web 2>/dev/null || pm2 start "$WEB_PATH/server.js" --name pasokmataram-web || true
-            pm2 save 2>/dev/null || true
+          if ! command -v pm2 >/dev/null 2>&1; then
+            echo "pm2 is required on the target host."
+            exit 1
           fi
-          
+          pm2 restart pasokmataram-web 2>/dev/null || pm2 start "$WEB_PATH/server.js" --name pasokmataram-web
+          pm2 save
+
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
-          for i in 1 2 3; do
-            echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
-            if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
-              echo "Deploy succeeded."
-              rm -f deploy-web-remote.sh
-              exit 0
-            fi
-            echo "Deploy attempt $i failed. Retrying in 5 seconds..."
-            sleep 5
-          done
+          if ! sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-web-remote.sh; then
+            rm -f deploy-web-remote.sh
+            exit 1
+          fi
           rm -f deploy-web-remote.sh
-          echo "Deploy failed after 3 attempts."
-          exit 255
+          echo "Web deploy completed on target host."
       
       - name: Health check web
         run: |
           sleep 15
-          curl --fail --silent --max-time 10 ${{ secrets.WEB_URL }} || echo "Web health check skipped"
-        continue-on-error: true
+          curl --fail --silent --show-error --max-time 10 "${{ secrets.WEB_URL }}"
 
   deploy-api:
     name: Deploy API to Server
@@ -426,7 +413,7 @@ jobs:
       - name: Extract API build on server
         run: |
           cat << 'REMOTE_SCRIPT' > deploy-api-remote.sh
-          set -e
+          set -euo pipefail
           API_PATH="${{ secrets.API_DEPLOY_PATH }}"
           
           mkdir -p "$API_PATH"
@@ -467,35 +454,30 @@ jobs:
           fi
           
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
-          if command -v pm2 >/dev/null 2>&1; then
-            pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api || true
-            pm2 save 2>/dev/null || true
+          if ! command -v pm2 >/dev/null 2>&1; then
+            echo "pm2 is required on the target host."
+            exit 1
           fi
+          pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api
+          pm2 save
           
           echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
+
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
-          for i in 1 2 3; do
-            echo "Deploy attempt $i of 3 on port ${{ env.SSH_PORT }}..."
-            if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
-              echo "Deploy succeeded."
-              rm -f deploy-api-remote.sh
-              exit 0
-            fi
-            echo "Deploy attempt $i failed. Retrying in 5 seconds..."
-            sleep 5
-          done
+          if ! sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
+            rm -f deploy-api-remote.sh
+            exit 1
+          fi
           rm -f deploy-api-remote.sh
-          echo "Deploy failed after 3 attempts."
-          exit 255
+          echo "API deploy completed on target host."
       
       - name: Health check API
         run: |
           sleep 15
-          curl --fail --silent --max-time 10 ${{ secrets.API_URL }}/health || echo "API health check skipped"
-        continue-on-error: true
+          curl --fail --silent --show-error --max-time 10 "${{ secrets.API_URL }}/health"
 
   summary:
     name: Deployment Summary
@@ -516,4 +498,4 @@ jobs:
           echo "- Commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Author: @${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Time: $(date -u)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Environment: .env.development + .env.production from GitHub Secrets" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: target-host runtime configuration" >> "$GITHUB_STEP_SUMMARY"
