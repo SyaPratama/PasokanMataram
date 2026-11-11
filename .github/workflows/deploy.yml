@@ -267,12 +267,32 @@ jobs:
           umask 077
           DB_CONFIG="pasokmataram-db.cnf"
           trap 'rm -f "$DB_CONFIG" deploy-web-remote.sh' EXIT
-          printf '[client]\nhost=%s\nport=%s\nuser=%s\npassword=%s\ndatabase=%s\n' "$DB_HOST" "$DB_PORT" "$DB_USER" "$DB_PASSWORD" "$DB_NAME" > "$DB_CONFIG"
+          DB_CONFIG="$DB_CONFIG" node --input-type=commonjs <<'MYSQL_CONFIG'
+          const fs = require('node:fs');
+          const option = (name) => {
+            const value = process.env[name];
+            if (!value || /[\r\n\0]/.test(value)) {
+              throw new Error(`${name} is missing or contains an unsupported control character.`);
+            }
+            return `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`;
+          };
+          const config = [
+            '[client]',
+            `host=${option('DB_HOST')}`,
+            `port=${option('DB_PORT')}`,
+            `user=${option('DB_USER')}`,
+            `password=${option('DB_PASSWORD')}`,
+            `database=${option('DB_NAME')}`,
+            '',
+          ].join('\n');
+          fs.writeFileSync(process.env.DB_CONFIG, config, { mode: 0o600 });
+          MYSQL_CONFIG
           cat << 'REMOTE_SCRIPT' > deploy-web-remote.sh
           set -euo pipefail
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           DB_CONFIG="$HOME/pasokmataram-db.cnf"
-          trap 'rm -f "$DB_CONFIG"' EXIT
+          DB_ERROR="$(mktemp)"
+          trap 'rm -f "$DB_CONFIG" "$DB_ERROR"' EXIT
           if [ ! -f "$DB_CONFIG" ]; then
             echo "Database option file missing on target host."
             exit 1
@@ -282,10 +302,17 @@ jobs:
             echo "mysql client is required on the target host."
             exit 78
           fi
-          if ! mysql --defaults-extra-file="$DB_CONFIG" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>&1; then
-            echo "Database authentication or access validation failed on target host."
+          if ! mysql --defaults-extra-file="$DB_CONFIG" --batch --skip-column-names --execute='SELECT 1' >/dev/null 2>"$DB_ERROR"; then
+            case "$(cat "$DB_ERROR")" in
+              *"ERROR 1044"*) echo "Database validation failed: user lacks access to the selected database." ;;
+              *"ERROR 1045"*) echo "Database validation failed: credentials or MySQL host grant rejected." ;;
+              *"ERROR 1049"*) echo "Database validation failed: database name does not exist." ;;
+              *"ERROR 2002"*|*"ERROR 2003"*) echo "Database validation failed: database host or port is unreachable." ;;
+              *) echo "Database validation failed on target host." ;;
+            esac
             exit 78
           fi
+          rm -f "$DB_ERROR"
           mkdir -p "$WEB_PATH"
           if [ -f "$WEB_PATH/.htaccess" ]; then
             cp "$WEB_PATH/.htaccess" /tmp/preserved_web_htaccess 2>/dev/null || true
