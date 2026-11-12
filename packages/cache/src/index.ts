@@ -6,8 +6,14 @@
 import { createClient } from 'redis';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const socketValue = process.env.REDIS_SOCKET
+  || process.env.REDIS_PATH
+  || (redisUrl.startsWith('unix://') || redisUrl.startsWith('/') ? redisUrl : undefined);
+const socketPath = socketValue?.replace(/^unix:\/\//, '');
 
-const client = createClient({ url: redisUrl });
+const client = socketPath
+  ? createClient({ socket: { path: socketPath } })
+  : createClient({ url: redisUrl });
 
 client.on('error', (err) => console.error('[Redis Error]', err));
 
