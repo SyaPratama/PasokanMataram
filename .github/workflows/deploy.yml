@@ -235,7 +235,10 @@ jobs:
     needs: [build-web]
     if: github.ref == 'refs/heads/main'
     env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
       - name: Download web build
@@ -409,11 +412,11 @@ jobs:
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3 4 5; do
             echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
-            if ! sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P "${{ env.SSH_PORT }}" $SSH_OPTS \
-              web-build.tar.gz "$DB_CONFIG" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/; then
+            if ! sshpass -e scp -P "$SSH_PORT" $SSH_OPTS \
+              web-build.tar.gz "$DB_CONFIG" "$SSH_USER@$SSH_HOST:~/"; then
               echo "Artifact upload attempt $i failed."
-            elif sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l -s -- $DB_STRICT" < deploy-web-remote.sh; then
+            elif sshpass -e ssh -p "$SSH_PORT" $SSH_OPTS \
+              "$SSH_USER@$SSH_HOST" "bash -l -s -- $DB_STRICT" < deploy-web-remote.sh; then
               echo "Web deploy completed on target host."
               exit 0
             else
@@ -443,7 +446,10 @@ jobs:
     needs: [deploy-web, build-api]
     if: github.ref == 'refs/heads/main'
     env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
       - name: Download API build
@@ -466,9 +472,9 @@ jobs:
           SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
-            if sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P "${{ env.SSH_PORT }}" $SSH_OPTS \
+            if sshpass -e scp -P "$SSH_PORT" $SSH_OPTS \
               api-build.tar.gz \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/; then
+              "$SSH_USER@$SSH_HOST:~/"; then
               echo "Upload succeeded."
               exit 0
             fi
@@ -536,8 +542,8 @@ jobs:
           trap 'rm -f deploy-api-remote.sh' EXIT
           for i in 1 2 3 4 5; do
             echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
-            if sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p "${{ env.SSH_PORT }}" $SSH_OPTS \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -l" < deploy-api-remote.sh; then
+            if sshpass -e ssh -p "$SSH_PORT" $SSH_OPTS \
+              "$SSH_USER@$SSH_HOST" "bash -l" < deploy-api-remote.sh; then
               echo "API deploy completed on target host."
               exit 0
             fi
