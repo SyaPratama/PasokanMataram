@@ -12,7 +12,7 @@ const socketValue = process.env.REDIS_SOCKET
 const socketPath = socketValue?.replace(/^unix:\/\//, '');
 
 const client = socketPath
-  ? createClient({ socket: { path: socketPath } })
+  ? createClient({ socket: { path: socketPath, tls: false } })
   : createClient({ url: redisUrl });
 
 client.on('error', (err) => console.error('[Redis Error]', err));
