@@ -165,6 +165,9 @@ jobs:
           cat << 'SERVER_JS_EOF' > api-dist/server.js
           import fs from 'fs';
           import path from 'path';
+          import { fileURLToPath } from 'url';
+
+          const appRoot = path.dirname(fileURLToPath(import.meta.url));
 
           const rawAppMode = (
             process.env.NODE_ENV ||
@@ -180,7 +183,7 @@ jobs:
           const runtimeOverrideKeys = new Set(['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']);
 
           function parseAndInjectEnv(filename) {
-            const envFilePath = path.resolve(process.cwd(), filename);
+            const envFilePath = path.resolve(appRoot, filename);
             if (!fs.existsSync(envFilePath)) return false;
             try {
               const fileContent = fs.readFileSync(envFilePath, 'utf8');
