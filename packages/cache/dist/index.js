@@ -11,7 +11,13 @@ exports.del = del;
 exports.invalidatePattern = invalidatePattern;
 const redis_1 = require("redis");
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-const client = (0, redis_1.createClient)({ url: redisUrl });
+const socketValue = process.env.REDIS_SOCKET
+    || process.env.REDIS_PATH
+    || (redisUrl.startsWith('unix://') || redisUrl.startsWith('/') ? redisUrl : undefined);
+const socketPath = socketValue?.replace(/^unix:\/\//, '');
+const client = socketPath
+    ? (0, redis_1.createClient)({ socket: { path: socketPath, tls: false } })
+    : (0, redis_1.createClient)({ url: redisUrl });
 exports.client = client;
 client.on('error', (err) => console.error('[Redis Error]', err));
 let connected = false;

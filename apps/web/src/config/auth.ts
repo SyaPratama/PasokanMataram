@@ -31,7 +31,9 @@ export const authConfig: AuthConfig = authConfigSchema.parse({
   sessionExpiryDays: process.env.SESSION_EXPIRY_DAYS ? Number(process.env.SESSION_EXPIRY_DAYS) : 7,
   cookieName: 'pasok_session',
   cookieDomain: process.env.COOKIE_DOMAIN || 'localhost',
-  cookieSecure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production',
+  cookieSecure:
+    process.env.COOKIE_SECURE === 'true' ||
+    (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'false'),
   cookieHttpOnly: true,
   cookieSameSite: 'lax',
   argon2TimeCost: 2,

@@ -37,8 +37,8 @@ function generateLiveUserToken(macroRole: string, microRole: string, email: stri
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
-      userId: `usr_${microRole.toLowerCase()}_live`,
-      tenantId: `tenant_${macroRole.toLowerCase()}_live`,
+      userId: crypto.randomUUID(),
+      tenantId: crypto.randomUUID(),
       macroRole,
       microRole,
       isSuperAdmin: macroRole === 'SUPER_ADMIN',

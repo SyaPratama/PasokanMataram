@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { themeColors } from '@pasok/config';
+import { themeColors } from '@pasok/config/theme';
 import type { CommodityForecast, ForecastHorizon, PriceDataPoint } from '../../types/forecast';
 import { Calendar, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 
@@ -41,13 +41,17 @@ export function ForecastInteractiveChart({
       if (low < min) min = low;
       if (high > max) max = high;
     });
+    if (!Number.isFinite(min) || !Number.isFinite(max)) {
+      min = commodity.currentPrice;
+      max = commodity.currentPrice;
+    }
     const padding = (max - min) * 0.15 || 1000;
     return {
       minPrice: Math.max(0, Math.floor((min - padding) / 500) * 500),
       maxPrice: Math.ceil((max + padding) / 500) * 500,
       priceRange: (Math.ceil((max + padding) / 500) * 500) - Math.max(0, Math.floor((min - padding) / 500) * 500),
     };
-  }, [filteredData]);
+  }, [filteredData, commodity.currentPrice]);
 
   const svgWidth = 800;
   const svgHeight = 320;
@@ -61,7 +65,7 @@ export function ForecastInteractiveChart({
 
   const getX = React.useCallback(
     (index: number) => {
-      return padLeft + (index / (filteredData.length - 1)) * chartW;
+      return padLeft + (index / Math.max(1, filteredData.length - 1)) * chartW;
     },
     [filteredData.length, chartW]
   );

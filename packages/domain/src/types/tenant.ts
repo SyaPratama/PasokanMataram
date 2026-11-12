@@ -108,6 +108,8 @@ export type MicroRole =
   | 'FIELD_OPERATOR'
   | 'OPERATOR_QC'
   | 'SUPERVISOR_HUB'
+  | 'PROCUREMENT_MANAGER'
+  | 'KITCHEN_STAFF'
   | 'SUPER_ADMIN';
 
 /**
@@ -146,6 +148,8 @@ export function isMicroRole(value: unknown): value is MicroRole {
       'FIELD_OPERATOR',
       'OPERATOR_QC',
       'SUPERVISOR_HUB',
+      'PROCUREMENT_MANAGER',
+      'KITCHEN_STAFF',
       'SUPER_ADMIN',
     ].includes(value)
   );

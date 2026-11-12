@@ -55,6 +55,8 @@ interface InMemoryLock {
 
 const inMemoryStore = new Map<string, InMemoryLock>();
 
+const allowInMemoryFallback = process.env.NODE_ENV !== 'production';
+
 function purgeExpiredInMemoryLocks(): void {
   const now = Date.now();
   for (const [key, lock] of inMemoryStore.entries()) {
@@ -78,6 +80,9 @@ export async function acquireLock(
   const startTime = Date.now();
 
   const client = await getRedisClient();
+  if (!client && !allowInMemoryFallback) {
+    return null;
+  }
 
   while (Date.now() - startTime < waitTimeoutMs) {
     if (client) {
@@ -87,7 +92,7 @@ export async function acquireLock(
           return lockToken;
         }
       } catch {}
-    } else {
+    } else if (allowInMemoryFallback) {
       purgeExpiredInMemoryLocks();
       const current = inMemoryStore.get(lockKey);
       if (!current) {

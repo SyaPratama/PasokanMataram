@@ -196,12 +196,15 @@ export class TenantService {
     const tenantId = asTenantId(row.tenant_id);
     const userId = asUserId(row.id);
     const isSuperAdmin = row.role === 'SUPER_ADMIN';
+    const tenantType: string = row.tenant_type;
 
     const macroRole = isSuperAdmin
       ? 'SUPER_ADMIN'
-      : row.tenant_type === 'HOREKA_BUYER'
+      : tenantType === 'HOREKA_BUYER' || tenantType === 'HOREKA'
         ? 'HOREKA'
-        : 'GAPOKTAN';
+        : tenantType === 'HUB_OPERATOR' || tenantType === 'LOGISTICS_HUB'
+          ? 'HUB_OPERATOR'
+          : 'GAPOKTAN';
     const microRole = row.role;
 
     const tokenPayload = {

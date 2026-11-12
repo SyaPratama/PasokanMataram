@@ -13,6 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { resolveServerJwtSecret } from './jwt-secret';
 const BASE_URL = process.env.APP_URL || 'http://localhost:3000';
 const SCREENSHOTS_DIR = path.resolve(__dirname, '../screenshots');
 
@@ -39,16 +40,7 @@ function findChromeExecutable(): string {
  * Menghasilkan token sesi hermetis untuk simulasi otentikasi peran.
  */
 function getJwtSecret(): string {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  try {
-    const envLocalPath = path.resolve(__dirname, '../../apps/web/.env.local');
-    if (fs.existsSync(envLocalPath)) {
-      const match = fs.readFileSync(envLocalPath, 'utf-8').match(/^JWT_SECRET=(.+)$/m);
-      const secret = match?.[1];
-      if (secret) return secret.trim();
-    }
-  } catch {}
-  return 'pasokmataram-super-secret-jwt-key-min-32-chars';
+  return resolveServerJwtSecret();
 }
 
 function generateMockSessionToken(macroRole: string, microRole: string): string {
@@ -56,8 +48,8 @@ function generateMockSessionToken(macroRole: string, microRole: string): string 
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
-      userId: `usr_demo_${microRole.toLowerCase()}`,
-      tenantId: `tenant_demo_${macroRole.toLowerCase()}`,
+      userId: crypto.randomUUID(),
+      tenantId: crypto.randomUUID(),
       macroRole,
       microRole,
       isSuperAdmin: macroRole === 'SUPER_ADMIN',

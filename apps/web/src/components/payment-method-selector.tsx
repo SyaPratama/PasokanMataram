@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Check } from 'lucide-react';
-import { PAYMENT_METHODS, type PaymentMethod } from '@pasok/config';
+import { PAYMENT_METHODS, type PaymentMethod } from '@pasok/config/payment';
 
 export type { PaymentMethod };
 

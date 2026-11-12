@@ -48,7 +48,7 @@ describe.skipIf(isCI)('Authenticated User - Pooling Flow', () => {
     await page.waitForSelector('body', { timeout: 10000 });
     
     const content = await page.content();
-    expect(content).toContain('Dapur Bergabung');
+    expect(content).toContain('Belanja Bersama Pasokan Dapur Se-DIY');
   }, 30000);
 
   test('Pooling campaign card visible', async () => {
