@@ -153,10 +153,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create environment files
-        run: |
-          echo "${{ secrets.ENV_DEVELOPMENT }}" > apps/api/.env.development
-          echo "${{ secrets.ENV_PRODUCTION }}" > apps/api/.env.production
 
       - name: Bundle API with esbuild (compiled JS only, no TS sources)
         run: |
@@ -466,12 +462,19 @@ jobs:
           ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
 
       - name: Upload API build to server
+        env:
+          ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
         run: |
+          set -euo pipefail
+          umask 077
+          API_ENV="pasokmataram-api.env.production"
+          trap 'rm -f "$API_ENV"' EXIT
+          printf '%s\n' "$ENV_PRODUCTION" > "$API_ENV"
           SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
             if scp -P "$SSH_PORT" $SSH_OPTS \
-              api-build.tar.gz \
+              api-build.tar.gz "$API_ENV" \
               "$SSH_USER@$SSH_HOST:~/"; then
               echo "Upload succeeded."
               exit 0
@@ -500,6 +503,11 @@ jobs:
 
           tar -xzf ~/api-build.tar.gz -C "$API_PATH"
           rm -f ~/api-build.tar.gz
+          if [ -f ~/pasokmataram-api.env.production ]; then
+            mv ~/pasokmataram-api.env.production "$API_PATH/.env.production"
+          fi
+          test -s "$API_PATH/.env.production"
+          chmod 600 "$API_PATH/.env.production"
 
           if [ -f /tmp/preserved_api_htaccess ]; then
             if grep -q "CLOUDLINUX" /tmp/preserved_api_htaccess 2>/dev/null; then

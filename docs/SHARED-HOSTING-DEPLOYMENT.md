@@ -71,24 +71,23 @@ Di repository Settings → Secrets and variables → Actions, tambahkan:
 # SSH Credentials
 SSH_HOST: syapratama.tech
 SSH_USER: syaprata
-SSH_PASSWORD: your_ssh_password
-SSH_PORT: 21098
+SSH_PRIVATE_KEY: <OpenSSH private key content>
+SSH_KNOWN_HOSTS: <pinned ssh-keyscan output>
+SSH_PORT: 22
 
 # Deploy Paths
 WEB_DEPLOY_PATH: /home/syaprata/public_html
 API_DEPLOY_PATH: /home/syaprata/api
 
-# Environment Variables (Base64 encoded)
-ENV_PRODUCTION: <base64 encoded .env.production content>
-ENV_DEVELOPMENT: <base64 encoded .env.development content>
+# Environment Files (raw multiline content)
+ENV_PRODUCTION: <contents of .env.production>
+ENV_DEVELOPMENT: <contents of .env.development>
 ```
 
-**Generate ENV secrets**:
+**Set ENV secrets**:
 ```bash
-# Encode .env.production
-cat .env.production | base64 -w 0
-
-# Hasilnya paste ke GitHub Secret ENV_PRODUCTION
+gh secret set ENV_PRODUCTION < .env.production
+gh secret set ENV_DEVELOPMENT < .env.development
 ```
 
 #### Step 2: Workflow Sudah Configured
