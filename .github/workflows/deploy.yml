@@ -177,6 +177,7 @@ jobs:
           const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
           const primaryEnv = isDev ? '.env.development' : '.env.production';
           const fallbackEnv = isDev ? '.env.production' : '.env.development';
+          const runtimeOverrideKeys = new Set(['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']);
 
           function parseAndInjectEnv(filename) {
             const envFilePath = path.resolve(process.cwd(), filename);
@@ -193,7 +194,7 @@ jobs:
                 if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
                   val = val.slice(1, -1);
                 }
-                if (key && process.env[key] === undefined) {
+                if (key && (process.env[key] === undefined || runtimeOverrideKeys.has(key))) {
                   process.env[key] = val;
                 }
               }
@@ -463,13 +464,25 @@ jobs:
 
       - name: Upload API build to server
         env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT || '3306' }}
+          DB_USER: ${{ secrets.DB_USER }}
           ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
         run: |
           set -euo pipefail
           umask 077
           API_ENV="pasokmataram-api.env.production"
           trap 'rm -f "$API_ENV"' EXIT
-          printf '%s\n' "$ENV_PRODUCTION" > "$API_ENV"
+          {
+            printf '%s\n' "$ENV_PRODUCTION"
+            printf 'DB_HOST=%s\n' "$DB_HOST"
+            printf 'DB_PORT=%s\n' "$DB_PORT"
+            printf 'DB_USER=%s\n' "$DB_USER"
+            printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD"
+            printf 'DB_NAME=%s\n' "$DB_NAME"
+          } > "$API_ENV"
           SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."

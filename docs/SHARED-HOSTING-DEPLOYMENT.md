@@ -79,6 +79,13 @@ SSH_PORT: 22
 WEB_DEPLOY_PATH: /home/syaprata/public_html
 API_DEPLOY_PATH: /home/syaprata/api
 
+# Database Runtime
+DB_HOST: localhost
+DB_PORT: 3306
+DB_USER: <cPanel database user>
+DB_PASSWORD: <database password>
+DB_NAME: <cPanel database name>
+
 # Environment Files (raw multiline content)
 ENV_PRODUCTION: <contents of .env.production>
 ENV_DEVELOPMENT: <contents of .env.development>
