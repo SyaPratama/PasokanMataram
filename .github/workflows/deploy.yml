@@ -401,12 +401,6 @@ jobs:
           fi
 
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
-          if ! command -v pm2 >/dev/null 2>&1; then
-            echo "pm2 is required on the target host."
-            exit 1
-          fi
-          pm2 restart pasokmataram-web 2>/dev/null || pm2 start "$WEB_PATH/server.js" --name pasokmataram-web
-          pm2 save
 
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
@@ -532,12 +526,6 @@ jobs:
           fi
 
           mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
-          if ! command -v pm2 >/dev/null 2>&1; then
-            echo "pm2 is required on the target host."
-            exit 1
-          fi
-          pm2 restart pasokmataram-api 2>/dev/null || pm2 start "$API_PATH/server.js" --name pasokmataram-api
-          pm2 save
 
           echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
