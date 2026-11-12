@@ -117,6 +117,9 @@ export async function withTenantContext<T>(
     await client.query('ROLLBACK');
     throw error;
   } finally {
+    try {
+      await client.query('SET @current_tenant_id = NULL, @is_super_admin = NULL');
+    } catch {}
     client.release();
   }
 }

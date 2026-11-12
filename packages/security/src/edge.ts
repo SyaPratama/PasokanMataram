@@ -70,6 +70,8 @@ export function canAccessKitchenCOGS(microRole: MicroRole): boolean {
   return (
     microRole === 'HEAD_CHEF' ||
     microRole === 'PURCHASING' ||
+    microRole === 'PROCUREMENT_MANAGER' ||
+    microRole === 'KITCHEN_STAFF' ||
     microRole === 'OWNER' ||
     microRole === 'FINANCE'
   );
@@ -83,6 +85,7 @@ export function canRequestPoolAllocation(microRole: MicroRole): boolean {
   return (
     microRole === 'HEAD_CHEF' ||
     microRole === 'PURCHASING' ||
+    microRole === 'PROCUREMENT_MANAGER' ||
     microRole === 'OWNER' ||
     microRole === 'FINANCE'
   );

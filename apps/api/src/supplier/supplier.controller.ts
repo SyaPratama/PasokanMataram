@@ -139,6 +139,9 @@ export class SupplierController {
         message: 'Armada pengiriman berhasil diberangkatkan.',
       };
     } catch (err: unknown) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
       const message = err instanceof Error ? err.message : 'Gagal mencatat pengiriman.';
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

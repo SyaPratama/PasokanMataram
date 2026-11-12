@@ -31,13 +31,16 @@ export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 
 const rawDatabaseUrl = `mysql://${process.env.DB_USER || 'pasok_user'}:${process.env.DB_PASSWORD || 'Tama123'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3307}/${process.env.DB_NAME || 'pasokmataram_db'}`;
 
+const resolvedHost =
+  process.env.DB_HOST || (process.env.NODE_ENV === 'production' ? '127.0.0.1' : 'localhost');
+const isLoopbackHost = ['localhost', '127.0.0.1', '::1'].includes(resolvedHost);
 const sslEnabled =
   process.env.DB_SSL === 'true' ||
-  (process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false');
+  (process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false' && !isLoopbackHost);
 
 export const databaseConfig: DatabaseConfig = databaseConfigSchema.parse({
   connectionString: rawDatabaseUrl,
-  host: process.env.DB_HOST || (process.env.NODE_ENV === 'production' ? '127.0.0.1' : 'localhost'),
+  host: resolvedHost,
   port: process.env.DB_PORT ? Number(process.env.DB_PORT) : (process.env.NODE_ENV === 'production' ? 3306 : 3307),
   user: process.env.DB_USER || 'pasok_user',
   password: process.env.DB_PASSWORD || 'Tama123',

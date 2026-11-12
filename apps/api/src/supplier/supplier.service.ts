@@ -4,7 +4,7 @@
  * Enforces PostgreSQL 16 RLS multi-tenant isolation and domain invariants.
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { RowDataPacket } from 'mysql2';
 import type { SecurityContext } from '@pasok/domain';
@@ -155,6 +155,8 @@ export class SupplierService {
    * @returns Manifest surat jalan pengiriman.
    */
   public async dispatchDelivery(_context: SecurityContext, _dto: DispatchOrderDto): Promise<never> {
-    throw new Error('Penerbitan manifest belum didukung oleh skema basis data saat ini.');
+    throw new NotImplementedException(
+      'Penerbitan manifest pengiriman belum tersedia pada skema basis data saat ini.'
+    );
   }
 }

@@ -32,16 +32,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (event.type === 'payment.paid') {
       await query(
-        `UPDATE pooling_reservations 
-         SET status = 'PAID', paid_at = NOW() 
-         WHERE reference = ?`,
+        `UPDATE pool_reservations
+         SET status = 'PAID'
+         WHERE payment_reference = ?`,
         [event.reference]
       );
     } else if (event.type === 'payment.failed' || event.type === 'payment.expired') {
       await query(
-        `UPDATE pooling_reservations 
-         SET status = 'FAILED' 
-         WHERE reference = ?`,
+        `UPDATE pool_reservations
+         SET status = 'CANCELLED'
+         WHERE payment_reference = ?`,
         [event.reference]
       );
     }

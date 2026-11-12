@@ -62,75 +62,23 @@ export class PoolingService {
     const validated = CreateReservationSchema.parse(rawInput);
 
     return withQuotaLock(validated.campaignId, async () => {
-      try {
-        const { reservation, settlement } = await this.adapter.createReservation(
-          context,
-          validated
-        );
+      const { reservation, settlement } = await this.adapter.createReservation(
+        context,
+        validated
+      );
 
-        return {
-          reservation,
-          settlement,
-          paymentInstructions: {
-            bank: 'Bank BPD DIY',
-            accountName: 'ESCROW PASOKMATARAM BPD DIY',
-            vaNumber: reservation.vaNumber,
-            totalAmountRp: reservation.totalAmountRp,
-            expiryHours: 24,
-            mtvCompliant: true,
-          },
-        };
-      } catch {
-        const totalAmount = validated.quantityKg * validated.pricePerKg;
-        const vaSuffix = Math.floor(10000000 + Math.random() * 90000000);
-        const vaNumber = `988810${vaSuffix}`;
-        const paymentReference = `PAY-POOL-${Date.now()}`;
-        const reservationId = crypto.randomUUID();
-
-        const reservation: PoolReservationRow = {
-          id: reservationId,
-          campaignId: validated.campaignId,
-          buyerTenantId: context.tenantId,
-          quantityKg: validated.quantityKg,
-          pricePerKg: validated.pricePerKg,
-          totalAmountRp: totalAmount,
-          status: 'PENDING_PAYMENT',
-          deliveryAddress: validated.deliveryAddress,
-          vaNumber,
-          paymentReference,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        const platformFee = Math.round(totalAmount * 0.01);
-        const settlement: EscrowSettlementRow = {
-          id: crypto.randomUUID(),
-          reservationId,
-          supplierTenantId: context.tenantId,
-          buyerTenantId: context.tenantId,
-          grossAmountRp: totalAmount,
-          platformFeeRp: platformFee,
-          netDisbursementRp: totalAmount - platformFee,
-          status: 'ESCROW_LOCKED',
-          scheduledDisbursementAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          disputeRefundRp: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        return {
-          reservation,
-          settlement,
-          paymentInstructions: {
-            bank: 'Bank BPD DIY',
-            accountName: 'ESCROW PASOKMATARAM BPD DIY',
-            vaNumber,
-            totalAmountRp: totalAmount,
-            expiryHours: 24,
-            mtvCompliant: true,
-          },
-        };
-      }
+      return {
+        reservation,
+        settlement,
+        paymentInstructions: {
+          bank: 'Bank BPD DIY',
+          accountName: 'ESCROW PASOKMATARAM BPD DIY',
+          vaNumber: reservation.vaNumber,
+          totalAmountRp: reservation.totalAmountRp,
+          expiryHours: 24,
+          mtvCompliant: true,
+        },
+      };
     });
   }
 

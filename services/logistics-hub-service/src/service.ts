@@ -100,48 +100,43 @@ export class LogisticsHubService {
     context: SecurityContext,
     input: QcDisputeInput
   ): Promise<QcDisputeResolution> {
-    let computedRefundRp = input.refundAmountRp || 0;
+    const resData = await query<{
+      price_per_kg: string;
+      total_amount_rp: string;
+    }>(
+      `SELECT price_per_kg, total_amount_rp
+       FROM pool_reservations
+       WHERE id = ?`,
+      [input.reservationId]
+    );
 
-    try {
-      const resData = await query<{
-        price_per_kg: string;
-        total_amount_rp: string;
-      }>(
-        `SELECT price_per_kg, total_amount_rp
-         FROM pool_reservations
-         WHERE id = ?`,
-        [input.reservationId]
-      );
-
-      const reservationRow = resData.rows[0];
-      if (reservationRow && input.disputedDeficitKg && !input.refundAmountRp) {
-        const pricePerKg = Number(reservationRow.price_per_kg);
-        computedRefundRp = Math.round(input.disputedDeficitKg * pricePerKg);
-      }
-
-      await query(
-        `UPDATE escrow_settlements
-         SET status = 'HELD_DISPUTE',
-             dispute_reason = ?,
-             dispute_refund_rp = ?,
-             net_disbursement_rp = GREATEST(0, net_disbursement_rp - ?),
-             updated_at = NOW()
-         WHERE reservation_id = ?`,
-        [`[${input.disputeType}] ${input.description}`, computedRefundRp, computedRefundRp, input.reservationId]
-      );
-
-      await query(
-        `UPDATE pool_reservations
-         SET status = 'DISPUTED',
-             updated_at = NOW()
-         WHERE id = ?`,
-        [input.reservationId]
-      );
-    } catch {
-      if (input.disputedDeficitKg && !input.refundAmountRp) {
-        computedRefundRp = Math.round(input.disputedDeficitKg * 50000);
-      }
+    const reservationRow = resData.rows[0];
+    if (!reservationRow) {
+      throw new Error(`Reservasi ${input.reservationId} tidak ditemukan untuk dispute QC.`);
     }
+
+    const computedRefundRp =
+      input.refundAmountRp ??
+      (input.disputedDeficitKg
+        ? Math.round(input.disputedDeficitKg * Number(reservationRow.price_per_kg))
+        : 0);
+
+    await query(
+      `UPDATE escrow_settlements
+       SET status = 'HELD_DISPUTE',
+           dispute_reason = ?,
+           updated_at = NOW()
+       WHERE reservation_id = ?`,
+      [`[${input.disputeType}] ${input.description}`, input.reservationId]
+    );
+
+    await query(
+      `UPDATE pool_reservations
+       SET status = 'DISPUTED',
+           updated_at = NOW()
+       WHERE id = ?`,
+      [input.reservationId]
+    );
 
     return {
       reservationId: input.reservationId,

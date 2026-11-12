@@ -35,7 +35,9 @@ export class BuyerService {
       const [rows] = await client.query(
         `SELECT id, tenant_id, outlet_name, address, regency, phone_number, is_active, created_at
          FROM business_outlets
-         ORDER BY created_at DESC`
+         WHERE tenant_id = ?
+         ORDER BY created_at DESC`,
+        [context.tenantId]
       );
       return rows;
     });
@@ -77,7 +79,9 @@ export class BuyerService {
                 pr.created_at, pc.commodity_name, pc.temperature_zone
          FROM pool_reservations pr
          JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
-         ORDER BY pr.created_at DESC`
+         WHERE pr.buyer_tenant_id = ?
+         ORDER BY pr.created_at DESC`,
+        [context.tenantId]
       );
       return rows;
     });

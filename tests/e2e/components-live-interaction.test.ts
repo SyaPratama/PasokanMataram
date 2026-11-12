@@ -27,22 +27,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { resolveServerJwtSecret } from './jwt-secret';
 
 const BASE_URL = process.env.APP_URL || 'http://localhost:3000';
 const CHROME_PATH = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const CAPTURE_DIR = path.resolve(__dirname, '../screenshots/components');
 
 function getJwtSecret(): string {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
-  try {
-    const envLocalPath = path.resolve(__dirname, '../../apps/web/.env.local');
-    if (fs.existsSync(envLocalPath)) {
-      const match = fs.readFileSync(envLocalPath, 'utf-8').match(/^JWT_SECRET=(.+)$/m);
-      const secret = match?.[1];
-      if (secret) return secret.trim();
-    }
-  } catch {}
-  return 'rahasia-kunci-otentikasi-jwt-pasokmataram-local-dev-32chars';
+  return resolveServerJwtSecret();
 }
 
 function generateLiveToken(macroRole: string, microRole: string): string {
@@ -50,8 +42,8 @@ function generateLiveToken(macroRole: string, microRole: string): string {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
-      userId: `usr_${microRole.toLowerCase()}_component_test`,
-      tenantId: `tenant_${macroRole.toLowerCase()}_component_test`,
+      userId: crypto.randomUUID(),
+      tenantId: crypto.randomUUID(),
       macroRole,
       microRole,
       isSuperAdmin: macroRole === 'SUPER_ADMIN',
@@ -145,6 +137,7 @@ describe('Live Component Interaction & Visual Capture Test (Puppeteer)', { timeo
         await page.waitForSelector('body', { timeout: 10000 });
 
         // Cari tombol accordion spesifikasi
+        await page.waitForSelector('button[aria-expanded]', { timeout: 15000 });
         const accordionButtons = await page.$$('button[aria-expanded]');
         const firstAccordion = accordionButtons[0];
         if (!firstAccordion) {

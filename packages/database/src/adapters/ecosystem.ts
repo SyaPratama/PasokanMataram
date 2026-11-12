@@ -4,6 +4,7 @@
  * MySQL implementation with application-level multi-tenant isolation.
  */
 
+import { randomUUID } from 'node:crypto';
 import type mysql from 'mysql2/promise';
 import type {
   SecurityContext,
@@ -79,10 +80,31 @@ export interface EscrowSettlementRow {
   updatedAt: string;
 }
 
+type DatabaseRow = Record<string, unknown>;
+
+const PLATFORM_FEE_RATE = 0.01;
+
+function asText(value: unknown): string {
+  return value === null || value === undefined ? '' : String(value);
+}
+
+function asNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function asIsoDate(value: unknown, fallbackMs = 0): string {
+  if (value === null || value === undefined) {
+    return new Date(fallbackMs).toISOString();
+  }
+  const parsed = new Date(value as string | number | Date);
+  return Number.isNaN(parsed.getTime()) ? new Date(fallbackMs).toISOString() : parsed.toISOString();
+}
+
 export class MySQLEcosystemAdapter {
   public async listCampaigns(context: SecurityContext): Promise<PoolingCampaignRow[]> {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
-      const [rows] = await client.query<any[]>(
+      const [rows] = await client.query<mysql.RowDataPacket[]>(
         `SELECT id, supplier_tenant_id, commodity_name, commodity_category,
                 temperature_zone, target_quota_kg, allocated_quota_kg, price_per_kg,
                 min_order_kg, status, starts_at, ends_at, created_at, updated_at
@@ -90,21 +112,21 @@ export class MySQLEcosystemAdapter {
          ORDER BY created_at DESC`
       );
 
-      return rows.map((r: any) => ({
-        id: String(r.id),
-        supplierTenantId: String(r.supplier_tenant_id),
-        commodityName: String(r.commodity_name),
+      return rows.map((r) => ({
+        id: asText(r.id),
+        supplierTenantId: asText(r.supplier_tenant_id),
+        commodityName: asText(r.commodity_name),
         commodityCategory: r.commodity_category as CommodityCategory,
         temperatureZone: r.temperature_zone as TemperatureZone,
-        targetQuotaKg: Number(r.target_quota_kg),
-        allocatedQuotaKg: Number(r.allocated_quota_kg),
-        pricePerKg: Number(r.price_per_kg),
-        minOrderKg: Number(r.min_order_kg),
-        status: String(r.status),
-        startsAt: new Date(r.starts_at).toISOString(),
-        endsAt: new Date(r.ends_at).toISOString(),
-        createdAt: new Date(r.created_at).toISOString(),
-        updatedAt: new Date(r.updated_at).toISOString(),
+        targetQuotaKg: asNumber(r.target_quota_kg),
+        allocatedQuotaKg: asNumber(r.allocated_quota_kg),
+        pricePerKg: asNumber(r.price_per_kg),
+        minOrderKg: asNumber(r.min_order_kg),
+        status: asText(r.status),
+        startsAt: asIsoDate(r.starts_at),
+        endsAt: asIsoDate(r.ends_at),
+        createdAt: asIsoDate(r.created_at),
+        updatedAt: asIsoDate(r.updated_at),
       }));
     });
   }
@@ -116,7 +138,7 @@ export class MySQLEcosystemAdapter {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
       const totalAmount = input.quantityKg * input.pricePerKg;
 
-      const [campaignRows] = await client.query<any[]>(
+      const [campaignRows] = await client.query<mysql.RowDataPacket[]>(
         `SELECT id, supplier_tenant_id, target_quota_kg, allocated_quota_kg, status
          FROM pooling_campaigns WHERE id = ? FOR UPDATE`,
         [input.campaignId]
@@ -126,27 +148,27 @@ export class MySQLEcosystemAdapter {
       if (!campaign) {
         throw new Error('Campaign not found');
       }
-      const supplierTenantId = campaign.supplier_tenant_id || context.tenantId;
-
+      const supplierTenantId = asText(campaign.supplier_tenant_id) || context.tenantId;
+      const reservationId = randomUUID();
       const vaSuffix = Math.floor(10000000 + Math.random() * 90000000);
       const vaNumber = `988810${vaSuffix}`;
       const paymentReference = `PAY-POOL-${Date.now()}`;
 
-      const [resResult] = await client.query<any>(
+      await client.query(
         `INSERT INTO pool_reservations (
-           campaign_id, buyer_tenant_id, quantity_kg, price_per_kg,
+           id, campaign_id, buyer_tenant_id, quantity_kg, price_per_kg,
            total_amount_rp, status, delivery_address, va_number, payment_reference
-         ) VALUES (?, ?, ?, ?, ?, 'PENDING_PAYMENT', ?, ?, ?)`,
-        [input.campaignId, context.tenantId, input.quantityKg, input.pricePerKg,
+         ) VALUES (?, ?, ?, ?, ?, ?, 'PENDING_PAYMENT', ?, ?, ?)`,
+        [reservationId, input.campaignId, context.tenantId, input.quantityKg, input.pricePerKg,
          totalAmount, input.deliveryAddress, vaNumber, paymentReference]
       );
 
-      const [newReservation] = await client.query<any[]>(
+      const [newReservation] = await client.query<mysql.RowDataPacket[]>(
         `SELECT id, campaign_id, buyer_tenant_id, quantity_kg, price_per_kg,
                 total_amount_rp, status, delivery_address, va_number,
                 payment_reference, created_at, updated_at
          FROM pool_reservations WHERE id = ?`,
-        [resResult.insertId]
+        [reservationId]
       );
 
       const r = newReservation[0];
@@ -162,26 +184,20 @@ export class MySQLEcosystemAdapter {
         [input.quantityKg, input.campaignId]
       );
 
-      const platformFee = Math.round(totalAmount * 0.01);
-      const netDisbursement = totalAmount - platformFee;
-      const scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      const [settlementResult] = await client.query<any>(
+      const settlementId = randomUUID();
+      await client.query(
         `INSERT INTO escrow_settlements (
-           reservation_id, supplier_tenant_id, buyer_tenant_id,
-           gross_amount_rp, platform_fee_rp, net_disbursement_rp,
-           status, scheduled_disbursement_at
-         ) VALUES (?, ?, ?, ?, ?, ?, 'ESCROW_LOCKED', ?)`,
-        [r.id, supplierTenantId, context.tenantId, totalAmount, platformFee, netDisbursement, scheduledAt]
+           id, reservation_id, escrow_account_number, locked_amount_rp, status
+         ) VALUES (?, ?, ?, ?, 'ESCROW_LOCKED')`,
+        [settlementId, reservationId, vaNumber, totalAmount]
       );
 
-      const [newSettlement] = await client.query<any[]>(
-        `SELECT id, reservation_id, supplier_tenant_id, buyer_tenant_id,
-                gross_amount_rp, platform_fee_rp, net_disbursement_rp,
-                status, scheduled_disbursement_at, dispute_refund_rp,
+      const [newSettlement] = await client.query<mysql.RowDataPacket[]>(
+        `SELECT id, reservation_id, escrow_account_number, locked_amount_rp,
+                disbursed_amount_rp, status, locked_at, disbursed_at, dispute_reason,
                 created_at, updated_at
          FROM escrow_settlements WHERE id = ?`,
-        [settlementResult.insertId]
+        [settlementId]
       );
 
       const s = newSettlement[0];
@@ -190,11 +206,16 @@ export class MySQLEcosystemAdapter {
       }
 
       return {
-        reservation: this.mapReservation(r),
-        settlement: this.mapSettlement(s),
+        reservation: this.mapReservation(r as DatabaseRow),
+        settlement: {
+          ...this.mapSettlement(s as DatabaseRow),
+          supplierTenantId,
+          buyerTenantId: context.tenantId,
+        },
       };
     });
   }
+
   public async submitWeighing(context: SecurityContext, input: SubmitWeighingInput): Promise<WeighingVerificationRow> {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
       const tolerance = evaluateWeighingTolerance({
@@ -204,129 +225,147 @@ export class MySQLEcosystemAdapter {
         measuredTempCelsius: input.measuredTempCelsius,
         temperatureZone: input.temperatureZone,
       });
-
+      const weighingId = randomUUID();
       const weightDiff = tolerance.weightDifferenceKg;
       const deviationPercent = tolerance.shrinkagePercentage;
 
-      const [result] = await client.query<any>(
+      await client.query(
         `INSERT INTO weighing_verifications (
-           reservation_id, hub_station_id, declared_weight_kg, actual_weight_kg,
-           deviation_percent, tolerance_status, tera_inspector_nik, weighing_ticket_url
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+           id, reservation_id, hub_id, operator_id, commodity_category,
+           temperature_zone, measured_temp_celsius, manifest_weight_kg,
+           actual_weight_kg, weight_difference_kg, shrinkage_percentage,
+           tolerance_status
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
+          weighingId,
           input.reservationId,
           'HUB-DEFAULT',
+          context.userId,
+          input.commodityCategory,
+          input.temperatureZone,
+          input.measuredTempCelsius,
           input.manifestWeightKg,
           input.actualWeightKg,
+          weightDiff,
           deviationPercent,
           tolerance.toleranceStatus,
-          input.operatorId,
-          'https://weighing.placeholder/ticket'
         ]
       );
 
-      const [newRow] = await client.query<any[]>(
-        `SELECT id, reservation_id, hub_station_id, declared_weight_kg, actual_weight_kg,
-                deviation_percent, tolerance_status, tera_inspector_nik, weighing_ticket_url,
-                created_at, updated_at
+      const [newRow] = await client.query<mysql.RowDataPacket[]>(
+        `SELECT id, reservation_id, hub_id, manifest_weight_kg, actual_weight_kg,
+                shrinkage_percentage, tolerance_status, operator_id, created_at
          FROM weighing_verifications WHERE id = ?`,
-        [result.insertId]
+        [weighingId]
       );
 
-      return this.mapWeighing(newRow[0]);
+      const row = newRow[0];
+      if (!row) {
+        throw new Error('Failed to store weighing verification');
+      }
+
+      return {
+        id: asText(row.id),
+        reservationId: asText(row.reservation_id),
+        hubStationId: asText(row.hub_id),
+        declaredWeightKg: asNumber(row.manifest_weight_kg),
+        actualWeightKg: asNumber(row.actual_weight_kg),
+        deviationPercent: asNumber(row.shrinkage_percentage),
+        toleranceStatus: row.tolerance_status as WeighingToleranceStatus,
+        teraInspectorNik: asText(row.operator_id),
+        weighingTicketUrl: 'https://weighing.placeholder/ticket',
+        createdAt: asIsoDate(row.created_at),
+        updatedAt: asIsoDate(row.created_at),
+      };
     });
   }
 
   public async getSettlementStatus(context: SecurityContext, reservationId: string): Promise<EscrowSettlementRow | null> {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
-      const [rows] = await client.query<any[]>(
-        `SELECT id, reservation_id, supplier_tenant_id, buyer_tenant_id,
-                gross_amount_rp, platform_fee_rp, net_disbursement_rp,
-                status, scheduled_disbursement_at, dispute_refund_rp,
-                created_at, updated_at
-         FROM escrow_settlements
-         WHERE reservation_id = ?
+      const [rows] = await client.query<mysql.RowDataPacket[]>(
+        `SELECT es.id, es.reservation_id, es.escrow_account_number, es.locked_amount_rp,
+                es.disbursed_amount_rp, es.status, es.locked_at, es.disbursed_at,
+                es.dispute_reason, es.created_at, es.updated_at,
+                pr.buyer_tenant_id, pc.supplier_tenant_id
+         FROM escrow_settlements es
+         JOIN pool_reservations pr ON pr.id = es.reservation_id
+         JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+         WHERE es.reservation_id = ?
+           AND (pr.buyer_tenant_id = ? OR pc.supplier_tenant_id = ? OR ? = 1)
          LIMIT 1`,
-        [reservationId]
+        [reservationId, context.tenantId, context.tenantId, context.isSuperAdmin ? 1 : 0]
       );
-      return rows[0] ? this.mapSettlement(rows[0]) : null;
+      return rows[0] ? this.mapSettlement(rows[0] as DatabaseRow) : null;
     });
   }
 
   public async listReservations(context: SecurityContext): Promise<PoolReservationRow[]> {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
-      const [rows] = await client.query<any[]>(
-        `SELECT id, campaign_id, buyer_tenant_id, quantity_kg, price_per_kg,
-                total_amount_rp, status, delivery_address, va_number,
-                payment_reference, created_at, updated_at
-         FROM pool_reservations
-         ORDER BY created_at DESC`
+      const [rows] = await client.query<mysql.RowDataPacket[]>(
+        `SELECT pr.id, pr.campaign_id, pr.buyer_tenant_id, pr.quantity_kg, pr.price_per_kg,
+                pr.total_amount_rp, pr.status, pr.delivery_address, pr.va_number,
+                pr.payment_reference, pr.created_at, pr.updated_at
+         FROM pool_reservations pr
+         JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+         WHERE (pr.buyer_tenant_id = ? OR pc.supplier_tenant_id = ? OR ? = 1)
+         ORDER BY pr.created_at DESC`,
+        [context.tenantId, context.tenantId, context.isSuperAdmin ? 1 : 0]
       );
-      return rows.map((r: any) => this.mapReservation(r));
+      return rows.map((r) => this.mapReservation(r as DatabaseRow));
     });
   }
 
   public async listSettlements(context: SecurityContext): Promise<EscrowSettlementRow[]> {
     return withTenantContext(context, async (client: mysql.PoolConnection) => {
-      const [rows] = await client.query<any[]>(
-        `SELECT id, reservation_id, supplier_tenant_id, buyer_tenant_id,
-                gross_amount_rp, platform_fee_rp, net_disbursement_rp,
-                status, scheduled_disbursement_at, dispute_refund_rp,
-                created_at, updated_at
-         FROM escrow_settlements
-         ORDER BY created_at DESC`
+      const [rows] = await client.query<mysql.RowDataPacket[]>(
+        `SELECT es.id, es.reservation_id, es.escrow_account_number, es.locked_amount_rp,
+                es.disbursed_amount_rp, es.status, es.locked_at, es.disbursed_at,
+                es.dispute_reason, es.created_at, es.updated_at,
+                pr.buyer_tenant_id, pc.supplier_tenant_id
+         FROM escrow_settlements es
+         JOIN pool_reservations pr ON pr.id = es.reservation_id
+         JOIN pooling_campaigns pc ON pc.id = pr.campaign_id
+         WHERE (pr.buyer_tenant_id = ? OR pc.supplier_tenant_id = ? OR ? = 1)
+         ORDER BY es.created_at DESC`,
+        [context.tenantId, context.tenantId, context.isSuperAdmin ? 1 : 0]
       );
-      return rows.map((r: any) => this.mapSettlement(r));
+      return rows.map((r) => this.mapSettlement(r as DatabaseRow));
     });
   }
 
-  private mapReservation(r: any): PoolReservationRow {
+  private mapReservation(r: DatabaseRow): PoolReservationRow {
     return {
-      id: String(r.id),
-      campaignId: String(r.campaign_id),
-      buyerTenantId: String(r.buyer_tenant_id),
-      quantityKg: Number(r.quantity_kg),
-      pricePerKg: Number(r.price_per_kg),
-      totalAmountRp: Number(r.total_amount_rp),
+      id: asText(r.id),
+      campaignId: asText(r.campaign_id),
+      buyerTenantId: asText(r.buyer_tenant_id),
+      quantityKg: asNumber(r.quantity_kg),
+      pricePerKg: asNumber(r.price_per_kg),
+      totalAmountRp: asNumber(r.total_amount_rp),
       status: r.status as ReservationStatus,
-      deliveryAddress: String(r.delivery_address),
-      vaNumber: String(r.va_number),
-      paymentReference: String(r.payment_reference),
-      createdAt: new Date(r.created_at).toISOString(),
-      updatedAt: new Date(r.updated_at).toISOString(),
+      deliveryAddress: asText(r.delivery_address),
+      vaNumber: asText(r.va_number),
+      paymentReference: asText(r.payment_reference),
+      createdAt: asIsoDate(r.created_at),
+      updatedAt: asIsoDate(r.updated_at),
     };
   }
 
-  private mapSettlement(r: any): EscrowSettlementRow {
+  private mapSettlement(r: DatabaseRow): EscrowSettlementRow {
+    const gross = asNumber(r.locked_amount_rp);
+    const fee = Math.round(gross * PLATFORM_FEE_RATE);
     return {
-      id: String(r.id),
-      reservationId: String(r.reservation_id),
-      supplierTenantId: String(r.supplier_tenant_id),
-      buyerTenantId: String(r.buyer_tenant_id),
-      grossAmountRp: Number(r.gross_amount_rp),
-      platformFeeRp: Number(r.platform_fee_rp),
-      netDisbursementRp: Number(r.net_disbursement_rp),
+      id: asText(r.id),
+      reservationId: asText(r.reservation_id),
+      supplierTenantId: asText(r.supplier_tenant_id),
+      buyerTenantId: asText(r.buyer_tenant_id),
+      grossAmountRp: gross,
+      platformFeeRp: fee,
+      netDisbursementRp: gross - fee,
       status: r.status as SettlementStatus,
-      scheduledDisbursementAt: new Date(r.scheduled_disbursement_at).toISOString(),
-      disputeRefundRp: Number(r.dispute_refund_rp || 0),
-      createdAt: new Date(r.created_at).toISOString(),
-      updatedAt: new Date(r.updated_at).toISOString(),
-    };
-  }
-
-  private mapWeighing(r: any): WeighingVerificationRow {
-    return {
-      id: String(r.id),
-      reservationId: String(r.reservation_id),
-      hubStationId: String(r.hub_station_id),
-      declaredWeightKg: Number(r.declared_weight_kg),
-      actualWeightKg: Number(r.actual_weight_kg),
-      deviationPercent: Number(r.deviation_percent),
-      toleranceStatus: r.tolerance_status as WeighingToleranceStatus,
-      teraInspectorNik: String(r.tera_inspector_nik),
-      weighingTicketUrl: String(r.weighing_ticket_url),
-      createdAt: new Date(r.created_at).toISOString(),
-      updatedAt: new Date(r.updated_at).toISOString(),
+      scheduledDisbursementAt: asIsoDate(r.disbursed_at, Date.now() + 86400000),
+      disputeRefundRp: 0,
+      createdAt: asIsoDate(r.created_at),
+      updatedAt: asIsoDate(r.updated_at),
     };
   }
 }

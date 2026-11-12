@@ -584,7 +584,11 @@ jobs:
       - name: Health check API
         run: |
           sleep 15
-          curl --fail --location --silent --show-error --max-time 30 "${{ secrets.API_URL }}/health/db"
+          api_base="${{ secrets.API_URL }}"
+          api_base="${api_base%/}"
+          api_base="${api_base%/api/v1}"
+          api_base="${api_base%/}"
+          curl --fail --location --silent --show-error --max-time 30 "${api_base}/api/v1/health"
 
   summary:
     name: Deployment Summary

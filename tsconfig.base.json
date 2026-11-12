@@ -20,6 +20,8 @@
     "baseUrl": ".",
     "paths": {
       "@pasok/config": ["packages/config/src/index.ts"],
+      "@pasok/config/theme": ["packages/config/src/theme.ts"],
+      "@pasok/config/payment": ["packages/config/src/payment.ts"],
       "@pasok/domain": ["packages/domain/src/index.ts"],
       "@pasok/repository-contracts": ["packages/repository-contracts/src/index.ts"],
       "@pasok/security": ["packages/security/src/index.ts"],

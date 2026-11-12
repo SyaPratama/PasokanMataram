@@ -59,8 +59,8 @@ function generateMockSessionToken(macroRole: string, microRole: string): string 
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
-      userId: `usr_audit_${microRole.toLowerCase()}`,
-      tenantId: `tenant_audit_${macroRole.toLowerCase()}`,
+      userId: crypto.randomUUID(),
+      tenantId: crypto.randomUUID(),
       macroRole,
       microRole,
       isSuperAdmin: macroRole === 'SUPER_ADMIN',

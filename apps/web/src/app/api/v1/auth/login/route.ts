@@ -56,6 +56,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       parseResult.data.password
     );
 
+    const tenantType: string = tenant.tenantType;
+
     const response = NextResponse.json(
       {
         success: true,
@@ -65,7 +67,13 @@ export async function POST(request: Request): Promise<NextResponse> {
           businessName: tenant.businessName,
           userName: user.fullName,
           role: user.role,
-          macroRole: tenant.tenantType === 'HOREKA_BUYER' ? 'HOREKA' : 'GAPOKTAN',
+          macroRole: user.role === 'SUPER_ADMIN'
+            ? 'SUPER_ADMIN'
+            : tenantType === 'HOREKA_BUYER' || tenantType === 'HOREKA'
+              ? 'HOREKA'
+              : tenantType === 'HUB_OPERATOR' || tenantType === 'LOGISTICS_HUB'
+                ? 'HUB_OPERATOR'
+                : 'GAPOKTAN',
           sessionToken,
         },
         sessionToken,
@@ -73,14 +81,20 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       { status: 200 }
     );
+    const isSecureRequest =
+      request.headers.get('x-forwarded-proto') === 'https' ||
+      new URL(request.url).protocol === 'https:';
     const cookieOptions = getSessionCookieOptions();
-    response.cookies.set(cookieOptions.name, sessionToken, cookieOptions);
+    response.cookies.set(cookieOptions.name, sessionToken, {
+      ...cookieOptions,
+      secure: cookieOptions.secure && isSecureRequest,
+    });
 
     const xsrfToken = crypto.randomBytes(32).toString('hex');
     response.cookies.set('XSRF-TOKEN', xsrfToken, {
       httpOnly: false,
       sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
+      secure: isSecureRequest,
       path: '/',
     });
 

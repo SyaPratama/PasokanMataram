@@ -31,10 +31,20 @@ export class SettlementService {
 
   public async markReservationPaid(reservationId: string, invoiceId: string): Promise<void> {
     await query(
-      `UPDATE pooling_reservations 
-       SET status = 'PAID', payment_invoice_id = ?, paid_at = NOW() 
+      `UPDATE pool_reservations
+       SET status = 'PAID',
+           updated_at = NOW()
        WHERE id = ?`,
-      [invoiceId, reservationId]
+      [reservationId]
+    );
+
+    await query(
+      `UPDATE payment_invoices
+       SET status = 'PAID',
+           paid_at = NOW(),
+           updated_at = NOW()
+       WHERE id = ? OR external_invoice_id = ?`,
+      [invoiceId, invoiceId]
     );
   }
 }
