@@ -238,7 +238,6 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
       SSH_USER: ${{ secrets.SSH_USER }}
-      SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
       - name: Download web build
@@ -246,15 +245,18 @@ jobs:
         with:
           name: web-build
 
-      - name: Install sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Configure pinned SSH host key
+      - name: Configure SSH credentials
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p "$HOME/.ssh"
-          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/known_hosts" "$HOME/.ssh/deploy_key"
           test -s "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/deploy_key" >/dev/null
 
       - name: Extract web build on server
         env:
@@ -409,13 +411,13 @@ jobs:
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
-          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3 4 5; do
             echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
-            if ! sshpass -e scp -P "$SSH_PORT" $SSH_OPTS \
+            if ! scp -P "$SSH_PORT" $SSH_OPTS \
               web-build.tar.gz "$DB_CONFIG" "$SSH_USER@$SSH_HOST:~/"; then
               echo "Artifact upload attempt $i failed."
-            elif sshpass -e ssh -p "$SSH_PORT" $SSH_OPTS \
+            elif ssh -p "$SSH_PORT" $SSH_OPTS \
               "$SSH_USER@$SSH_HOST" "bash -l -s -- $DB_STRICT" < deploy-web-remote.sh; then
               echo "Web deploy completed on target host."
               exit 0
@@ -449,7 +451,6 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
       SSH_USER: ${{ secrets.SSH_USER }}
-      SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
       - name: Download API build
@@ -457,22 +458,25 @@ jobs:
         with:
           name: api-build
 
-      - name: Install sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Configure pinned SSH host key
+      - name: Configure SSH credentials
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p "$HOME/.ssh"
-          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/known_hosts" "$HOME/.ssh/deploy_key"
           test -s "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/deploy_key" >/dev/null
 
       - name: Upload API build to server
         run: |
-          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."
-            if sshpass -e scp -P "$SSH_PORT" $SSH_OPTS \
+            if scp -P "$SSH_PORT" $SSH_OPTS \
               api-build.tar.gz \
               "$SSH_USER@$SSH_HOST:~/"; then
               echo "Upload succeeded."
@@ -538,11 +542,11 @@ jobs:
           echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
-          SSH_OPTS="-o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           trap 'rm -f deploy-api-remote.sh' EXIT
           for i in 1 2 3 4 5; do
             echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
-            if sshpass -e ssh -p "$SSH_PORT" $SSH_OPTS \
+            if ssh -p "$SSH_PORT" $SSH_OPTS \
               "$SSH_USER@$SSH_HOST" "bash -l" < deploy-api-remote.sh; then
               echo "API deploy completed on target host."
               exit 0
