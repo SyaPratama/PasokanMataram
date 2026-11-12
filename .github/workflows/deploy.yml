@@ -156,12 +156,12 @@ jobs:
 
       - name: Bundle API with esbuild (compiled JS only, no TS sources)
         run: |
-          npx esbuild apps/api/src/main.ts --bundle --platform=node --target=node20 --format=esm --external:argon2 --external:@nestjs/microservices --external:@nestjs/microservices/* --external:@nestjs/websockets/* --outfile=apps/api/dist/main.js
+          npx esbuild apps/api/src/main.ts --bundle --platform=node --target=node20 --format=cjs --external:argon2 --external:@nestjs/microservices --external:@nestjs/microservices/* --external:@nestjs/websockets/* --outfile=apps/api/dist/main.cjs
 
       - name: Package API build (artifacts only, no TS sources)
         run: |
           mkdir -p api-dist/dist
-          cp apps/api/dist/main.js api-dist/dist/
+          cp apps/api/dist/main.cjs api-dist/dist/
           cat << 'SERVER_JS_EOF' > api-dist/server.js
           import fs from 'fs';
           import path from 'path';
@@ -214,7 +214,7 @@ jobs:
 
           process.env.NODE_ENV = isDev ? 'development' : 'production';
 
-          import('./dist/main.js');
+          import('./dist/main.cjs');
           SERVER_JS_EOF
           cp api-dist/server.js api-dist/app.js
           cat << 'PACKAGE_JSON_EOF' > api-dist/package.json
@@ -584,7 +584,7 @@ jobs:
       - name: Health check API
         run: |
           sleep 15
-          curl --fail --silent --show-error --max-time 10 "${{ secrets.API_URL }}/health"
+          curl --fail --location --silent --show-error --max-time 30 "${{ secrets.API_URL }}/health/db"
 
   summary:
     name: Deployment Summary
