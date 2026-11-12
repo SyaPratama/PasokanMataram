@@ -156,7 +156,7 @@ jobs:
 
       - name: Bundle API with esbuild (compiled JS only, no TS sources)
         run: |
-          npx esbuild apps/api/src/main.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=apps/api/dist/main.js
+          npx esbuild apps/api/src/main.ts --bundle --platform=node --target=node20 --format=esm --external:argon2 --external:@nestjs/microservices --external:@nestjs/microservices/* --external:@nestjs/websockets/* --outfile=apps/api/dist/main.js
 
       - name: Package API build (artifacts only, no TS sources)
         run: |
@@ -214,8 +214,17 @@ jobs:
           import('./dist/main.js');
           SERVER_JS_EOF
           cp api-dist/server.js api-dist/app.js
-          cp apps/api/package.json api-dist/
-          cp -r node_modules api-dist/
+          cat << 'PACKAGE_JSON_EOF' > api-dist/package.json
+          {
+            "name": "@pasok/api-runtime",
+            "private": true,
+            "type": "module",
+            "dependencies": {
+              "argon2": "^0.41.1"
+            }
+          }
+          PACKAGE_JSON_EOF
+          npm install --prefix api-dist --omit=dev --no-audit --no-fund
           cd api-dist
           tar -czf ../api-build.tar.gz .
 

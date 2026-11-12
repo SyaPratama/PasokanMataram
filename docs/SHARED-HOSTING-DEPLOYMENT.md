@@ -103,7 +103,7 @@ File `.github/workflows/deploy.yml` sudah ada:
 
 **Jobs**:
 1. `build-web` - Build Next.js standalone
-2. `build-api` - Bundle NestJS dengan esbuild
+2. `build-api` - Bundle NestJS dan workspace internal dengan esbuild; paketkan hanya dependency native produksi
 3. `deploy-web` - Upload & extract ke public_html
 4. `deploy-api` - Upload & extract ke api/
 
