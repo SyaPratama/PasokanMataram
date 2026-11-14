@@ -463,6 +463,13 @@ jobs:
           fi
 
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
+          echo "Runtime user: $(id -un)"
+          echo "Node procs: $(ps -u "$(id -un)" -o pid,etime,cmd 2>/dev/null | grep -c 'server.js' || true)"
+          ps -u "$(id -un)" -o pid,etime,cmd 2>/dev/null | grep 'server.js' | head -3 || true
+          echo "Env keys: $(cut -d= -f1 "$web_env_file" 2>/dev/null | tr '\n' ' ' | cut -c1-400)"
+          echo "Web root first entries: $(ls -1 "$WEB_PATH" 2>/dev/null | head -20 | tr '\n' ' ')"
+          echo "Node available: $(command -v node || echo no)"
+          echo "Pasok logs: $(ls -1 "$HOME/logs" 2>/dev/null | grep -i pasok | head -5 | tr '\n' ' ' || true)"
 
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
