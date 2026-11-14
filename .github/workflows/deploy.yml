@@ -392,6 +392,10 @@ jobs:
 
           tar -xzf ~/web-build.tar.gz -C "$WEB_PATH"
           rm -f ~/web-build.tar.gz
+          web_env_file="$WEB_PATH/.env.production"
+          if ! grep -qE '^[[:space:]]*REDIS_(SOCKET|URL)=' "$web_env_file" 2>/dev/null; then
+            echo "::warning::$web_env_file tidak mendefinisikan REDIS_SOCKET atau REDIS_URL; cache, antrean, dan lock akan memakai fallback in-memory atau fail-closed sampai env dilengkapi."
+          fi
           if [ -f /tmp/preserved_web_htaccess ]; then
             if grep -q "CLOUDLINUX" /tmp/preserved_web_htaccess 2>/dev/null; then
               cat /tmp/preserved_web_htaccess > "$WEB_PATH/.htaccess"
