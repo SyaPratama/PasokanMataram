@@ -469,6 +469,7 @@ jobs:
             echo "::warning::Web files were deployed WITHOUT applying schema and taxonomy (database step skipped)."
           fi
 
+          find "$WEB_PATH" -type d -path '*/node_modules/argon2/build' -prune -exec rm -rf {} + 2>/dev/null || true
           app_node="$(ls -1d "$HOME"/nodevenv/pasokmataram/*/bin/node 2>/dev/null | head -1 || true)"
           [ -n "$app_node" ] || app_node="$(ls -1d "$HOME"/nodevenv/*/*/bin/node 2>/dev/null | head -1 || true)"
           echo "App node: ${app_node:-none}"
