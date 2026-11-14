@@ -308,7 +308,15 @@ jobs:
           set -euo pipefail
           umask 077
           DB_CONFIG="pasokmataram-db.cnf"
-          trap 'rm -f "$DB_CONFIG" deploy-web-remote.sh' EXIT
+          WEB_ENV_DB="web-env-db.fragment"
+          trap 'rm -f "$DB_CONFIG" "$WEB_ENV_DB" deploy-web-remote.sh' EXIT
+          {
+            printf 'DB_HOST=%s\n' "$DB_HOST"
+            printf 'DB_PORT=%s\n' "$DB_PORT"
+            printf 'DB_USER=%s\n' "$DB_USER"
+            printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD"
+            printf 'DB_NAME=%s\n' "$DB_NAME"
+          } > "$WEB_ENV_DB"
           DB_CONFIG="$DB_CONFIG" node --input-type=commonjs <<'MYSQL_CONFIG'
           const fs = require('node:fs');
           const option = (name) => {
@@ -336,7 +344,7 @@ jobs:
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           DB_CONFIG="$HOME/pasokmataram-db.cnf"
           DB_ERROR="$(mktemp)"
-          trap 'rm -f "$DB_CONFIG" "$DB_ERROR"' EXIT
+          trap 'rm -f "$DB_CONFIG" "$DB_ERROR" "$HOME/web-env-db.fragment"' EXIT
 
           # Any database problem: warn and skip DB steps, or stop (exit 78) in strict mode.
           db_problem() {
@@ -396,39 +404,17 @@ jobs:
           if ! grep -qE '^[[:space:]]*REDIS_(SOCKET|URL)=' "$web_env_file" 2>/dev/null; then
             echo "::warning::$web_env_file tidak mendefinisikan REDIS_SOCKET atau REDIS_URL; cache, antrean, dan lock akan memakai fallback in-memory atau fail-closed sampai env dilengkapi."
           fi
-          if [ -f "$HOME/pasokmataram-db.cnf" ]; then
-            DB_CNF="$HOME/pasokmataram-db.cnf" NODE_ENV_FILE="$web_env_file" node <<'NODE_ENV_SYNC'
-          const fs = require('fs');
-          const cnfPath = process.env.DB_CNF;
-          const envPath = process.env.NODE_ENV_FILE;
-          const parseOption = (raw) => {
-            const value = raw.trim();
-            if (value.startsWith('"') && value.endsWith('"')) {
-              return value.slice(1, -1).replaceAll('\\"', '"').replaceAll('\\\\', '\\');
-            }
-            return value;
-          };
-          const options = {};
-          for (const line of fs.readFileSync(cnfPath, 'utf8').split(/\r?\n/)) {
-            const match = /^([A-Za-z_]+)=(.*)$/.exec(line);
-            if (match) options[match[1]] = parseOption(match[2]);
-          }
-          const mapping = [
-            ['DB_HOST', 'host'],
-            ['DB_PORT', 'port'],
-            ['DB_USER', 'user'],
-            ['DB_PASSWORD', 'password'],
-            ['DB_NAME', 'database'],
-          ];
-          const existing = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8').split(/\r?\n/) : [];
-          const kept = existing.filter((line) => !/^\s*DB_(HOST|PORT|USER|PASSWORD|NAME)=/.test(line));
-          while (kept.length > 0 && kept[kept.length - 1] === '') kept.pop();
-          for (const [key, source] of mapping) {
-            if (!options[source]) throw new Error(`Missing ${source} in ${cnfPath}`);
-            kept.push(`${key}=${options[source]}`);
-          }
-          fs.writeFileSync(envPath, `${kept.join('\n')}\n`);
-          NODE_ENV_SYNC
+          if [ -f "$HOME/web-env-db.fragment" ]; then
+            if [ -f "$web_env_file" ]; then
+              synced_env="$(mktemp)"
+              grep -vE '^[[:space:]]*DB_(HOST|PORT|USER|PASSWORD|NAME)=' "$web_env_file" > "$synced_env" || true
+              cat "$HOME/web-env-db.fragment" >> "$synced_env"
+              mv "$synced_env" "$web_env_file"
+            else
+              cp "$HOME/web-env-db.fragment" "$web_env_file"
+            fi
+            rm -f "$HOME/web-env-db.fragment"
+            chmod 600 "$web_env_file"
             echo "Web .env.production DB_* lines synchronized from deploy secrets."
           fi
           if [ -f /tmp/preserved_web_htaccess ]; then
@@ -483,7 +469,7 @@ jobs:
           for i in 1 2 3 4 5; do
             echo "Remote deploy attempt $i of 5 on port ${{ env.SSH_PORT }}..."
             if ! scp -P "$SSH_PORT" $SSH_OPTS \
-              web-build.tar.gz "$DB_CONFIG" "$SSH_USER@$SSH_HOST:~/"; then
+              web-build.tar.gz "$DB_CONFIG" "$WEB_ENV_DB" "$SSH_USER@$SSH_HOST:~/"; then
               echo "Artifact upload attempt $i failed."
             elif ssh -p "$SSH_PORT" $SSH_OPTS \
               "$SSH_USER@$SSH_HOST" "bash -l -s -- $DB_STRICT" < deploy-web-remote.sh; then
