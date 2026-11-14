@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server';
 import { LoginSchema } from '@/lib/validations/auth-schemas';
 import { TenantService } from '@/services/tenant-service';
 import { getSessionCookieOptions } from '@/lib/auth';
-import { loginRateLimiter, checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit';
 import crypto from 'crypto';
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const isLocal = ip === '127.0.0.1' || ip === 'localhost' || ip === '::1';
     const maxAttempts = isLocal ? 100 : 5;
     try {
-      const rateResult = await checkRateLimit(`login:${ip}`, loginRateLimiter, maxAttempts);
+      const rateResult = await checkRateLimit(`login:${ip}`, maxAttempts);
       if (!rateResult.success) {
         return NextResponse.json(
           {
