@@ -396,6 +396,41 @@ jobs:
           if ! grep -qE '^[[:space:]]*REDIS_(SOCKET|URL)=' "$web_env_file" 2>/dev/null; then
             echo "::warning::$web_env_file tidak mendefinisikan REDIS_SOCKET atau REDIS_URL; cache, antrean, dan lock akan memakai fallback in-memory atau fail-closed sampai env dilengkapi."
           fi
+          if [ -f "$HOME/pasokmataram-db.cnf" ]; then
+            DB_CNF="$HOME/pasokmataram-db.cnf" NODE_ENV_FILE="$web_env_file" node <<'NODE_ENV_SYNC'
+          const fs = require('fs');
+          const cnfPath = process.env.DB_CNF;
+          const envPath = process.env.NODE_ENV_FILE;
+          const parseOption = (raw) => {
+            const value = raw.trim();
+            if (value.startsWith('"') && value.endsWith('"')) {
+              return value.slice(1, -1).replaceAll('\\"', '"').replaceAll('\\\\', '\\');
+            }
+            return value;
+          };
+          const options = {};
+          for (const line of fs.readFileSync(cnfPath, 'utf8').split(/\r?\n/)) {
+            const match = /^([A-Za-z_]+)=(.*)$/.exec(line);
+            if (match) options[match[1]] = parseOption(match[2]);
+          }
+          const mapping = [
+            ['DB_HOST', 'host'],
+            ['DB_PORT', 'port'],
+            ['DB_USER', 'user'],
+            ['DB_PASSWORD', 'password'],
+            ['DB_NAME', 'database'],
+          ];
+          const existing = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8').split(/\r?\n/) : [];
+          const kept = existing.filter((line) => !/^\s*DB_(HOST|PORT|USER|PASSWORD|NAME)=/.test(line));
+          while (kept.length > 0 && kept[kept.length - 1] === '') kept.pop();
+          for (const [key, source] of mapping) {
+            if (!options[source]) throw new Error(`Missing ${source} in ${cnfPath}`);
+            kept.push(`${key}=${options[source]}`);
+          }
+          fs.writeFileSync(envPath, `${kept.join('\n')}\n`);
+          NODE_ENV_SYNC
+            echo "Web .env.production DB_* lines synchronized from deploy secrets."
+          fi
           if [ -f /tmp/preserved_web_htaccess ]; then
             if grep -q "CLOUDLINUX" /tmp/preserved_web_htaccess 2>/dev/null; then
               cat /tmp/preserved_web_htaccess > "$WEB_PATH/.htaccess"
