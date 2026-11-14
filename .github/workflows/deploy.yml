@@ -480,11 +480,12 @@ jobs:
             echo "::warning::Web files were deployed WITHOUT applying schema and taxonomy (database step skipped)."
           fi
 
-          app_node="$(ls -1d "$HOME"/nodevenv/*/*/bin/node 2>/dev/null | head -1 || true)"
+          app_node="$(ls -1d "$HOME"/nodevenv/pasokmataram/*/bin/node 2>/dev/null | head -1 || true)"
+          [ -n "$app_node" ] || app_node="$(ls -1d "$HOME"/nodevenv/*/*/bin/node 2>/dev/null | head -1 || true)"
           echo "App node: ${app_node:-none}"
           if [ -n "$app_node" ]; then
-            echo "App node version: $("$app_node" -v 2>&1)"
-            app_probe="$(cd "$WEB_PATH" && "$app_node" -e "console.log(require.resolve('argon2')); require('argon2').hash('x').then(()=>console.log('argon2-ok')).catch((e)=>console.log('argon2-fail', e.message))" 2>&1 | tail -4)"
+            echo "App node version: $("$app_node" -v 2>&1 || true)"
+            app_probe="$(cd "$WEB_PATH" && "$app_node" -e "try { console.log('resolve', require.resolve('argon2')); require('argon2').hash('x').then(()=>console.log('argon2-ok')).catch((e)=>console.log('argon2-fail', e.message)); } catch (e) { console.log('argon2-throw', e.message); }" 2>&1 | tail -4 || true)"
             echo "Argon2 probe: $app_probe"
           fi
           : > "$WEB_PATH/stderr.log" 2>/dev/null || true
