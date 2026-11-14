@@ -47,14 +47,13 @@ function checkMemoryLimit(identifier: string, limit: number, windowMs: number): 
 async function getReadyClient() {
   if (!redis) return null;
   if (redis.status === 'ready') return redis;
-  if (redis.status === 'wait') {
-    try {
-      await redis.connect();
-    } catch {
-      return null;
-    }
+  if (redis.status !== 'wait') return null;
+  try {
+    await redis.connect();
+  } catch {
+    return null;
   }
-  return redis.status === 'ready' ? redis : null;
+  return redis;
 }
 
 /**
