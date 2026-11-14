@@ -73,6 +73,11 @@ jobs:
         run: |
           mkdir -p web-dist
           cp -r apps/web/.next/standalone/* web-dist/
+          mkdir -p web-dist/node_modules
+          cp -r node_modules/argon2 web-dist/node_modules/
+          find apps/web/.next/standalone -path '*argon2*' | head -10
+          ls -1 web-dist/node_modules/argon2/prebuilds/linux-x64 2>/dev/null || echo "no linux-x64 prebuilds"
+          ls -1 web-dist/node_modules/argon2/build/Release 2>/dev/null || echo "no argon2 build/Release"
           mkdir -p web-dist/apps/web/.next
           cp -r apps/web/.next/static web-dist/apps/web/.next/
           cp -r apps/web/public web-dist/apps/web/
@@ -264,6 +269,8 @@ jobs:
           }
           PACKAGE_JSON_EOF
           npm install --prefix api-dist --omit=dev --no-audit --no-fund
+          npm rebuild --prefix api-dist argon2 --build-from-source
+          ls -1 api-dist/node_modules/argon2/build/Release 2>/dev/null || echo "no argon2 build/Release (api)"
           cd api-dist
           tar -czf ../api-build.tar.gz .
 
