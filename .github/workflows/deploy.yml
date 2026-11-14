@@ -480,6 +480,14 @@ jobs:
             echo "::warning::Web files were deployed WITHOUT applying schema and taxonomy (database step skipped)."
           fi
 
+          app_node="$(ls -1d "$HOME"/nodevenv/*/*/bin/node 2>/dev/null | head -1 || true)"
+          echo "App node: ${app_node:-none}"
+          if [ -n "$app_node" ]; then
+            echo "App node version: $("$app_node" -v 2>&1)"
+            app_probe="$(cd "$WEB_PATH" && "$app_node" -e "console.log(require.resolve('argon2')); require('argon2').hash('x').then(()=>console.log('argon2-ok')).catch((e)=>console.log('argon2-fail', e.message))" 2>&1 | tail -4)"
+            echo "Argon2 probe: $app_probe"
+          fi
+          : > "$WEB_PATH/stderr.log" 2>/dev/null || true
           mkdir -p "$WEB_PATH/tmp" && touch "$WEB_PATH/tmp/restart.txt"
           echo "Runtime user: $(id -un)"
           echo "Node procs: $(ps -u "$(id -un)" -o pid,etime,cmd 2>/dev/null | grep -c 'server.js' || true)"
