@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   build-web:
@@ -32,6 +32,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Rebuild argon2 against the target Node ABI
+        run: |
+          npm rebuild argon2 --build-from-source
+          ls -1 node_modules/argon2/prebuilds/linux-x64 2>/dev/null || true
 
       - name: Create environment files
         run: |
@@ -152,6 +157,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Rebuild argon2 against the target Node ABI
+        run: |
+          npm rebuild argon2 --build-from-source
+          ls -1 node_modules/argon2/prebuilds/linux-x64 2>/dev/null || true
 
 
       - name: Bundle API with esbuild (compiled JS only, no TS sources)
