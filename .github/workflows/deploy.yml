@@ -166,7 +166,6 @@ jobs:
           PORT=3099 \
           HOST=127.0.0.1 \
           JWT_SECRET="$(openssl rand -hex 32)" \
-          REDIS_URL=redis://127.0.0.1:6379 \
           DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=smoke DB_PASSWORD=smoke DB_NAME=smoke DB_SSL=false \
           node apps/api/dist/main.cjs > "$API_SMOKE_LOG" 2>&1 &
           API_PID=$!
