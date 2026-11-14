@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   appConfig,
   databaseConfig,
@@ -41,7 +41,6 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
   });
 
   it('memvalidasi cache configuration (Redis lock TTL)', () => {
-    expect(cacheConfig.url).toMatch(/^(redis|unix):\/\//);
     expect(cacheConfig.defaultLockTtlSeconds).toBe(10);
     expect(cacheConfig.keyPrefix).toBe('pasokmataram:');
   });
@@ -61,6 +60,26 @@ describe('Centralized Configuration Architecture (Prinsip IX Konstitusi)', () =>
     expect(kybRulesConfig.maxFileSizeBytes).toBe(5 * 1024 * 1024);
   });
 
+
+  it('menurunkan URL TLS Upstash hanya dari kredensial REST', async () => {
+    vi.resetModules();
+    vi.stubEnv('UPSTASH_REDIS_REST_URL', 'https://unit-test.upstash.io');
+    vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '');
+    try {
+      const unconfigured = await import('@pasok/config');
+      expect(unconfigured.cacheConfig.url).toBe('');
+
+      vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', 'tok en/valu');
+      vi.resetModules();
+      const configured = await import('@pasok/config');
+      expect(configured.cacheConfig.url).toBe(
+        'rediss://default:tok%20en%2Fvalu@unit-test.upstash.io:6379'
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
+  });
 
   it('memvalidasi theme colors tokens', () => {
     expect(themeColors.primer.DEFAULT).toBe('#2E5339');

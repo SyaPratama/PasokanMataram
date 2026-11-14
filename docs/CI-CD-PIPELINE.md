@@ -212,15 +212,17 @@ WEB_DEPLOY_PATH=/home/syaprata/public_html
 API_DEPLOY_PATH=/home/syaprata/api
 ```
 
-**Environment Files** (Base64 encoded):
+**Environment Files** (multiline mentah, bukan base64):
 ```bash
-# Generate
-cat apps/web/.env.production | base64 -w 0 > web_env.txt
-cat apps/api/.env.production | base64 -w 0 > api_env.txt
+gh secret set ENV_PRODUCTION < apps/web/.env.production
+gh secret set ENV_DEVELOPMENT < apps/web/.env.development
+```
 
-# Add ke GitHub Secrets
-ENV_PRODUCTION=<paste hasil base64>
-ENV_DEVELOPMENT=<paste hasil base64 dev>
+`ENV_PRODUCTION` dan `ENV_DEVELOPMENT` WAJIB memuat kredensial Upstash Redis. Pipeline menolak build bila tidak ada:
+
+```text
+UPSTASH_REDIS_REST_URL=https://<database>.upstash.io
+UPSTASH_REDIS_REST_TOKEN=<rest token>
 ```
 
 ### Setting up Secrets

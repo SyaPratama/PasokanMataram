@@ -1,6 +1,6 @@
 /**
  * @file packages/cache/src/index.ts
- * @description Redis caching layer with tenant-scoped keys
+ * @description Upstash Redis caching layer with tenant-scoped keys
  */
 declare const client: import("@redis/client").RedisClientType<{
     graph: {
@@ -291,7 +291,7 @@ declare const client: import("@redis/client").RedisClientType<{
         RESERVE: typeof import("@redis/bloom/dist/commands/top-k/RESERVE");
         reserve: typeof import("@redis/bloom/dist/commands/top-k/RESERVE");
     };
-} & import("redis").RedisModules, import("redis").RedisFunctions, import("redis").RedisScripts>;
+} & import("redis").RedisModules, import("redis").RedisFunctions, import("redis").RedisScripts> | null;
 export declare function get(key: string): Promise<string | null>;
 export declare function set(key: string, value: string, ttlSeconds?: number): Promise<void>;
 export declare function del(key: string): Promise<void>;

@@ -26,6 +26,7 @@ export function validateJobPayload<Q extends QueueName>(queue: Q, payload: unkno
  * Defers connection until the first message enqueue or worker startup.
  */
 export const getQueueRedisClient = lazyAsync<Redis | null>(async () => {
+  if (!cacheConfig.url) return null;
   try {
     const client = new Redis(cacheConfig.url, {
       maxRetriesPerRequest: 1,

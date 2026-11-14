@@ -1,7 +1,7 @@
 "use strict";
 /**
  * @file packages/cache/src/index.ts
- * @description Redis caching layer with tenant-scoped keys
+ * @description Upstash Redis caching layer with tenant-scoped keys
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.client = void 0;
@@ -10,44 +10,58 @@ exports.set = set;
 exports.del = del;
 exports.invalidatePattern = invalidatePattern;
 const redis_1 = require("redis");
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-const socketValue = process.env.REDIS_SOCKET
-    || process.env.REDIS_PATH
-    || (redisUrl.startsWith('unix://') || redisUrl.startsWith('/') ? redisUrl : undefined);
-const socketPath = socketValue?.replace(/^unix:\/\//, '');
-const client = socketPath
-    ? (0, redis_1.createClient)({ socket: { path: socketPath, tls: false } })
-    : (0, redis_1.createClient)({ url: redisUrl });
+/**
+ * Menurunkan URL TCP ber-TLS dari kredensial Upstash Redis REST.
+ * Token REST Upstash juga merupakan kata sandi TCP native database.
+ * @returns URL rediss:// siap pakai, atau undefined bila kredensial belum lengkap.
+ */
+function resolveUpstashUrl() {
+    const restUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!restUrl || !token)
+        return undefined;
+    try {
+        const host = new URL(restUrl).hostname;
+        return `rediss://default:${encodeURIComponent(token)}@${host}:6379`;
+    }
+    catch {
+        return undefined;
+    }
+}
+const redisUrl = resolveUpstashUrl();
+const client = redisUrl ? (0, redis_1.createClient)({ url: redisUrl }) : null;
 exports.client = client;
-client.on('error', (err) => console.error('[Redis Error]', err));
+client?.on('error', (err) => console.error('[Redis Error]', err));
 let connected = false;
 async function ensureConnection() {
+    if (!client) {
+        throw new Error('Upstash Redis belum dikonfigurasi: isi UPSTASH_REDIS_REST_URL dan UPSTASH_REDIS_REST_TOKEN.');
+    }
     if (!connected) {
         await client.connect();
         connected = true;
     }
+    return client;
 }
 async function get(key) {
-    await ensureConnection();
-    return client.get(key);
+    return (await ensureConnection()).get(key);
 }
 async function set(key, value, ttlSeconds) {
-    await ensureConnection();
+    const activeClient = await ensureConnection();
     if (ttlSeconds) {
-        await client.setEx(key, ttlSeconds, value);
+        await activeClient.setEx(key, ttlSeconds, value);
     }
     else {
-        await client.set(key, value);
+        await activeClient.set(key, value);
     }
 }
 async function del(key) {
-    await ensureConnection();
-    await client.del(key);
+    await (await ensureConnection()).del(key);
 }
 async function invalidatePattern(pattern) {
-    await ensureConnection();
-    const keys = await client.keys(pattern);
+    const activeClient = await ensureConnection();
+    const keys = await activeClient.keys(pattern);
     if (keys.length > 0) {
-        await client.del(keys);
+        await activeClient.del(keys);
     }
 }

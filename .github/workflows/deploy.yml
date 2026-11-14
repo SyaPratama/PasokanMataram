@@ -47,9 +47,40 @@ jobs:
           echo "::add-mask::$production_jwt_secret"
           printf 'JWT_SECRET=%s\n' "$production_jwt_secret" >> "$GITHUB_ENV"
           unset production_jwt_secret
+          upstash_url="$(awk -F= '$1 == "UPSTASH_REDIS_REST_URL" {sub(/^[^=]*=/, ""); print; exit}' apps/web/.env.production)"
+          upstash_url="${upstash_url#\"}"
+          upstash_url="${upstash_url%\"}"
+          upstash_token="$(awk -F= '$1 == "UPSTASH_REDIS_REST_TOKEN" {sub(/^[^=]*=/, ""); print; exit}' apps/web/.env.production)"
+          upstash_token="${upstash_token#\"}"
+          upstash_token="${upstash_token%\"}"
+          case "$upstash_url" in
+            https://*) ;;
+            *)
+              echo "::error::ENV_PRODUCTION must contain UPSTASH_REDIS_REST_URL=https://<database>.upstash.io"
+              exit 1
+              ;;
+          esac
+          if [ -z "$upstash_token" ]; then
+            echo "::error::ENV_PRODUCTION must contain a non-empty UPSTASH_REDIS_REST_TOKEN."
+            exit 1
+          fi
+          echo "::add-mask::$upstash_token"
+          printf 'UPSTASH_REDIS_REST_URL=%s\n' "$upstash_url" >> "$GITHUB_ENV"
+          printf 'UPSTASH_REDIS_REST_TOKEN=%s\n' "$upstash_token" >> "$GITHUB_ENV"
+          unset upstash_token upstash_url
         env:
           ENV_DEVELOPMENT: ${{ secrets.ENV_DEVELOPMENT }}
           ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
+
+      - name: Verify Upstash Redis credentials
+        run: |
+          set -euo pipefail
+          pong="$(curl -sS --max-time 15 -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" "$UPSTASH_REDIS_REST_URL/ping" || true)"
+          if [ "$pong" != '{"result":"PONG"}' ]; then
+            echo "::error::Upstash Redis rejected the credentials from ENV_PRODUCTION."
+            exit 1
+          fi
+          echo "Upstash Redis reachable with ENV_PRODUCTION credentials."
 
       - name: Build web with Next.js standalone output
         run: |
@@ -166,7 +197,6 @@ jobs:
           PORT=3099 \
           HOST=127.0.0.1 \
           JWT_SECRET="$(openssl rand -hex 32)" \
-          REDIS_URL=redis://127.0.0.1:6379 \
           DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=smoke DB_PASSWORD=smoke DB_NAME=smoke DB_SSL=false \
           node apps/api/dist/main.cjs > "$API_SMOKE_LOG" 2>&1 &
           API_PID=$!
@@ -522,6 +552,24 @@ jobs:
             printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD"
             printf 'DB_NAME=%s\n' "$DB_NAME"
           } > "$API_ENV"
+          upstash_url="$(awk -F= '$1 == "UPSTASH_REDIS_REST_URL" {sub(/^[^=]*=/, ""); print; exit}' "$API_ENV")"
+          upstash_url="${upstash_url#\"}"
+          upstash_url="${upstash_url%\"}"
+          upstash_token="$(awk -F= '$1 == "UPSTASH_REDIS_REST_TOKEN" {sub(/^[^=]*=/, ""); print; exit}' "$API_ENV")"
+          upstash_token="${upstash_token#\"}"
+          upstash_token="${upstash_token%\"}"
+          case "$upstash_url" in
+            https://*) ;;
+            *)
+              echo "::error::ENV_PRODUCTION must contain UPSTASH_REDIS_REST_URL=https://<database>.upstash.io"
+              exit 1
+              ;;
+          esac
+          if [ -z "$upstash_token" ]; then
+            echo "::error::ENV_PRODUCTION must contain a non-empty UPSTASH_REDIS_REST_TOKEN."
+            exit 1
+          fi
+          unset upstash_token upstash_url
           SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           for i in 1 2 3; do
             echo "Upload attempt $i of 3 on port ${{ env.SSH_PORT }}..."

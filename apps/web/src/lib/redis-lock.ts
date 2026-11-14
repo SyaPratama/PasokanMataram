@@ -16,32 +16,35 @@ const redisOptions = {
   enableOfflineQueue: false,
 };
 
-export const redis = cacheConfig.socketPath
-  ? new Redis({ path: cacheConfig.socketPath, ...redisOptions })
-  : new Redis(cacheConfig.url, redisOptions);
+export const redis = cacheConfig.url
+  ? new Redis(cacheConfig.url, redisOptions)
+  : null;
 
-redis.on('error', () => {});
+redis?.on('error', () => {});
 async function getRedisClient(): Promise<Redis | null> {
-  if (redis.status === 'ready') return redis;
-  if (redis.status === 'connecting') {
+  const client = redis;
+  if (!client) return null;
+  if (client.status === 'ready') return client;
+  if (client.status === 'connecting') {
+    const activeClient = client;
     const { promise, resolve } = Promise.withResolvers<boolean>();
     const onReady = () => { cleanup(); resolve(true); };
     const onClose = () => { cleanup(); resolve(false); };
     const timer = setTimeout(() => { cleanup(); resolve(false); }, 300);
     function cleanup() {
       clearTimeout(timer);
-      redis.removeListener('ready', onReady);
-      redis.removeListener('close', onClose);
+      activeClient.removeListener('ready', onReady);
+      activeClient.removeListener('close', onClose);
     }
-    redis.once('ready', onReady);
-    redis.once('close', onClose);
+    client.once('ready', onReady);
+    client.once('close', onClose);
     await promise;
-    return (redis.status as string) === 'ready' ? redis : null;
+    return (client.status as string) === 'ready' ? client : null;
   }
-  if (redis.status === 'wait') {
+  if (client.status === 'wait') {
     try {
-      await redis.connect();
-      return (redis.status as string) === 'ready' ? redis : null;
+      await client.connect();
+      return (client.status as string) === 'ready' ? client : null;
     } catch {
       return null;
     }

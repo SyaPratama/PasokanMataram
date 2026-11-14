@@ -312,8 +312,9 @@ DB_USER=root
 DB_PASSWORD=xxx
 DB_NAME=pasokmataram_db
 
-# Redis (untuk distributed locks)
-REDIS_URL=redis://localhost:6379
+# Upstash Redis (untuk distributed locks)
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 
 # Solosmartpay
 SOLOSMARTPAY_TOKEN=ssp_test_xxxxx

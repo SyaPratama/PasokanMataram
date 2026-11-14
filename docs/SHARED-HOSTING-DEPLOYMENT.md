@@ -97,6 +97,8 @@ gh secret set ENV_PRODUCTION < .env.production
 gh secret set ENV_DEVELOPMENT < .env.development
 ```
 
+`.env.production` dan `.env.development` WAJIB memuat `UPSTASH_REDIS_REST_URL=https://<database>.upstash.io` dan `UPSTASH_REDIS_REST_TOKEN=<rest token>`. Build web dan upload API gagal dengan `::error::` bila salah satu tidak ada; tidak ada fallback Redis lokal.
+
 #### Step 2: Workflow Sudah Configured
 
 File `.github/workflows/deploy.yml` sudah ada:
@@ -346,10 +348,9 @@ DB_PASSWORD=SecurePassword123!
 DB_NAME=syaprata_pasokmataram
 DB_SSL=false
 
-# Redis (Unix socket atau TCP)
-REDIS_URL=redis://localhost:6379
-# atau Unix socket jika available
-# REDIS_URL=unix:///home/syaprata/redis/redis.sock
+# Upstash Redis (TCP/TLS rediss:// diturunkan dari kredensial REST)
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 
 # Auth
 JWT_SECRET=production_jwt_secret_min_32_chars_here
@@ -388,8 +389,9 @@ DB_PASSWORD=SecurePassword123!
 DB_NAME=syaprata_pasokmataram
 DB_SSL=false
 
-# Redis
-REDIS_URL=redis://localhost:6379
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 
 # Auth
 JWT_SECRET=production_jwt_secret_min_32_chars_here
@@ -455,25 +457,15 @@ mysql -u syaprata_pasok -p syaprata_pasokmataram < packages/database/migrations/
 
 ## Redis Setup
 
-### Option 1: Shared Hosting Redis Manager
+Cache, antrean, dan distributed lock memakai Upstash Redis via TLS. Tidak ada Redis lokal yang perlu dipasang di server.
 
 ```bash
-# cPanel → Redis Manager
-# Create Redis instance: localhost:6379
-# No password atau set password
+# Upstash Console -> Connect -> isi dua nilai ini di .env.production server
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 ```
 
-### Option 2: Unix Socket (if available)
-
-```bash
-# Check if Redis available
-redis-cli ping
-
-# Configure Unix socket
-# Edit redis.conf
-unixsocket /home/syaprata/redis/redis.sock
-unixsocketperm 700
-```
+URL TCP `rediss://` diturunkan otomatis dari pasangan variabel tersebut.
 
 ---
 

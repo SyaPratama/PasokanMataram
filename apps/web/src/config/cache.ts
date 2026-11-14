@@ -1,6 +1,6 @@
 /**
  * @file src/config/cache.ts
- * @description Konfigurasi Redis 7 Community Cache & Distributed Mutex Lock.
+ * @description Konfigurasi Upstash Redis Cache & Distributed Mutex Lock.
  * Mematuhi Prinsip VII.1 dan Prinsip IX Konstitusi PasokMataram v1.5.0.
  */
 
@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 const cacheConfigSchema = z.object({
   url: z.string(),
-  socketPath: z.string().optional(),
   defaultLockTtlSeconds: z.number().int().positive().default(10),
   defaultLockTimeoutMs: z.number().int().positive().default(2000),
   retryIntervalMs: z.number().int().positive().default(50),
@@ -18,36 +17,24 @@ const cacheConfigSchema = z.object({
 export type CacheConfig = z.infer<typeof cacheConfigSchema>;
 
 /**
- * Mendeteksi jalur berkas soket Unix Domain Redis dari environment variabel.
- * Mendukung format langsung REDIS_SOCKET atau prefix unix:// pada REDIS_URL.
- * @returns Jalur absolut berkas soket Unix atau undefined jika mode TCP.
- */
-function resolveSocketPath(): string | undefined {
-  const direct = process.env.REDIS_SOCKET || process.env.REDIS_PATH;
-  if (direct) return direct.replace(/^unix:\/\//, '');
-
-  const envUrl = process.env.REDIS_URL;
-  if (envUrl && (envUrl.startsWith('/') || envUrl.includes('.sock') || envUrl.startsWith('unix://'))) {
-    return envUrl.replace(/^unix:\/\//, '');
-  }
-  return undefined;
-}
-
-/**
- * Membangun URL koneksi Redis baku berdasarkan ketersediaan Unix socket atau TCP fallback.
- * @returns String URL koneksi Redis (unix:// atau redis://).
+ * Menurunkan URL TCP ber-TLS dari kredensial Upstash Redis REST.
+ * Token REST Upstash juga merupakan kata sandi TCP native database.
+ * @returns URL rediss:// siap pakai, atau string kosong bila kredensial belum lengkap.
  */
 function buildRedisUrl(): string {
-  const socketPath = resolveSocketPath();
-  if (socketPath) {
-    return `unix://${socketPath}`;
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!restUrl || !token) return '';
+  try {
+    const host = new URL(restUrl).hostname;
+    return `rediss://default:${encodeURIComponent(token)}@${host}:6379`;
+  } catch {
+    return '';
   }
-  return process.env.REDIS_URL || 'redis://localhost:6379';
 }
 
 export const cacheConfig: CacheConfig = cacheConfigSchema.parse({
   url: buildRedisUrl(),
-  socketPath: resolveSocketPath(),
   defaultLockTtlSeconds: 10,
   defaultLockTimeoutMs: 2000,
   retryIntervalMs: 50,

@@ -30,11 +30,12 @@ WEB_DEPLOY_PATH=/home/syaprata/public_html
 API_DEPLOY_PATH=/home/syaprata/api
 ```
 
-Generate environment secrets:
+Set environment secret (multiline mentah, bukan base64):
 ```bash
-cat .env.production | base64 -w 0
-# Paste hasil ke GitHub Secret: ENV_PRODUCTION
+gh secret set ENV_PRODUCTION < apps/web/.env.production
 ```
+
+Pastikan `.env.production` memuat `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN`; pipeline menolak deploy tanpa keduanya.
 
 ### Step 2: Trigger Deployment (1 menit)
 
@@ -206,8 +207,9 @@ DB_USER=syaprata_pasok
 DB_PASSWORD=SecurePassword123!
 DB_NAME=syaprata_pasokmataram
 
-# Redis
-REDIS_URL=redis://localhost:6379
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 
 # Auth
 JWT_SECRET=production_secret_min_32_chars
@@ -241,8 +243,9 @@ DB_USER=syaprata_pasok
 DB_PASSWORD=SecurePassword123!
 DB_NAME=syaprata_pasokmataram
 
-# Redis
-REDIS_URL=redis://localhost:6379
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 
 # Auth (same secrets as Web)
 JWT_SECRET=production_secret_min_32_chars

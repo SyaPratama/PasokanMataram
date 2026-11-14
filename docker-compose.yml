@@ -24,22 +24,6 @@ services:
     networks:
       - pasokmataram-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: pasokmataram-redis
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    networks:
-      - pasokmataram-net
-
   minio:
     image: coollabsio/minio:latest
     container_name: pasokmataram-minio
@@ -81,7 +65,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-Tama123}
       DB_NAME: ${DB_NAME:-pasokmataram_db}
       DB_SSL: "false"
-      REDIS_URL: redis://redis:6379
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
       ML_SERVICE_URL: http://ml-service:8000
       SOLOSMARTPAY_TOKEN: ${SOLOSMARTPAY_TOKEN:-ssp_test_pasokmataram_demo}
       SOLOSMARTPAY_WEBHOOK_SECRET: ${SOLOSMARTPAY_WEBHOOK_SECRET:-ssp_secret_default_key}
@@ -89,7 +74,6 @@ services:
       - "3001:3001"
     depends_on:
       - mysql
-      - redis
     networks:
       - pasokmataram-net
 
@@ -123,10 +107,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-Tama123}
       DB_NAME: ${DB_NAME:-pasokmataram_db}
       DB_SSL: "false"
-      REDIS_URL: redis://redis:6379
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
     depends_on:
       - mysql
-      - redis
     networks:
       - pasokmataram-net
 
@@ -143,7 +127,6 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
   minio_data:
 
 networks:
