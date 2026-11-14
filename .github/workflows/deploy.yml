@@ -470,6 +470,13 @@ jobs:
           echo "Web root first entries: $(ls -1 "$WEB_PATH" 2>/dev/null | head -20 | tr '\n' ' ')"
           echo "Node available: $(command -v node || echo no)"
           echo "Pasok logs: $(ls -1 "$HOME/logs" 2>/dev/null | grep -i pasok | head -5 | tr '\n' ' ' || true)"
+          if [ -f "$WEB_PATH/stderr.log" ]; then
+            echo "Web stderr tail:"; tail -n 30 "$WEB_PATH/stderr.log" 2>/dev/null || true
+          else
+            echo "Web stderr: absent"
+          fi
+          echo "Passenger htaccess: $(grep -iE "passenger|node" "$WEB_PATH/.htaccess" 2>/dev/null | tr '\n' '|' | cut -c1-300)"
+          echo "Tmp dir: $(ls -la "$WEB_PATH/tmp" 2>/dev/null | head -6 | tr '\n' '|' || true)"
 
           echo "Web deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
