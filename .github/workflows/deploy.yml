@@ -351,8 +351,7 @@ jobs:
           WEB_PATH="${{ secrets.WEB_DEPLOY_PATH }}"
           DB_CONFIG="$HOME/pasokmataram-db.cnf"
           DB_ERROR="$(mktemp)"
-          PASSENGER_CONFIG="$(mktemp)"
-          trap 'rm -f "$DB_CONFIG" "$DB_ERROR" "$PASSENGER_CONFIG" "$HOME/web-env-db.fragment"' EXIT
+          trap 'rm -f "$DB_CONFIG" "$DB_ERROR" "$HOME/web-env-db.fragment"' EXIT
 
           # Any database problem: warn and skip DB steps, or stop (exit 78) in strict mode.
           db_problem() {
@@ -397,9 +396,6 @@ jobs:
           rm -f "$DB_ERROR"
 
           mkdir -p "$WEB_PATH"
-          if [ -f "$WEB_PATH/.htaccess" ] && grep -q "CLOUDLINUX PASSENGER CONFIGURATION BEGIN" "$WEB_PATH/.htaccess" 2>/dev/null; then
-            awk '/CLOUDLINUX PASSENGER CONFIGURATION BEGIN/{capture=1} capture{print} /CLOUDLINUX PASSENGER CONFIGURATION END/{capture=0}' "$WEB_PATH/.htaccess" > "$PASSENGER_CONFIG"
-          fi
 
           if [ -d "$WEB_PATH" ]; then
             cp -r "$WEB_PATH" "${WEB_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
@@ -426,11 +422,6 @@ jobs:
             echo "Web .env.production DB_* lines synchronized from deploy secrets."
             echo "Env diagnostics: user=$(id -un) | $(ls -ld "$WEB_PATH" | awk '{print $1, $3, $4}') | $(ls -l "$web_env_file" | awk '{print $1, $3, $4}') | server.js: $(ls -l "$WEB_PATH/server.js" 2>/dev/null | awk '{print $1, $3, $5}')"
             echo "htaccess head:"; sed -n '1,10p' "$WEB_PATH/.htaccess" 2>/dev/null || true
-          fi
-          if [ -s "$PASSENGER_CONFIG" ]; then
-            merged_htaccess="$(mktemp)"
-            cat "$PASSENGER_CONFIG" "$WEB_PATH/.htaccess" > "$merged_htaccess"
-            mv "$merged_htaccess" "$WEB_PATH/.htaccess"
           fi
 
           if ! grep -q "ErrorDocument 404" "$WEB_PATH/.htaccess" 2>/dev/null; then
@@ -475,6 +466,19 @@ jobs:
             echo "::error::Web Node environment $HOME/nodevenv/pasokmataram/*/bin/node was not found."
             exit 1
           fi
+          passenger_htaccess="$(mktemp)"
+          {
+            echo '# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN'
+            printf 'PassengerAppRoot "%s"\n' "$WEB_PATH"
+            echo 'PassengerBaseURI "/"'
+            printf 'PassengerNodejs "%s"\n' "$app_node"
+            echo 'PassengerAppType node'
+            echo 'PassengerStartupFile server.js'
+            echo '# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END'
+            cat "$WEB_PATH/.htaccess"
+          } > "$passenger_htaccess"
+          mv "$passenger_htaccess" "$WEB_PATH/.htaccess"
+          chmod 644 "$WEB_PATH/.htaccess"
           echo "App node: $app_node"
           echo "App node version: $("$app_node" -v 2>&1)"
           app_probe="$(cd "$WEB_PATH" && "$app_node" -e "try { console.log('resolve', require.resolve('argon2')); require('argon2').hash('x').then(()=>console.log('argon2-ok')).catch((e)=>console.log('argon2-fail', e.message)); } catch (e) { console.log('argon2-throw', e.message); }" 2>&1 | tail -4 || true)"
@@ -551,7 +555,7 @@ jobs:
       - name: Health check web
         run: |
           sleep 15
-          curl --fail --silent --show-error --max-time 10 "${{ secrets.WEB_URL }}"
+          curl --fail --location --silent --show-error --output /dev/null --max-time 20 "${{ secrets.WEB_URL }}"
 
   deploy-api:
     name: Deploy API to Server
