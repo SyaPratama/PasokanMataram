@@ -16,28 +16,12 @@ ErrorDocument 502 /
 ErrorDocument 503 /
 
 # 3. Phusion Passenger / LiteSpeed Node.js Application Directives
-<IfModule mod_passenger.c>
-    PassengerAppType node
-    PassengerStartupFile server.js
-    PassengerAppRoot .
-    PassengerFriendlyErrorPages off
-</IfModule>
+PassengerEnabled On
+PassengerAppEnv production
+PassengerAppType node
+PassengerStartupFile server.js
+PassengerFriendlyErrorPages off
 
-# 4. LiteSpeed Rewrite Engine untuk Berkas Statis & Routing Bersih
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-
-    # Lewatkan berkas statis publik dan Next.js chunks secara langsung
-    RewriteCond %{REQUEST_URI} ^/(_next|icons|images|favicon\.ico|icon\.svg|robots\.txt|sitemap\.xml|sw\.js|manifest\.webmanifest) [NC]
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^ - [L]
-
-    # Alihkan seluruh rute halaman dan error ke handler utama Next.js
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ / [QSA,L]
-</IfModule>
 
 # 5. Header Keamanan Baku
 <IfModule mod_headers.c>
