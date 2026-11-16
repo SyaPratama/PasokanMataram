@@ -629,10 +629,6 @@ jobs:
           API_PATH="${{ secrets.API_DEPLOY_PATH }}"
 
           mkdir -p "$API_PATH"
-          if [ -f "$API_PATH/.htaccess" ]; then
-            cp "$API_PATH/.htaccess" /tmp/preserved_api_htaccess 2>/dev/null || true
-          fi
-
           if [ -d "$API_PATH" ]; then
             cp -r "$API_PATH" "${API_PATH}_backup_$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
             ls -dt ${API_PATH}_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf 2>/dev/null || true
@@ -645,34 +641,61 @@ jobs:
           fi
           test -s "$API_PATH/.env.production"
           chmod 600 "$API_PATH/.env.production"
+          find "$API_PATH" -type d -path '*/node_modules/argon2/build' -prune -exec rm -rf {} + 2>/dev/null || true
 
-          if [ -f /tmp/preserved_api_htaccess ]; then
-            if grep -q "CLOUDLINUX" /tmp/preserved_api_htaccess 2>/dev/null; then
-              cat /tmp/preserved_api_htaccess > "$API_PATH/.htaccess"
+          api_node="$(ls -1d "$HOME"/nodevenv/api-pasokmataram/*/bin/node 2>/dev/null | head -1 || true)"
+          if [ -z "$api_node" ]; then
+            echo "::error::API Node environment $HOME/nodevenv/api-pasokmataram/*/bin/node was not found."
+            exit 1
+          fi
+          echo "API node: $api_node"
+          echo "API node version: $("$api_node" -v 2>&1)"
+          api_probe="$(cd "$API_PATH" && "$api_node" -e "try { console.log('resolve', require.resolve('argon2')); require('argon2').hash('x').then(()=>console.log('argon2-ok')).catch((e)=>console.log('argon2-fail', e.message)); } catch (e) { console.log('argon2-throw', e.message); }" 2>&1 | tail -4 || true)"
+          echo "API argon2 probe: $api_probe"
+          if ! printf '%s\n' "$api_probe" | grep -q 'argon2-ok'; then
+            echo "::error::Argon2 cannot load under the API application's Node runtime."
+            exit 1
+          fi
+
+          cat > "$API_PATH/.htaccess" <<PASSENGER_HTACCESS
+          # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+          PassengerAppRoot "$API_PATH"
+          PassengerBaseURI "/"
+          PassengerNodejs "$api_node"
+          PassengerAppType node
+          PassengerStartupFile server.js
+          # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+          PassengerEnabled On
+          PassengerAppEnv production
+          PassengerFriendlyErrorPages off
+          Options -Indexes
+          DirectoryIndex disabled
+          <FilesMatch "^\.env|^\.git|^(server|app)\.js$|^stderr\.log$">
+              Order allow,deny
+              Deny from all
+          </FilesMatch>
+          PASSENGER_HTACCESS
+          chmod 644 "$API_PATH/.htaccess"
+          : > "$API_PATH/stderr.log" 2>/dev/null || true
+
+          app_root="${API_PATH#"$HOME"/}"
+          if command -v cloudlinux-selector >/dev/null 2>&1 && [ "$app_root" != "$API_PATH" ]; then
+            if selector_output="$(cloudlinux-selector restart --json --interpreter nodejs --user "$(id -un)" --app-root "$app_root" 2>&1)"; then
+              echo "CloudLinux restarted API Node application: $app_root"
+            else
+              echo "::error::CloudLinux could not restart API Node application $app_root."
+              printf '%s\n' "$selector_output"
+              exit 1
             fi
-            rm -f /tmp/preserved_api_htaccess
+          else
+            mkdir -p "$API_PATH/tmp"
+            touch "$API_PATH/tmp/restart.txt"
           fi
 
-          if ! grep -q "ErrorDocument 404" "$API_PATH/.htaccess" 2>/dev/null; then
-            echo "" >> "$API_PATH/.htaccess"
-            echo "Options -Indexes" >> "$API_PATH/.htaccess"
-            echo "DirectoryIndex disabled" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 400 /" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 401 /" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 403 /403" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 404 /404" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 500 /" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 502 /" >> "$API_PATH/.htaccess"
-            echo "ErrorDocument 503 /" >> "$API_PATH/.htaccess"
-            echo '<FilesMatch "^\.env|^\.git">' >> "$API_PATH/.htaccess"
-            echo "    Order allow,deny" >> "$API_PATH/.htaccess"
-            echo "    Deny from all" >> "$API_PATH/.htaccess"
-            echo "</FilesMatch>" >> "$API_PATH/.htaccess"
+          echo "API deployed successfully with the verified Passenger runtime."
+          if [ -f "$API_PATH/stderr.log" ]; then
+            echo "API stderr tail:"; tail -n 30 "$API_PATH/stderr.log" 2>/dev/null || true
           fi
-
-          mkdir -p "$API_PATH/tmp" && touch "$API_PATH/tmp/restart.txt"
-
-          echo "API deployed successfully with pure build artifacts and preserved .htaccess"
           REMOTE_SCRIPT
 
           SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=5 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
