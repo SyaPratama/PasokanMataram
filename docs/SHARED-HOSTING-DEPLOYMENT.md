@@ -39,7 +39,7 @@ Shared Hosting Server
 ### Server Requirements
 
 **Minimum**:
-- Node.js 20.x LTS
+- Node.js 22.x LTS
 - MySQL 8.0+
 - Redis 7.x
 - RAM: 2GB minimum (4GB recommended)
@@ -76,8 +76,8 @@ SSH_KNOWN_HOSTS: <pinned ssh-keyscan output>
 SSH_PORT: 22
 
 # Deploy Paths
-WEB_DEPLOY_PATH: /home/syaprata/public_html
-API_DEPLOY_PATH: /home/syaprata/api
+WEB_DEPLOY_PATH: /home/<cpanel-user>/pasokmataram
+API_DEPLOY_PATH: /home/<cpanel-user>/api-pasokmataram
 
 # Database Runtime
 DB_HOST: localhost
@@ -237,90 +237,81 @@ pm2 save
 
 ### 1. Setup Node.js App (Passenger)
 
-**cPanel → Setup Node.js App**:
+Configure both applications in **cPanel > Setup Node.js App**.
 
 **Web App**:
-- Application root: `/home/syaprata/public_html`
-- Application URL: `https://syapratama.tech`
+- Application root: `/home/<cpanel-user>/pasokmataram`
+- Application URL: `https://pasok.syapratama.tech`
 - Application startup file: `server.js`
-- Node.js version: 20.x
+- Node.js version: 22.x
 - Environment: production
 
 **API App**:
-- Application root: `/home/syaprata/api`
-- Application URL: `https://api.syapratama.tech` (subdomain)
+- Application root: `/home/<cpanel-user>/api-pasokmataram`
+- Application URL: `https://api-pasok.syapratama.tech`
 - Application startup file: `server.js`
-- Node.js version: 20.x
+- Node.js version: 22.x
 - Environment: production
 
-### 2. Configure .htaccess (Web)
+### 2. Passenger Runtime Configuration
+
+`.github/workflows/deploy.yml` generates the Passenger block from `WEB_DEPLOY_PATH`, `API_DEPLOY_PATH`, and each application's Node environment. Do not hardcode `/usr/bin/node`. Do not rewrite application routes to `/`; with `DirectoryIndex disabled`, that rewrite returns a LiteSpeed 403 before Passenger handles the request.
+
+Web configuration:
 
 ```apache
-# /home/syaprata/public_html/.htaccess
-
-# Passenger Configuration
-PassengerEnabled On
-PassengerAppEnv production
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/<cpanel-user>/pasokmataram"
+PassengerBaseURI "/"
+PassengerNodejs "/home/<cpanel-user>/nodevenv/pasokmataram/22/bin/node"
 PassengerAppType node
 PassengerStartupFile server.js
-PassengerNodejs /usr/bin/node
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+PassengerEnabled On
+PassengerAppEnv production
+PassengerFriendlyErrorPages off
+```
 
-# Next.js Static Assets
-RewriteEngine On
-RewriteBase /
+API configuration:
 
-# Security
-<FilesMatch "^\.env|^\.git">
+```apache
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/<cpanel-user>/api-pasokmataram"
+PassengerBaseURI "/"
+PassengerNodejs "/home/<cpanel-user>/nodevenv/api-pasokmataram/22/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+PassengerEnabled On
+PassengerAppEnv production
+PassengerFriendlyErrorPages off
+```
+
+Both roots must deny direct HTTP access to runtime files:
+
+```apache
+<FilesMatch "^\.env|^\.git|^(server|app)\.js$|^stderr\.log$">
     Order allow,deny
     Deny from all
 </FilesMatch>
-
-# Next.js Routes
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /server.js [L,QSA]
-
-# Error Documents
-ErrorDocument 404 /404
-ErrorDocument 500 /
-
-# Compression
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript
-</IfModule>
 ```
 
-### 3. Configure .htaccess (API)
+### 3. Runtime Environment and Health Checks
 
-```apache
-# /home/syaprata/api/.htaccess
-
-PassengerEnabled On
-PassengerAppEnv production
-PassengerAppType node
-PassengerStartupFile server.js
-PassengerNodejs /usr/bin/node
-
-# Security
-<FilesMatch "^\.env|^\.git">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# CORS Headers (untuk Web BFF)
-Header set Access-Control-Allow-Origin "https://syapratama.tech"
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, Authorization"
-```
+- The standalone web artifact contains no `.env*` files.
+- Deployment uploads `ENV_PRODUCTION` separately, replaces `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` with the current deployment secrets, then installs only the root `.env.production` with mode `600`.
+- Deployment restarts the exact CloudLinux selector application and touches `tmp/restart.txt` so Passenger reloads the new environment.
+- Web health requires successful responses from `/` and `/api/v1/commodities`.
+- API health requires a successful response from `/api/v1/health`.
 
 ### 4. Setup Subdomain untuk API
 
-**cPanel → Subdomains**:
-- Subdomain: `api`
+**cPanel > Subdomains**:
+- Subdomain: `api-pasok`
 - Domain: `syapratama.tech`
-- Document Root: `/home/syaprata/api`
+- Document Root: `/home/<cpanel-user>/api-pasokmataram`
 
-Result: `https://api.syapratama.tech`
+Result: `https://api-pasok.syapratama.tech`
 
 ---
 
@@ -329,21 +320,21 @@ Result: `https://api.syapratama.tech`
 ### Web Frontend
 
 ```bash
-# /home/syaprata/public_html/.env.production
+# /home/<cpanel-user>/pasokmataram/.env.production
 
 NODE_ENV=production
 PORT=3000
 
 # API URL (internal/external)
-NEXT_PUBLIC_API_URL=https://api.syapratama.tech
-API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_API_URL=https://api-pasok.syapratama.tech
+API_BASE_URL=https://api-pasok.syapratama.tech
 
 # Database
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=syaprata_pasok
-DB_PASSWORD=SecurePassword123!
-DB_NAME=syaprata_pasokmataram
+DB_USER=<cpanel-database-user>
+DB_PASSWORD=<database-password>
+DB_NAME=<cpanel-database-name>
 DB_SSL=false
 
 # Redis (Unix socket atau TCP)
@@ -375,7 +366,7 @@ ML_FORECAST_TIMEOUT_MS=5000
 ### API Backend
 
 ```bash
-# /home/syaprata/api/.env.production
+# /home/<cpanel-user>/api-pasokmataram/.env.production
 
 NODE_ENV=production
 PORT=4000
@@ -383,9 +374,9 @@ PORT=4000
 # Database (sama dengan Web)
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=syaprata_pasok
-DB_PASSWORD=SecurePassword123!
-DB_NAME=syaprata_pasokmataram
+DB_USER=<cpanel-database-user>
+DB_PASSWORD=<database-password>
+DB_NAME=<cpanel-database-name>
 DB_SSL=false
 
 # Redis
