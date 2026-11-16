@@ -500,10 +500,9 @@ jobs:
               printf '%s\n' "$selector_output"
               exit 1
             fi
-          else
-            mkdir -p "$WEB_PATH/tmp"
-            touch "$WEB_PATH/tmp/restart.txt"
           fi
+          mkdir -p "$WEB_PATH/tmp"
+          touch "$WEB_PATH/tmp/restart.txt"
           echo "Runtime user: $(id -un)"
           echo "Node procs: $(ps -u "$(id -un)" -o pid,etime,cmd 2>/dev/null | grep -c 'server.js' || true)"
           ps -u "$(id -un)" -o pid,etime,cmd 2>/dev/null | grep 'server.js' | head -3 || true
@@ -558,7 +557,10 @@ jobs:
       - name: Health check web
         run: |
           sleep 15
-          curl --fail --location --silent --show-error --output /dev/null --max-time 20 "${{ secrets.WEB_URL }}"
+          web_base="${{ secrets.WEB_URL }}"
+          web_base="${web_base%/}"
+          curl --fail --location --silent --show-error --output /dev/null --max-time 20 "$web_base"
+          curl --fail --location --silent --show-error --output /dev/null --max-time 20 "$web_base/api/v1/commodities"
 
   deploy-api:
     name: Deploy API to Server
