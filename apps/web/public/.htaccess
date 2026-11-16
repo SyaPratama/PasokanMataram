@@ -30,7 +30,7 @@ PassengerFriendlyErrorPages off
 </IfModule>
 
 # 6. Proteksi Berkas Sensitif & Lingkungan (.env, .git, dan rahasia kredensial)
-<FilesMatch "^\.env|^\.git">
+<FilesMatch "^\.env|^\.git|^(server|app)\.js$|^stderr\.log$">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -39,4 +39,6 @@ PassengerFriendlyErrorPages off
     RewriteRule ^\.env.*$ - [F,L,NC]
     RewriteRule ^\.git.*$ - [F,L,NC]
     RewriteRule ^credentials\.json$ - [F,L,NC]
+    RewriteRule ^(server|app)\.js$ - [F,L,NC]
+    RewriteRule ^stderr\.log$ - [F,L,NC]
 </IfModule>
