@@ -96,6 +96,7 @@ jobs:
           const isDev = rawAppMode === 'development' || rawAppMode === 'dev';
           const primaryEnv = isDev ? '.env.development' : '.env.production';
           const fallbackEnv = isDev ? '.env.production' : '.env.development';
+          const runtimeOverrideKeys = new Set(['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']);
 
           function parseAndInjectEnv(filename) {
             const envFilePath = path.resolve(process.cwd(), filename);
@@ -112,7 +113,7 @@ jobs:
                 if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
                   val = val.slice(1, -1);
                 }
-                if (key && process.env[key] === undefined) {
+                if (key && (process.env[key] === undefined || runtimeOverrideKeys.has(key))) {
                   process.env[key] = val;
                 }
               }
