@@ -43,9 +43,6 @@ export async function GET(request: Request) {
 
     sql += ' ORDER BY p.created_at DESC';
 
-    const res = await query<unknown>(sql, params);
-    const rows = Array.isArray(res) ? (res as CampaignRow[]) : [];
-
     interface CampaignRow {
       id: string;
       commodity: string;
@@ -56,7 +53,9 @@ export async function GET(request: Request) {
       status: string;
       temperatureZone: string;
     }
-    const data = rows.map((r: CampaignRow, idx: number) => ({
+    const { rows } = await query<CampaignRow>(sql, params);
+
+    const data = rows.map((r, idx: number) => ({
       id: `POOL-${r.id.slice(0, 8).toUpperCase()}`,
       campaignUuid: r.id,
       commodity: r.commodity,
