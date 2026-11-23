@@ -31,8 +31,8 @@ export async function POST(request: Request): Promise<NextResponse> {
           { status: 429 }
         );
       }
-    } catch {
-      // Graceful fallback if Redis rate limiter fails
+    } catch (rateLimitError: unknown) {
+      console.warn('[LOGIN RATE LIMIT]', rateLimitError);
     }
 
     const body = await request.json();

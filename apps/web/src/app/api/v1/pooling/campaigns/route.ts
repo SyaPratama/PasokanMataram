@@ -43,11 +43,20 @@ export async function GET(request: Request) {
 
     sql += ' ORDER BY p.created_at DESC';
 
-    const res = await query<any>(sql, params);
-    const rows = res.rows || [];
+    const res = await query<unknown>(sql, params);
+    const rows = Array.isArray(res) ? (res as CampaignRow[]) : [];
 
-    // Map each campaign into the format needed by the UI
-    const data = rows.map((r: any, idx: number) => ({
+    interface CampaignRow {
+      id: string;
+      commodity: string;
+      targetQuotaKg: number;
+      currentCollectedKg: number;
+      normalPricePerKg: number;
+      pooledPricePerKg: number;
+      status: string;
+      temperatureZone: string;
+    }
+    const data = rows.map((r: CampaignRow, idx: number) => ({
       id: `POOL-${r.id.slice(0, 8).toUpperCase()}`,
       campaignUuid: r.id,
       commodity: r.commodity,
