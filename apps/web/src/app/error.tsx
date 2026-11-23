@@ -34,7 +34,7 @@ export default function GlobalErrorPage({
           Terjadi Kendala Teknis
         </h1>
 
-        <p className="text-sm text-gelap/70 leading-relaxed mb-8 max-w-md mx-auto">
+        <p className="text-sm text-gelap-muted leading-relaxed mb-8 max-w-md mx-auto">
           Sistem sedang mengalami kendala sementara saat memproses permintaan Anda. Silakan coba muat ulang data atau kembali ke beranda utama.
         </p>
 

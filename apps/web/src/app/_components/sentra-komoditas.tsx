@@ -166,12 +166,12 @@ export function SentraKomoditasSection() {
             <h2 className="mt-2 text-2xl md:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight">
               Bahan Pangan Sentra Produsen D.I. Yogyakarta
             </h2>
-            <p className="mt-3 text-sm md:text-base text-gelap/70 font-body leading-relaxed">
+            <p className="mt-3 text-sm md:text-base text-gelap-muted font-body leading-relaxed">
               Dipasok langsung oleh peternakan ayam, RPH daging, koperasi susu, dan produsen pangan binaan dengan kontrol mutu higienis untuk standar dapur profesional.
             </p>
           </div>
 
-          <div className="text-sm text-gelap/70 font-medium">
+          <div className="text-sm text-gelap-muted font-medium">
             Menampilkan <span className="font-bold text-primer">{filteredItems.length}</span> dari{' '}
             <span className="font-bold text-gelap">{items.length}</span> bahan pangan siap kirim
           </div>
@@ -180,7 +180,7 @@ export function SentraKomoditasSection() {
         <div className="bg-netral-canvas p-4 sm:p-5 rounded-2xl border border-netral-border/80 mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
             <div className="md:col-span-7 relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap/50">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap-muted">
                 <Search className="w-5 h-5 text-primer" aria-hidden="true" />
               </div>
               <input
@@ -194,14 +194,14 @@ export function SentraKomoditasSection() {
                 }}
                 placeholder="Cari komoditas (misal: Bawang, Cabai, Sleman, Grade A)..."
                 aria-label="Cari nama komoditas, sentra panen, atau mutu"
-                className="w-full pl-11 pr-10 py-3 text-sm text-gelap bg-white border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] placeholder:text-gelap/45 transition-colors"
+                className="w-full pl-11 pr-10 py-3 text-sm text-gelap bg-white border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] placeholder:text-gelap-muted transition-colors"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   aria-label="Hapus kata kunci pencarian"
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gelap/50 hover:text-gelap transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gelap-muted hover:text-gelap transition-colors"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
                 </button>
@@ -209,7 +209,7 @@ export function SentraKomoditasSection() {
             </div>
 
             <div className="md:col-span-5 relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap/50">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap-muted">
                 <SlidersHorizontal className="w-4 h-4 text-sekunder" aria-hidden="true" />
               </div>
               <select
@@ -229,8 +229,8 @@ export function SentraKomoditasSection() {
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gelap/50">
-                <ChevronDown className="w-4 h-4 text-gelap/50" aria-hidden="true" />
+              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gelap-muted">
+                <ChevronDown className="w-4 h-4 text-gelap-muted" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -260,32 +260,32 @@ export function SentraKomoditasSection() {
                         <h3 className="font-heading font-bold text-base sm:text-lg text-gelap group-hover:text-primer transition-colors leading-snug">
                           {item.nama}
                         </h3>
-                        <div className="flex items-center text-xs text-gelap/85 mt-1 font-body">
+                        <div className="flex items-center text-xs text-gelap-muted mt-1 font-body">
                           <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder shrink-0" aria-hidden="true" />
                           <span className="truncate">{item.sentra}</span>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-[11px] sm:text-xs text-gelap/80 block font-medium whitespace-nowrap">
+                        <span className="text-[11px] sm:text-xs text-gelap-muted block font-medium whitespace-nowrap">
                           Estimasi Grosir
                         </span>
                         <div className="flex items-baseline justify-end gap-1 mt-0.5">
                           <span className="font-heading font-extrabold text-base text-primer whitespace-nowrap font-mono tabular-nums">
                             {item.hargaEstimasi}
                           </span>
-                          <span className="text-xs text-gelap/80 font-medium whitespace-nowrap">
+                          <span className="text-xs text-gelap-muted font-medium whitespace-nowrap">
                             /{item.satuan}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-2 mb-4 p-3 bg-white rounded-xl border border-netral-border/60 text-xs text-gelap/85 space-y-1.5 font-body">
-                      <div className="flex items-center text-gelap/85">
+                    <div className="mt-2 mb-4 p-3 bg-white rounded-xl border border-netral-border/60 text-xs text-gelap-muted space-y-1.5 font-body">
+                      <div className="flex items-center text-gelap-muted">
                         <Calendar className="w-3.5 h-3.5 mr-1.5 text-aksen-dark flex-shrink-0" aria-hidden="true" />
                         <span>{item.jadwalPanen}</span>
                       </div>
-                      <div className="flex items-start text-gelap/85">
+                      <div className="flex items-start text-gelap-muted">
                         <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <span className="leading-snug">{item.standarMutu}</span>
                       </div>
@@ -293,7 +293,7 @@ export function SentraKomoditasSection() {
 
                     <div className="mt-auto pt-2">
                       <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-gelap/85 font-medium">Kuota Pooling Terkunci</span>
+                        <span className="text-gelap-muted font-medium">Kuota Pooling Terkunci</span>
                         <span className="font-semibold text-gelap font-mono tabular-nums">
                           {item.kuotaTerkumpul} / {item.kuotaTarget} kg ({percentage}%)
                         </span>
@@ -307,7 +307,7 @@ export function SentraKomoditasSection() {
                     </div>
 
                     <div className="mt-4 pt-2 flex items-center justify-between gap-2">
-                      <span className="text-[11px] text-gelap/85 font-semibold whitespace-nowrap shrink-0">Min. 25 kg</span>
+                      <span className="text-[11px] text-gelap-muted font-semibold whitespace-nowrap shrink-0">Min. 25 kg</span>
                       <Link
                         href="/register"
                         className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-xl bg-primer-surface/10 hover:bg-primer hover:text-white text-xs font-bold text-primer-deep group-hover:shadow-xs transition-all min-h-[44px] whitespace-nowrap shrink-0"
@@ -348,7 +348,7 @@ export function SentraKomoditasSection() {
                     </button>
                   ))}
                 </div>
-                <span className="text-[11px] font-semibold text-gelap/60">
+                <span className="text-[11px] font-semibold text-gelap-muted">
                   Geser horizontal untuk menelusuri ({activeSlide + 1} dari {paginatedItems.length})
                 </span>
               </div>
@@ -356,7 +356,7 @@ export function SentraKomoditasSection() {
 
             {totalPages > 1 && (
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-                <span className="text-xs text-gelap/70 font-body">
+                <span className="text-xs text-gelap-muted font-body">
                   Menampilkan <span className="font-bold text-primer font-mono tabular-nums">{Math.min(filteredItems.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}–{Math.min(filteredItems.length, currentPage * ITEMS_PER_PAGE)}</span> dari <span className="font-bold text-gelap font-mono tabular-nums">{filteredItems.length}</span> komoditas
                 </span>
 
@@ -416,13 +416,13 @@ export function SentraKomoditasSection() {
           </>
         ) : (
           <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-netral-border/80 bg-netral-canvas/40">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-netral-border flex items-center justify-center mx-auto mb-3 text-gelap/40">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-netral-border flex items-center justify-center mx-auto mb-3 text-gelap-muted">
               <Search className="w-6 h-6" aria-hidden="true" />
             </div>
             <h3 className="font-heading font-bold text-base text-gelap">
               Komoditas Tidak Ditemukan
             </h3>
-            <p className="text-xs text-gelap/70 mt-1 max-w-sm mx-auto">
+            <p className="text-xs text-gelap-muted mt-1 max-w-sm mx-auto">
               Tidak ada hasil yang sesuai dengan filter wilayah atau kata kunci pencarian Anda saat ini.
             </p>
             <button

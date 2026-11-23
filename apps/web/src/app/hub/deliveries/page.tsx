@@ -30,12 +30,12 @@ export default function HubDeliveriesPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Protokol Subuh 03:00 - 06:30 WIB</Badge>
-            <span className="text-xs text-gelap/60">Target Tiba Sebelum Dapur Masak</span>
+            <span className="text-xs text-gelap-muted">Target Tiba Sebelum Dapur Masak</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Jadwal Antar Subuh &amp; Logistik Rantai Dingin
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             4 jendela distribusi terjadwal dari Hub Sewon Bantul ke dapur restoran dan hotel se-D.I. Yogyakarta.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function HubDeliveriesPage() {
         {deliveries.length === 0 ? (
           <div className="col-span-full p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
             <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
-            <p className="text-xs text-gelap/60">Belum ada pengantaran armada rantai dingin aktif saat ini.</p>
+            <p className="text-xs text-gelap-muted">Belum ada pengantaran armada rantai dingin aktif saat ini.</p>
           </div>
         ) : (
           deliveries.map((del) => (
@@ -87,26 +87,26 @@ export default function HubDeliveriesPage() {
 
             <div className="grid grid-cols-2 gap-3 p-3 bg-netral-canvas rounded-xl text-xs">
               <div>
-                <span className="text-gelap/60 text-[11px] block">Jadwal Berangkat:</span>
+                <span className="text-gelap-muted text-[11px] block">Jadwal Berangkat:</span>
                 <span className="font-bold text-gelap flex items-center gap-1 mt-0.5">
                   <Clock className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
                   {del.departureTime}
                 </span>
               </div>
               <div>
-                <span className="text-gelap/60 text-[11px] block">Suhu Box Reefer:</span>
+                <span className="text-gelap-muted text-[11px] block">Suhu Box Reefer:</span>
                 <span className="font-bold text-primer flex items-center gap-1 mt-0.5">
                   {del.temperatureCelsius} &deg;C (Standar Dingin)
                 </span>
               </div>
               <div>
-                <span className="text-gelap/60 text-[11px] block">Kendaraan &amp; Supir:</span>
+                <span className="text-gelap-muted text-[11px] block">Kendaraan &amp; Supir:</span>
                 <span className="font-semibold text-gelap block mt-0.5 truncate" title={del.truckId}>
                   {del.driverName}
                 </span>
               </div>
               <div>
-                <span className="text-gelap/60 text-[11px] block">Jumlah Gerai Tujuan:</span>
+                <span className="text-gelap-muted text-[11px] block">Jumlah Gerai Tujuan:</span>
                 <span className="font-semibold text-gelap block mt-0.5">
                   {del.destinationCount} Restoran
                 </span>
@@ -114,7 +114,7 @@ export default function HubDeliveriesPage() {
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
-              <span className="text-gelap/60 flex items-center gap-1">
+              <span className="text-gelap-muted flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
                 {del.routeZone}
               </span>

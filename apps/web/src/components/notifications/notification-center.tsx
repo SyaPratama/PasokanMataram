@@ -74,7 +74,7 @@ export function NotificationCenter(): React.JSX.Element {
       case 'KYB_STATUS':
         return <ShieldCheck className="w-4 h-4 text-primer" aria-hidden="true" />;
       default:
-        return <Bell className="w-4 h-4 text-gelap/60" aria-hidden="true" />;
+        return <Bell className="w-4 h-4 text-gelap-muted" aria-hidden="true" />;
     }
   };
 
@@ -83,7 +83,7 @@ export function NotificationCenter(): React.JSX.Element {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="p-2 rounded-xl text-gelap/70 hover:text-primer hover:bg-netral-canvas relative min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
+        className="p-2 rounded-xl text-gelap-muted hover:text-primer hover:bg-netral-canvas relative min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
         aria-label="Pemberitahuan Sistem"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -126,7 +126,7 @@ export function NotificationCenter(): React.JSX.Element {
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="p-1 rounded-lg text-gelap/50 hover:text-gelap hover:bg-white min-h-[36px] min-w-[36px] flex items-center justify-center transition-colors"
+              className="p-1 rounded-lg text-gelap-muted hover:text-gelap hover:bg-white min-h-[36px] min-w-[36px] flex items-center justify-center transition-colors"
               aria-label="Tutup Panel Notifikasi"
             >
               <X className="w-4 h-4" aria-hidden="true" />
@@ -167,8 +167,8 @@ export function NotificationCenter(): React.JSX.Element {
 
           <div className="max-h-80 overflow-y-auto custom-scrollbar divide-y divide-netral-border/60">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-gelap/60 space-y-1">
-                <Bell className="w-6 h-6 text-gelap/30 mx-auto" aria-hidden="true" />
+              <div className="p-8 text-center text-xs text-gelap-muted space-y-1">
+                <Bell className="w-6 h-6 text-gelap-muted mx-auto" aria-hidden="true" />
                 <p className="font-semibold text-gelap">Belum ada notifikasi baru</p>
                 <p>Pembaruan transaksi dan pengadaan akan muncul di sini secara realtime.</p>
               </div>
@@ -198,7 +198,7 @@ export function NotificationCenter(): React.JSX.Element {
                         </button>
                       )}
                     </div>
-                    <p className="text-xs text-gelap/80 mt-0.5 leading-snug line-clamp-2">{item.body}</p>
+                    <p className="text-xs text-gelap-muted mt-0.5 leading-snug line-clamp-2">{item.body}</p>
                     {item.actionUrl && (
                       <Link
                         href={item.actionUrl}
@@ -219,7 +219,7 @@ export function NotificationCenter(): React.JSX.Element {
 
           {notifications.length > 0 && (
             <div className="p-3 bg-netral-canvas border-t border-netral-border flex items-center justify-between">
-              <span className="text-xs text-gelap/60 font-mono">
+              <span className="text-xs text-gelap-muted font-mono">
                 {unreadCount} belum dibaca
               </span>
               <button

@@ -93,7 +93,7 @@ export function ForecastInsightCards({
 
           <div className="p-3.5 rounded-xl bg-netral-canvas/60 border border-netral-border/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <div className="text-[10px] font-semibold text-gelap/60 uppercase tracking-wider">
+              <div className="text-[10px] font-semibold text-gelap-muted uppercase tracking-wider">
                 Jendela Pembelian Optimal:
               </div>
               <div className="text-sm font-bold text-gelap font-heading flex items-center gap-1.5 mt-0.5">
@@ -102,23 +102,23 @@ export function ForecastInsightCards({
               </div>
             </div>
             <div className="sm:text-right">
-              <div className="text-[10px] font-semibold text-gelap/60 uppercase tracking-wider">
+              <div className="text-[10px] font-semibold text-gelap-muted uppercase tracking-wider">
                 Target Harga Efisien:
               </div>
               <div className="text-base font-extrabold text-primer font-mono tabular-nums">
                 Rp {optimalBuyWindow.targetPrice.toLocaleString('id-ID')}
-                <span className="text-xs font-normal text-gelap/60"> / {commodity.unit}</span>
+                <span className="text-xs font-normal text-gelap-muted"> / {commodity.unit}</span>
               </div>
             </div>
           </div>
 
-          <p className="text-xs text-gelap/80 leading-relaxed">
+          <p className="text-xs text-gelap-muted leading-relaxed">
             {optimalBuyWindow.explanation}
           </p>
         </div>
 
         <div className="pt-3 border-t border-netral-border/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <span className="text-[11px] text-gelap/60">
+          <span className="text-[11px] text-gelap-muted">
             Tingkat keyakinan model: <strong className="text-primer font-mono">{commodity.confidenceScore}%</strong>
           </span>
 
@@ -172,7 +172,7 @@ export function ForecastInsightCards({
           </div>
 
           <div className="p-3 rounded-xl bg-netral-canvas/60 border border-netral-border/60">
-            <div className="text-[10px] font-semibold text-gelap/60 uppercase">
+            <div className="text-[10px] font-semibold text-gelap-muted uppercase">
               Curah Hujan Dasarian:
             </div>
             <div className="text-sm font-bold text-gelap font-mono tabular-nums mt-0.5">
@@ -180,12 +180,12 @@ export function ForecastInsightCards({
             </div>
           </div>
 
-          <p className="text-xs text-gelap/80 leading-relaxed">
+          <p className="text-xs text-gelap-muted leading-relaxed">
             {weatherAnomalyRisk.description}
           </p>
         </div>
 
-        <div className="pt-2 border-t border-netral-border/60 text-[10px] text-gelap/60 leading-tight">
+        <div className="pt-2 border-t border-netral-border/60 text-[10px] text-gelap-muted leading-tight">
           Sumber: {weatherAnomalyRisk.bmkgSource}
         </div>
       </div>

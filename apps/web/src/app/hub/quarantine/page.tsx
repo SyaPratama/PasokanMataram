@@ -30,12 +30,12 @@ export default function HubQuarantinePage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="destructive">Ruang Isolasi Mutu Terproteksi</Badge>
-            <span className="text-xs text-gelap/60">Toleransi Mutu Ketat DIY</span>
+            <span className="text-xs text-gelap-muted">Toleransi Mutu Ketat DIY</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Karantina Komoditas &amp; Deviasi Mutu
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Penanganan stok panen yang tidak memenuhi standar QC dapur sebelum masuk ke gerai HoReKa.
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function HubQuarantinePage() {
           <span className="font-bold font-heading text-status-danger block mb-0.5">
             Protokol Pencegahan Sengketa Timbangan &amp; Kualitas (Zero-Dispute)
           </span>
-          <p className="leading-relaxed text-gelap/85">
+          <p className="leading-relaxed text-gelap-muted">
             Komoditas yang masuk ke zona karantina tidak akan dikirim ke dapur restoran dan saldo escrow tidak akan dicairkan sampai hasil remediasi atau penyesuaian bobot disetujui bersama oleh ketua Gapoktan.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function HubQuarantinePage() {
             <h2 className="text-sm font-bold text-gelap font-heading">
               Daftar Batch Dalam Masa Karantina &amp; Remediasi
             </h2>
-            <p className="text-[11px] text-gelap/65 mt-0.5">
+            <p className="text-[11px] text-gelap-muted mt-0.5">
               Dikelola oleh supervisor QC Hub Transit Sewon Bantul.
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function HubQuarantinePage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-netral-canvas/60 text-gelap/85 font-semibold border-b border-netral-border">
+            <thead className="bg-netral-canvas/60 text-gelap-muted font-semibold border-b border-netral-border">
               <tr>
                 <th className="p-3.5">ID Karantina</th>
                 <th className="p-3.5">Pemasok &amp; Komoditas</th>
@@ -89,7 +89,7 @@ export default function HubQuarantinePage() {
             <tbody className="divide-y divide-netral-border/60 text-gelap">
               {quarantineItems.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 px-4 text-center text-gelap/60 text-xs">
+                  <td colSpan={6} className="py-8 px-4 text-center text-gelap-muted text-xs">
                     Tidak Ada
                   </td>
                 </tr>
@@ -99,14 +99,14 @@ export default function HubQuarantinePage() {
                     <td className="p-3.5 font-mono font-bold text-primer">{item.id}</td>
                     <td className="p-3.5">
                       <div className="font-semibold">{item.commodity}</div>
-                      <div className="text-[11px] text-gelap/60">{item.supplier}</div>
+                      <div className="text-[11px] text-gelap-muted">{item.supplier}</div>
                     </td>
                     <td className="p-3.5 font-mono font-bold">{item.weightKg} kg</td>
                     <td className="p-3.5 max-w-xs">
                       <p className="text-[11px] text-status-danger font-medium">{item.reason}</p>
-                      <span className="text-[10px] text-gelap/60">Kadar air: {item.moistureActual}%</span>
+                      <span className="text-[10px] text-gelap-muted">Kadar air: {item.moistureActual}%</span>
                     </td>
-                    <td className="p-3.5 font-medium text-gelap/70">{item.quarantineZone}</td>
+                    <td className="p-3.5 font-medium text-gelap-muted">{item.quarantineZone}</td>
                     <td className="p-3.5">
                       <Button
                         variant="primary"

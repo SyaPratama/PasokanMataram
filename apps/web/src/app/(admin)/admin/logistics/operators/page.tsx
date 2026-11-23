@@ -159,7 +159,7 @@ export default function LogisticsOperatorsPage() {
               Jalur Tertutup
             </span>
           </div>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Penerbitan akun staf QC dan Supervisor fisik cross-docking hub DIY dengan ikatan fasilitas kaku.
           </p>
         </div>
@@ -179,14 +179,14 @@ export default function LogisticsOperatorsPage() {
             <Building2 className="w-4 h-4 text-primer" />
             <span>Daftar Operator Terdaftar ({operators.length})</span>
           </div>
-          <span className="text-[11px] text-gelap/60">
+          <span className="text-[11px] text-gelap-muted">
             Terikat kaku ke Fasilitas Fisik DIY
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-netral-canvas/60 text-gelap/70 font-semibold border-b border-netral-border">
+            <thead className="bg-netral-canvas/60 text-gelap-muted font-semibold border-b border-netral-border">
               <tr>
                 <th className="p-3.5">Nama Operator</th>
                 <th className="p-3.5">Surel Akun</th>
@@ -202,7 +202,7 @@ export default function LogisticsOperatorsPage() {
                   <td className="p-3.5 font-bold text-gelap">
                     {op.fullName}
                   </td>
-                  <td className="p-3.5 font-mono text-gelap/80">
+                  <td className="p-3.5 font-mono text-gelap-muted">
                     {op.email}
                   </td>
                   <td className="p-3.5">
@@ -238,7 +238,7 @@ export default function LogisticsOperatorsPage() {
                       {op.status}
                     </span>
                   </td>
-                  <td className="p-3.5 text-gelap/60">
+                  <td className="p-3.5 text-gelap-muted">
                     {op.createdAt}
                   </td>
                 </tr>
@@ -258,7 +258,7 @@ export default function LogisticsOperatorsPage() {
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full text-gelap/50 hover:text-gelap hover:bg-netral-canvas"
+              className="absolute top-4 right-4 p-2 rounded-full text-gelap-muted hover:text-gelap hover:bg-netral-canvas"
             >
               <X className="w-5 h-5" />
             </button>
@@ -271,7 +271,7 @@ export default function LogisticsOperatorsPage() {
                     Penerbitan Akun Operator Hub
                   </h2>
                 </div>
-                <p className="text-xs text-gelap/65 mb-4 leading-relaxed">
+                <p className="text-xs text-gelap-muted mb-4 leading-relaxed">
                   Akun operator terikat secara kaku pada fasilitas fisik dan wajib diaktivasi mandiri dalam 24 jam.
                 </p>
 
@@ -384,7 +384,7 @@ export default function LogisticsOperatorsPage() {
                 <h2 className="text-lg font-bold font-heading text-gelap">
                   Akun Operator Berhasil Diterbitkan!
                 </h2>
-                <p className="text-xs text-gelap/70 leading-relaxed">
+                <p className="text-xs text-gelap-muted leading-relaxed">
                   Bagikan tautan aktivasi mandiri di bawah kepada operator. Tautan ini hanya berlaku selama <strong className="text-gelap">24 jam</strong>.
                 </p>
 
@@ -402,13 +402,13 @@ export default function LogisticsOperatorsPage() {
                   </div>
                   <div
                     suppressHydrationWarning
-                    className="p-2 bg-white rounded-lg border border-netral-border font-mono text-[11px] break-all text-gelap/80 select-all"
+                    className="p-2 bg-white rounded-lg border border-netral-border font-mono text-[11px] break-all text-gelap-muted select-all"
                   >
                     {origin ? `${origin}${issuedResult.activationUrl}` : issuedResult.activationUrl}
                   </div>
                   <div
                     suppressHydrationWarning
-                    className="text-[10px] text-gelap/60 flex items-center gap-1"
+                    className="text-[10px] text-gelap-muted flex items-center gap-1"
                   >
                     <Clock className="w-3 h-3 text-sekunder" />
                     Kedaluwarsa: {new Date(issuedResult.expiresAt).toLocaleString('id-ID')}

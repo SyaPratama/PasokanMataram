@@ -163,7 +163,7 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
           value={documentNumber}
           onChange={(e) => setDocumentNumber(e.target.value)}
           required
-          className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap placeholder:text-gelap/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium min-h-[44px] transition-colors"
+          className="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap placeholder:text-gelap-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer font-medium min-h-[44px] transition-colors"
         />
       </div>
 
@@ -188,7 +188,7 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
             <span className="text-xs sm:text-sm font-bold text-primer hover:underline block">
               Pilih berkas dari perangkat
             </span>
-            <span className="text-xs text-gelap/80 block mt-1 font-body">
+            <span className="text-xs text-gelap-muted block mt-1 font-body">
               {file ? (
                 <span className="inline-flex items-center text-primer font-bold">
                   <FileText className="w-4 h-4 mr-1 shrink-0" aria-hidden="true" />
@@ -204,7 +204,7 @@ export function DocumentUploader({ onSuccess }: DocumentUploaderProps) {
 
       {uploadProgress !== null ? (
         <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-gelap/80 font-medium">
+          <div className="flex justify-between text-xs text-gelap-muted font-medium">
             <span>Mengunggah dokumen ke penyimpanan privat…</span>
             <span className="font-mono font-bold text-primer">{uploadProgress}%</span>
           </div>

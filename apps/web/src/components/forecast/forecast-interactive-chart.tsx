@@ -139,7 +139,7 @@ export function ForecastInteractiveChart({
               Ensemble v2.1
             </span>
           </div>
-          <p className="text-xs text-gelap/60 mt-0.5 flex flex-wrap items-center gap-1.5">
+          <p className="text-xs text-gelap-muted mt-0.5 flex flex-wrap items-center gap-1.5">
             <span>Garis tebal: data pasar aktual</span>
             <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
             <span>Garis putus-putus: estimasi ML</span>
@@ -157,7 +157,7 @@ export function ForecastInteractiveChart({
               className={`px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                 horizon === h
                   ? 'bg-white text-primer shadow-2xs font-extrabold'
-                  : 'text-gelap/70 hover:text-gelap'
+                  : 'text-gelap-muted hover:text-gelap'
               }`}
             >
               {h} Hari
@@ -316,10 +316,10 @@ export function ForecastInteractiveChart({
             </div>
             <div className="text-base font-heading font-black text-primer font-mono tabular-nums">
               Rp {hoveredPoint.price.toLocaleString('id-ID')}
-              <span className="text-[10px] font-normal text-gelap/60"> / {commodity.unit}</span>
+              <span className="text-[10px] font-normal text-gelap-muted"> / {commodity.unit}</span>
             </div>
             {hoveredPoint.confidenceLower && hoveredPoint.confidenceUpper && (
-              <div className="text-[10px] text-gelap/70 font-mono">
+              <div className="text-[10px] text-gelap-muted font-mono">
                 Rentang 95%: Rp {hoveredPoint.confidenceLower.toLocaleString('id-ID')} &ndash; Rp {hoveredPoint.confidenceUpper.toLocaleString('id-ID')}
               </div>
             )}
@@ -331,19 +331,19 @@ export function ForecastInteractiveChart({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-0.5 bg-primer rounded-full inline-block" />
-            <span className="text-gelap/80 font-medium text-[11px]">Historis 14 Hari</span>
+            <span className="text-gelap-muted font-medium text-[11px]">Historis 14 Hari</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-0.5 bg-sekunder border-b border-dashed border-sekunder inline-block" />
-            <span className="text-gelap/80 font-medium text-[11px]">Proyeksi Model ML</span>
+            <span className="text-gelap-muted font-medium text-[11px]">Proyeksi Model ML</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-2 bg-aksen/20 rounded-xs inline-block" />
-            <span className="text-gelap/80 font-medium text-[11px]">Pita Ketidakpastian 95%</span>
+            <span className="text-gelap-muted font-medium text-[11px]">Pita Ketidakpastian 95%</span>
           </div>
         </div>
 
-        <div className="text-[11px] text-gelap/60 font-mono">
+        <div className="text-[11px] text-gelap-muted font-mono">
           MAPE Akurasi: <strong className="text-primer font-bold">{commodity.modelMetadata.mapeAccuracy}%</strong>
         </div>
       </div>

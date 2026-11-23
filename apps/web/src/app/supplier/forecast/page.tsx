@@ -56,7 +56,7 @@ export default function SupplierForecastPage() {
   const getTrendIcon = (trend: 'UP' | 'DOWN' | 'STABLE') => {
     if (trend === 'UP') return <TrendingUp className="w-4 h-4 text-status-success" />;
     if (trend === 'DOWN') return <TrendingDown className="w-4 h-4 text-status-danger" />;
-    return <Minus className="w-4 h-4 text-gelap/60" />;
+    return <Minus className="w-4 h-4 text-gelap-muted" />;
   };
 
   if (isLoading) {
@@ -72,7 +72,7 @@ export default function SupplierForecastPage() {
       <div className="space-y-6">
         <div className="p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
           <h2 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada Data Prakiraan</h2>
-          <p className="text-xs text-gelap/60">Tidak ada data proyeksi harga panen yang tersedia saat ini.</p>
+          <p className="text-xs text-gelap-muted">Tidak ada data proyeksi harga panen yang tersedia saat ini.</p>
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function SupplierForecastPage() {
               Mitra Gapoktan
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-gelap/70 mt-1">
+          <p className="text-xs sm:text-sm text-gelap-muted mt-1">
             Panduan kecerdasan buatan untuk mengoptimalkan kalender petik dan memprediksi harga tampung di Hub Transit Sentolo.
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function SupplierForecastPage() {
             >
               <span>{item.name}</span>
               <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
-                isSelected ? 'bg-white/20 text-white' : 'bg-netral-canvas text-gelap/60'
+                isSelected ? 'bg-white/20 text-white' : 'bg-netral-canvas text-gelap-muted'
               }`}>
                 {item.trend === 'UP' ? `Apresiasi +${item.trendPercentage}%` : `Diskon ${item.trendPercentage}%`}
               </span>
@@ -132,26 +132,26 @@ export default function SupplierForecastPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
+          <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap truncate">
             Harga Beli Hub Hari Ini
           </div>
           <div className="text-xl font-heading font-black text-gelap mt-1 font-mono tabular-nums">
             Rp {selectedCommodity.currentPrice.toLocaleString('id-ID')}
-            <span className="text-xs font-normal text-gelap/60"> / {selectedCommodity.unit}</span>
+            <span className="text-xs font-normal text-gelap-muted"> / {selectedCommodity.unit}</span>
           </div>
-          <div className="text-[11px] text-gelap/60 mt-1">
+          <div className="text-[11px] text-gelap-muted mt-1">
             Standar: Grade A Tare-Zero
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
+          <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap truncate">
             Proyeksi Nilai Tampung 7 Hari
           </div>
           <div className="text-xl font-heading font-black text-primer mt-1 font-mono tabular-nums">
             Rp {selectedCommodity.predictedPrice7d.toLocaleString('id-ID')}
           </div>
-          <div className="text-[11px] text-gelap/60 mt-1 flex items-center gap-1">
+          <div className="text-[11px] text-gelap-muted mt-1 flex items-center gap-1">
             {getTrendIcon(selectedCommodity.predictedPrice7d >= selectedCommodity.currentPrice ? 'UP' : 'DOWN')}
             <span>
               {selectedCommodity.predictedPrice7d >= selectedCommodity.currentPrice ? 'Tren Menguntungkan' : 'Kecenderungan Melemah'}
@@ -160,13 +160,13 @@ export default function SupplierForecastPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
+          <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap truncate">
             Proyeksi Nilai Tampung 30 Hari
           </div>
           <div className="text-xl font-heading font-black text-primer mt-1 font-mono tabular-nums">
             Rp {selectedCommodity.predictedPrice30d.toLocaleString('id-ID')}
           </div>
-          <div className="text-[11px] text-gelap/60 mt-1 flex items-center gap-1">
+          <div className="text-[11px] text-gelap-muted mt-1 flex items-center gap-1">
             <span className="font-mono font-bold text-primer">
               {selectedCommodity.trendPercentage > 0 ? `+${selectedCommodity.trendPercentage}%` : `${selectedCommodity.trendPercentage}%`}
             </span>
@@ -175,13 +175,13 @@ export default function SupplierForecastPage() {
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-          <div className="text-[11px] font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap truncate">
+          <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap truncate">
             Saran Waktu Setor Panen
           </div>
           <div className="text-sm font-heading font-bold text-sekunder mt-1 truncate">
             {selectedCommodity.optimalBuyWindow.startDate}
           </div>
-          <div className="text-[11px] text-gelap/60 mt-1">
+          <div className="text-[11px] text-gelap-muted mt-1">
             Alokasi hub: Sentra Sentolo & Bantul
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function SupplierForecastPage() {
         userType="SUPPLIER"
       />
 
-      <div className="p-4 rounded-2xl bg-netral-canvas/60 border border-netral-border/70 text-xs text-gelap/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-netral-canvas/60 border border-netral-border/70 text-xs text-gelap-muted flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-sekunder flex-shrink-0" />
           <span className="inline-flex flex-wrap items-center gap-1.5">
@@ -207,7 +207,7 @@ export default function SupplierForecastPage() {
             <span>Akurasi MAPE: <span className="font-mono text-primer font-bold">{selectedCommodity.modelMetadata.mapeAccuracy}%</span></span>
           </span>
         </div>
-        <div className="text-[11px] text-gelap/60">
+        <div className="text-[11px] text-gelap-muted">
           Dana penjualan panen diproteksi sistem rekening escrow terbit otomatis saat QR Pass tervalidasi.
         </div>
       </div>

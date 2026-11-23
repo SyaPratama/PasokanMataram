@@ -15,12 +15,12 @@ export default function HubHelpPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Kanal Siaga 24 Jam</Badge>
-            <span className="text-xs text-gelap/60">Hub Transit Sewon Bantul</span>
+            <span className="text-xs text-gelap-muted">Hub Transit Sewon Bantul</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Pusat Bantuan Stasiun &amp; Layanan Darurat Hub
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Dukungan teknis timbangan digital, armada mogok di jalan, dan koordinasi cepat konsorsium pangan.
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function HubHelpPage() {
             <Radio className="w-5 h-5" aria-hidden="true" />
           </div>
           <h2 className="text-sm font-bold text-gelap font-heading">Radio Logistik &amp; Dispatcher</h2>
-          <p className="text-xs text-gelap/70 leading-relaxed">
+          <p className="text-xs text-gelap-muted leading-relaxed">
             Komunikasi langsung VHF &amp; hotline darurat untuk supir truk dan operator sortir di lapangan.
           </p>
           <div className="text-xs font-mono font-bold text-primer pt-2">
@@ -45,7 +45,7 @@ export default function HubHelpPage() {
             <Wrench className="w-5 h-5" aria-hidden="true" />
           </div>
           <h2 className="text-sm font-bold text-gelap font-heading">Teknisi Timbangan &amp; Sensor</h2>
-          <p className="text-xs text-gelap/70 leading-relaxed">
+          <p className="text-xs text-gelap-muted leading-relaxed">
             Layanan tanggap cepat perbaikan sensor sel beban (load cell) timbangan tera dan moisture tester.
           </p>
           <div className="text-xs font-mono font-bold text-aksen-dark pt-2">
@@ -58,7 +58,7 @@ export default function HubHelpPage() {
             <ShieldCheck className="w-5 h-5" aria-hidden="true" />
           </div>
           <h2 className="text-sm font-bold text-gelap font-heading">Pusat Mediasi Sengketa QC</h2>
-          <p className="text-xs text-gelap/70 leading-relaxed">
+          <p className="text-xs text-gelap-muted leading-relaxed">
             Eskalasi selisih timbangan atau penolakan mutu antara Gapoktan binaan dan pihak pembeli HoReKa.
           </p>
           <div className="text-xs font-mono font-bold text-primer pt-2">

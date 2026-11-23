@@ -13,7 +13,7 @@ export function KepatuhanKeamananSection() {
           <h2 className="mt-2 text-2xl md:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Keamanan Escrow & Kepatuhan Legalitas KYB
           </h2>
-          <p className="mt-3 text-sm md:text-base text-gelap/70 font-body">
+          <p className="mt-3 text-sm md:text-base text-gelap-muted font-body">
             Menghilangkan risiko penipuan tonase, wanprestasi bayar mundur, dan komoditas oplosan dengan validasi entitas resmi serta sistem pembukuan berpasangan.
           </p>
         </div>
@@ -24,10 +24,10 @@ export function KepatuhanKeamananSection() {
               <FileCheck className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Verifikasi Entitas Sah (KYB)</h3>
-            <p className="mt-2 text-xs text-gelap/70 leading-relaxed">
+            <p className="mt-2 text-xs text-gelap-muted leading-relaxed">
               Setiap pihak yang bertransaksi wajib diverifikasi secara hukum. HoReKa melampirkan Nomor Induk Berusaha (NIB OSS), sedangkan supplier melampirkan NIB atau sertifikasi mutu resmi (Halal, NKV, SKP, P-IRT).
             </p>
-            <ul className="mt-4 space-y-2 text-xs text-gelap/80">
+            <ul className="mt-4 space-y-2 text-xs text-gelap-muted">
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 mr-2 text-primer flex-shrink-0" />
                 Validasi NIB OSS Republik Indonesia
@@ -44,10 +44,10 @@ export function KepatuhanKeamananSection() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Rekening Penampung Escrow</h3>
-            <p className="mt-2 text-xs text-gelap/70 leading-relaxed">
+            <p className="mt-2 text-xs text-gelap-muted leading-relaxed">
               Dana pembelian dikunci pada rekening penampung bersama saat pesanan diterbitkan. Supplier menerima kepastian pasar, sementara pemilik kafe terlindungi dari risiko barang susut atau tidak terkirim.
             </p>
-            <ul className="mt-4 space-y-2 text-xs text-gelap/80">
+            <ul className="mt-4 space-y-2 text-xs text-gelap-muted">
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 mr-2 text-sekunder flex-shrink-0" />
                 Dana terkunci hingga barang diterima dapur
@@ -64,10 +64,10 @@ export function KepatuhanKeamananSection() {
               <Lock className="w-5 h-5" />
             </div>
             <h3 className="font-heading font-bold text-lg text-gelap">Isolasi Data Multi-Tenant (RLS)</h3>
-            <p className="mt-2 text-xs text-gelap/70 leading-relaxed">
+            <p className="mt-2 text-xs text-gelap-muted leading-relaxed">
               Arsitektur database PostgreSQL menerapkan Row-Level Security (RLS) yang mengisolasi seluruh data pesanan, dokumen legalitas, dan saldo keuangan per entitas tenant.
             </p>
-            <ul className="mt-4 space-y-2 text-xs text-gelap/80">
+            <ul className="mt-4 space-y-2 text-xs text-gelap-muted">
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 mr-2 text-aksen flex-shrink-0" />
                 Pemisahan hak akses dapur vs pemilik

@@ -10,7 +10,7 @@ export function KybAuditSkeleton() {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-netral-canvas text-xs uppercase text-gelap/60 border-b border-netral-border">
+          <thead className="bg-netral-canvas text-xs uppercase text-gelap-muted border-b border-netral-border">
             <tr>
               <th className="py-3 px-4">Nama Usaha / Penanggung Jawab</th>
               <th className="py-3 px-4">Tipe Mitra</th>

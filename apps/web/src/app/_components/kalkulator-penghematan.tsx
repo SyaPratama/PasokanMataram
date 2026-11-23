@@ -30,7 +30,7 @@ export function KalkulatorPenghematan() {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Hitung Potensi Penghematan Dapur Usaha Anda
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap/80 font-body">
+          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
             Bandingkan pengeluaran belanja eceran pasar harian dengan pengadaan terpadu dari ekosistem supplier pangan lokal D.I. Yogyakarta.
           </p>
         </div>
@@ -108,7 +108,7 @@ export function KalkulatorPenghematan() {
                   className="w-full accent-primer cursor-pointer h-2 bg-netral-border rounded-lg"
                   aria-label="Estimasi belanja dapur per hari"
                 />
-                <div className="flex justify-between text-[10px] text-gelap/60 mt-1 font-mono">
+                <div className="flex justify-between text-[10px] text-gelap-muted mt-1 font-mono">
                   <span>Rp 500 rb</span>
                   <span>Rp 7.5 jt</span>
                   <span>Rp 15 jt</span>
@@ -116,7 +116,7 @@ export function KalkulatorPenghematan() {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 flex items-center gap-2 text-xs text-gelap/70">
+            <div className="mt-6 pt-4 flex items-center gap-2 text-xs text-gelap-muted">
               <ShieldCheck className="w-4 h-4 text-primer shrink-0" />
               <span>Simulasi berdasarkan deviasi harga pasar eceran vs kontrak supplier pangan DIY 2026</span>
             </div>

@@ -61,7 +61,7 @@ export default function MaintenancePage() {
             <span className="font-heading font-extrabold text-base tracking-tight text-gelap block leading-tight">
               PasokMataram
             </span>
-            <span className="text-[11px] text-gelap/60 block font-medium">
+            <span className="text-[11px] text-gelap-muted block font-medium">
               Rantai Pasok Pangan D.I. Yogyakarta
             </span>
           </div>
@@ -97,7 +97,7 @@ export default function MaintenancePage() {
               {title}
             </h1>
 
-            <p className="text-sm text-gelap/70 leading-relaxed font-body">
+            <p className="text-sm text-gelap-muted leading-relaxed font-body">
               {message}
             </p>
           </div>
@@ -110,7 +110,7 @@ export default function MaintenancePage() {
               <h2 className="text-xs font-bold text-gelap uppercase tracking-wider mb-1 font-heading">
                 Escrow Terlindungi
               </h2>
-              <p className="text-xs text-gelap/70 leading-relaxed font-body">
+              <p className="text-xs text-gelap-muted leading-relaxed font-body">
                 Rekening penampung escrow dan pencatatan komitmen alokasi panen tetap aman terenkripsi.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function MaintenancePage() {
               <h2 className="text-xs font-bold text-gelap uppercase tracking-wider mb-1 font-heading">
                 Hub Logistik Siaga
               </h2>
-              <p className="text-xs text-gelap/70 leading-relaxed font-body">
+              <p className="text-xs text-gelap-muted leading-relaxed font-body">
                 Penerimaan fisik gabungan hasil panen dan stasiun timbangan tera tetap beroperasi di lokasi hub.
               </p>
             </div>
@@ -134,7 +134,7 @@ export default function MaintenancePage() {
               <h2 className="text-xs font-bold text-gelap uppercase tracking-wider mb-1 font-heading">
                 Layanan Darurat
               </h2>
-              <p className="text-xs text-gelap/70 leading-relaxed font-body">
+              <p className="text-xs text-gelap-muted leading-relaxed font-body">
                 Kebutuhan pasokan mendesak untuk operasional dapur dapat dikoordinasikan langsung ke kontak pengawas.
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function MaintenancePage() {
       </div>
 
       <footer className="w-full max-w-4xl mx-auto pt-6 border-t border-netral-border/60 text-center">
-        <p className="text-xs text-gelap/60 font-body">
+        <p className="text-xs text-gelap-muted font-body">
           Sistem Pengadaan Pangan PasokMataram terintegrasi standar SNI &amp; Metrologi Legal D.I. Yogyakarta.
         </p>
       </footer>

@@ -30,7 +30,7 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={twMerge(clsx('text-xs text-gelap/70 font-body', className))} {...props} />;
+  return <p className={twMerge(clsx('text-xs text-gelap-muted font-body', className))} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

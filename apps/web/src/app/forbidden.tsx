@@ -31,7 +31,7 @@ export default function Forbidden() {
           Akses Tidak Diizinkan
         </h1>
 
-        <p className="text-sm text-gelap/70 leading-relaxed mb-8 max-w-md mx-auto">
+        <p className="text-sm text-gelap-muted leading-relaxed mb-8 max-w-md mx-auto">
           Anda tidak memiliki wewenang atau hak akses yang memadai untuk membuka modul operasional ini. Silakan kembali ke beranda utama atau masuk dengan akun yang memiliki hak akses.
         </p>
 

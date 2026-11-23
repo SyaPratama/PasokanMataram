@@ -130,7 +130,7 @@ export function PaketLayanan() {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Pilihan Paket Akun Sesuai Skala Bisnis Anda
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
+          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
             Tanpa biaya tersembunyi. Dapur restoran hanya membayar transaksi yang berhasil, supplier menerima pembayaran penuh terproteksi escrow.
           </p>
         </div>
@@ -178,7 +178,7 @@ export function PaketLayanan() {
                       className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                         tier.isFeatured
                           ? 'bg-white/10 text-white/90 border border-white/20'
-                          : 'bg-netral-canvas text-gelap/85 border border-netral-border/60'
+                          : 'bg-netral-canvas text-gelap-muted border border-netral-border/60'
                       }`}
                     >
                       {tier.escrowFee}
@@ -226,7 +226,7 @@ export function PaketLayanan() {
                         />
                         <span
                           className={`leading-relaxed ${
-                            tier.isFeatured ? 'text-white/90' : 'text-gelap/85'
+                            tier.isFeatured ? 'text-white/90' : 'text-gelap-muted'
                           }`}
                         >
                           {feature}
@@ -282,13 +282,13 @@ export function PaketLayanan() {
                 </button>
               ))}
             </div>
-            <span className="text-[11px] text-gelap/60 font-medium">
+            <span className="text-[11px] text-gelap-muted font-medium">
               Geser untuk melihat {PRICING_TIERS.length} pilihan paket
             </span>
           </div>
         )}
 
-        <div className="mt-10 max-w-3xl mx-auto p-4 sm:p-5 rounded-2xl bg-white border border-netral-border/70 text-center text-xs text-gelap/70 flex items-center justify-center gap-2 shadow-2xs">
+        <div className="mt-10 max-w-3xl mx-auto p-4 sm:p-5 rounded-2xl bg-white border border-netral-border/70 text-center text-xs text-gelap-muted flex items-center justify-center gap-2 shadow-2xs">
           <Clock className="w-4 h-4 text-sekunder shrink-0" aria-hidden="true" />
           <span>
             Seluruh paket menikmati jaminan drop-off terjadwal dan proteksi rekening penampung resmi.

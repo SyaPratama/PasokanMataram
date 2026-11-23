@@ -30,12 +30,12 @@ export default function AdminQuotasPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Alokasi Pasokan Bahan Pangan 2026</Badge>
-            <span className="text-xs text-gelap/60">5 Kabupaten/Kota DIY</span>
+            <span className="text-xs text-gelap-muted">5 Kabupaten/Kota DIY</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Katalog Komoditas &amp; Alokasi Kuota Konsorsium
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Pengaturan batas serap pasokan agregat, penetapan harga dasar (floor price) produsen, dan jaminan transparansi.
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function AdminQuotasPage() {
         {quotas.length === 0 ? (
           <div className="col-span-full p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
             <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
-            <p className="text-xs text-gelap/60">Belum ada data kuota agregat yang aktif saat ini.</p>
+            <p className="text-xs text-gelap-muted">Belum ada data kuota agregat yang aktif saat ini.</p>
           </div>
         ) : (
           quotas.map((qta) => {
@@ -59,7 +59,7 @@ export default function AdminQuotasPage() {
                 <div>
                   <span className="text-[10px] font-mono font-bold text-primer">{qta.id}</span>
                   <h2 className="text-sm font-bold text-gelap font-heading mt-0.5">{qta.name}</h2>
-                  <p className="text-xs text-gelap/70">{qta.variety}</p>
+                  <p className="text-xs text-gelap-muted">{qta.variety}</p>
                 </div>
                 <Badge
                   variant={
@@ -80,7 +80,7 @@ export default function AdminQuotasPage() {
 
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gelap/65">Terisi: {qta.allocatedTon} Ton</span>
+                  <span className="text-gelap-muted">Terisi: {qta.allocatedTon} Ton</span>
                   <span className="font-bold text-gelap">{percent}% dari {qta.totalQuotaTon} Ton</span>
                 </div>
                 <div className="w-full bg-netral-border/50 rounded-full h-2 overflow-hidden">
@@ -97,8 +97,8 @@ export default function AdminQuotasPage() {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-netral-border/60 text-xs flex justify-between items-center text-gelap/85">
-                <span className="flex items-center gap-1 text-gelap/60 text-[11px]">
+              <div className="pt-2 border-t border-netral-border/60 text-xs flex justify-between items-center text-gelap-muted">
+                <span className="flex items-center gap-1 text-gelap-muted text-[11px]">
                   <MapPin className="w-3 h-3 text-primer" aria-hidden="true" />
                   {qta.regency}
                 </span>

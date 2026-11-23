@@ -28,12 +28,12 @@ export default function AdminOverviewPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Konsorsium Tata Kelola DIY</Badge>
-            <span className="text-xs text-gelap/60">Hak Akses: SUPER_ADMIN</span>
+            <span className="text-xs text-gelap-muted">Hak Akses: SUPER_ADMIN</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Pusat Komando &amp; Pengawasan Platform PasokMataram
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Audit legalitas mitra usaha, kuota komoditas, dan integritas multi-tenant RLS.
           </p>
         </div>
@@ -50,36 +50,36 @@ export default function AdminOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Tenant Terverifikasi</span>
+            <span className="text-xs font-semibold text-gelap-muted">Tenant Terverifikasi</span>
             <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">142 Entitas</div>
-          <p className="text-[11px] text-gelap/60 mt-1">84 Restoran HoReKa, 58 Supplier &amp; Gapoktan</p>
+          <p className="text-[11px] text-gelap-muted mt-1">84 Restoran HoReKa, 58 Supplier &amp; Gapoktan</p>
         </div>
 
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Alokasi Kuota Terkunci</span>
+            <span className="text-xs font-semibold text-gelap-muted">Alokasi Kuota Terkunci</span>
             <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">42.8 Ton</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Ayam, sapi, susu, bumbu &amp; panen sayur</p>
+          <p className="text-[11px] text-gelap-muted mt-1">Ayam, sapi, susu, bumbu &amp; panen sayur</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Integritas RLS &amp; Lock</span>
+            <span className="text-xs font-semibold text-gelap-muted">Integritas RLS &amp; Lock</span>
             <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <Lock className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">100% Sehat</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Zero cross-tenant leakage</p>
+          <p className="text-[11px] text-gelap-muted mt-1">Zero cross-tenant leakage</p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Audit &amp; Verifikasi KYB
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Antrean validasi legalitas NIB &amp; SK kelompok tani</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Antrean validasi legalitas NIB &amp; SK kelompok tani</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -117,7 +117,7 @@ export default function AdminOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Operator Logistik Hub
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Closed provisioning akun operator stasiun Sewon</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Closed provisioning akun operator stasiun Sewon</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -139,7 +139,7 @@ export default function AdminOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Katalog &amp; Kuota DIY
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Penetapan batas serap panen di 5 kabupaten/kota</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Penetapan batas serap panen di 5 kabupaten/kota</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -160,7 +160,7 @@ export default function AdminOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Audit Mutex &amp; RLS
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Pemeriksaan Redis distributed lock &amp; isolasi database</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Pemeriksaan Redis distributed lock &amp; isolasi database</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -181,7 +181,7 @@ export default function AdminOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Dokumentasi Platform
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Prinsip Konstitusi v1.9.0 dan spesifikasi teknis API</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Prinsip Konstitusi v1.9.0 dan spesifikasi teknis API</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">

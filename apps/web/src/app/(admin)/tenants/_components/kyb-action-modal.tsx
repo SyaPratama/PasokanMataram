@@ -73,7 +73,7 @@ export function KybActionModal({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="w-8 h-8 rounded-lg text-gelap/70 hover:text-gelap hover:bg-netral-border/40 focus:outline-none focus:ring-2 focus:ring-primer flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg text-gelap-muted hover:text-gelap hover:bg-netral-border/40 focus:outline-none focus:ring-2 focus:ring-primer flex items-center justify-center transition-colors"
             aria-label="Tutup dialog"
           >
             <X className="w-4 h-4" />
@@ -81,7 +81,7 @@ export function KybActionModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
-          <p className="text-xs text-gelap/85 leading-relaxed font-body">
+          <p className="text-xs text-gelap-muted leading-relaxed font-body">
             {decision === 'APPROVED' ? (
               <>
                 Konfirmasi persetujuan legalitas untuk{' '}
@@ -111,7 +111,7 @@ export function KybActionModal({
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="misal: Halaman NIB buram, tanggal masa berlaku terpotong..."
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap focus:outline-none focus:ring-2 focus:ring-primer font-body placeholder:text-gelap/50"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-netral-border rounded-xl text-gelap focus:outline-none focus:ring-2 focus:ring-primer font-body placeholder:text-gelap-muted"
               />
               {error && (
                 <div className="mt-1 flex items-center space-x-1 text-[11px] text-status-danger font-semibold">

@@ -194,7 +194,7 @@ export default function AdminTenantsPage() {
             <ShieldCheck className="w-6 h-6 mr-2 text-primer" />
             Meja Kerja Audit Kepatuhan (KYB)
           </h1>
-          <p className="text-xs text-gelap/80 mt-1 font-body flex items-center gap-1.5">
+          <p className="text-xs text-gelap-muted mt-1 font-body flex items-center gap-1.5">
             <span>Validasi legalitas resmi mitra HoReKa dan Gapoktan D.I. Yogyakarta</span>
             <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
             <span>SLA 1x24 Jam Kerja</span>
@@ -221,7 +221,7 @@ export default function AdminTenantsPage() {
                   }}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${statusFilter === tab.key
                       ? 'bg-primer text-white shadow-xs'
-                      : 'text-gelap/80 hover:text-gelap hover:bg-netral-canvas'
+                      : 'text-gelap-muted hover:text-gelap hover:bg-netral-canvas'
                     }`}
                 >
                   {tab.label}
@@ -249,7 +249,7 @@ export default function AdminTenantsPage() {
             <label htmlFor="admin-tenant-search" className="sr-only">
               Cari nama entitas, penanggung jawab, email, atau kabupaten
             </label>
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gelap/50" aria-hidden="true" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gelap-muted" aria-hidden="true" />
             <Input
               id="admin-tenant-search"
               name="admin-tenant-search"
@@ -260,7 +260,7 @@ export default function AdminTenantsPage() {
               className="pl-9 text-xs"
             />
           </div>
-          <div className="text-xs text-gelap/80 hidden sm:block">
+          <div className="text-xs text-gelap-muted hidden sm:block">
             Menampilkan <strong>{displayedItems.length}</strong> entitas
           </div>
         </div>
@@ -277,9 +277,9 @@ export default function AdminTenantsPage() {
         <KybAuditSkeleton />
       ) : displayedItems.length === 0 ? (
         <div className="w-full bg-white rounded-xl border border-netral-border p-12 text-center shadow-xs">
-          <FileText className="w-12 h-12 mx-auto text-gelap/40 mb-3" />
+          <FileText className="w-12 h-12 mx-auto text-gelap-muted mb-3" />
           <h3 className="text-sm font-bold text-gelap font-heading">Tidak Ada Antrean Verifikasi</h3>
-          <p className="text-xs text-gelap/75 mt-1 max-w-sm mx-auto">
+          <p className="text-xs text-gelap-muted mt-1 max-w-sm mx-auto">
             {statusFilter === 'PENDING_VERIFICATION'
               ? 'Seluruh berkas pendaftaran mitra saat ini telah diproses audit.'
               : `Tidak ditemukan entitas mitra dengan filter terpilih.`}
@@ -289,7 +289,7 @@ export default function AdminTenantsPage() {
         <div className="w-full bg-white rounded-xl border border-netral-border shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-netral-canvas text-[11px] uppercase text-gelap/80 border-b border-netral-border font-bold tracking-wider">
+              <thead className="bg-netral-canvas text-[11px] uppercase text-gelap-muted border-b border-netral-border font-bold tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Entitas Usaha & Pemilik</th>
                   <th className="py-3 px-4">Kategori Mitra</th>
@@ -304,7 +304,7 @@ export default function AdminTenantsPage() {
                   <tr key={item.tenantId} className="hover:bg-netral-canvas/40 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-gelap">{item.businessName}</div>
-                      <div className="text-[11px] text-gelap/75 flex items-center gap-1.5">
+                      <div className="text-[11px] text-gelap-muted flex items-center gap-1.5">
                         <span>{item.owner.fullName}</span>
                         <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
                         <span>{item.owner.phoneNumber}</span>
@@ -318,7 +318,7 @@ export default function AdminTenantsPage() {
                     <td className="py-3.5 px-4 text-xs font-semibold text-gelap">
                       Sentra {item.regency.replace('_', ' ')}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-gelap/80 font-medium">
+                    <td className="py-3.5 px-4 text-xs text-gelap-muted font-medium">
                       {item.submittedAt}
                     </td>
                     <td className="py-3.5 px-4 text-center">
@@ -340,7 +340,7 @@ export default function AdminTenantsPage() {
             </table>
           </div>
 
-          <div className="p-3.5 border-t border-netral-border flex items-center justify-between text-xs text-gelap/75 bg-netral-canvas/40">
+          <div className="p-3.5 border-t border-netral-border flex items-center justify-between text-xs text-gelap-muted bg-netral-canvas/40">
             <div>
               Menampilkan <strong>{displayedItems.length}</strong> mitra di D.I. Yogyakarta
             </div>
@@ -349,7 +349,7 @@ export default function AdminTenantsPage() {
                 variant="outline"
                 size="sm"
                 disabled
-                className="border-netral-border text-xs text-gelap/50"
+                className="border-netral-border text-xs text-gelap-muted"
               >
                 <ChevronLeft className="w-3.5 h-3.5 mr-1" />
                 Sebelumnya
@@ -358,7 +358,7 @@ export default function AdminTenantsPage() {
                 variant="outline"
                 size="sm"
                 disabled
-                className="border-netral-border text-xs text-gelap/50"
+                className="border-netral-border text-xs text-gelap-muted"
               >
                 Selanjutnya
                 <ChevronRight className="w-3.5 h-3.5 ml-1" />

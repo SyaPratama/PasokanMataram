@@ -65,12 +65,12 @@ export default function AdminSystemPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Arsitektur Terisolasi Konstitusi v1.9.0</Badge>
-            <span className="text-xs text-gelap/60">PostgreSQL 16 &amp; Redis 7</span>
+            <span className="text-xs text-gelap-muted">PostgreSQL 16 &amp; Redis 7</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Audit Mutex Distributed Lock &amp; Database RLS
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Verifikasi integritas isolasi multi-tenant, zero cross-tenant leakage, dan status engine antrean konsorsium.
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function AdminSystemPage() {
               <Badge variant="success">{item.status}</Badge>
             </div>
 
-            <p className="text-xs text-gelap/85 leading-relaxed">{item.description}</p>
+            <p className="text-xs text-gelap-muted leading-relaxed">{item.description}</p>
 
             <div className="pt-2 border-t border-netral-border/60 flex items-center justify-between text-xs">
-              <span className="text-gelap/60">Metrik Pengujian:</span>
+              <span className="text-gelap-muted">Metrik Pengujian:</span>
               <span className="font-mono font-bold text-primer">{item.metric}</span>
             </div>
           </div>

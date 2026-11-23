@@ -30,7 +30,7 @@ export default function NotFound() {
           Rute Tidak Ditemukan
         </h1>
 
-        <p className="text-sm text-gelap/70 leading-relaxed mb-8 max-w-md mx-auto">
+        <p className="text-sm text-gelap-muted leading-relaxed mb-8 max-w-md mx-auto">
           Halaman pengadaan bahan baku atau modul sistem yang Anda tuju tidak tersedia, telah dipindahkan, atau alamat tautan yang dimasukkan keliru.
         </p>
 

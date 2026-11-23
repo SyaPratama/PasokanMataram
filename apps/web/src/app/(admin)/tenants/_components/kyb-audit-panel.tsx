@@ -51,7 +51,7 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
           </button>
           <div>
             <h2 className="text-lg font-heading font-bold text-gelap">{tenant.businessName}</h2>
-            <p className="text-xs text-gelap/80">ID Entitas: {tenant.tenantId}</p>
+            <p className="text-xs text-gelap-muted">ID Entitas: {tenant.tenantId}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -85,23 +85,23 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
       <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-netral-border">
         <div className="lg:col-span-5 p-6 space-y-6">
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap/80 mb-3 flex items-center">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap-muted mb-3 flex items-center">
               <Building2 className="w-4 h-4 mr-1.5 text-primer" />
               Profil Entitas Usaha
             </h3>
             <div className="space-y-3.5 text-sm">
               <div>
-                <span className="text-xs text-gelap/75 block">Nama Resmi Usaha:</span>
+                <span className="text-xs text-gelap-muted block">Nama Resmi Usaha:</span>
                 <span className="font-bold text-gelap">{tenant.businessName}</span>
               </div>
               <div>
-                <span className="text-xs text-gelap/75 block">Kategori Mitra:</span>
+                <span className="text-xs text-gelap-muted block">Kategori Mitra:</span>
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-primer-light text-primer border border-primer/20">
                   {tenant.tenantType === 'HOREKA_BUYER' ? 'Pembeli HoReKa' : 'Pemasok Gapoktan'}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-gelap/75 block">Sentra Produksi / Operasional:</span>
+                <span className="text-xs text-gelap-muted block">Sentra Produksi / Operasional:</span>
                 <span className="flex items-center text-gelap font-semibold mt-0.5">
                   <MapPin className="w-4 h-4 mr-1 text-sekunder" />
                   Sentra {tenant.regency.replace('_', ' ')}, D.I. Yogyakarta
@@ -111,17 +111,17 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
           </div>
 
           <div className="pt-4 border-t border-netral-border/60">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap/80 mb-3 flex items-center">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap-muted mb-3 flex items-center">
               <User className="w-4 h-4 mr-1.5 text-primer" />
               Penanggung Jawab Usaha
             </h3>
             <div className="space-y-3.5 text-sm">
               <div>
-                <span className="text-xs text-gelap/75 block">Nama Lengkap:</span>
+                <span className="text-xs text-gelap-muted block">Nama Lengkap:</span>
                 <span className="font-semibold text-gelap">{tenant.owner.fullName}</span>
               </div>
               <div>
-                <span className="text-xs text-gelap/75 block">Alamat Surel:</span>
+                <span className="text-xs text-gelap-muted block">Alamat Surel:</span>
                 <a
                   href={`mailto:${tenant.owner.email}`}
                   className="flex items-center text-primer hover:underline font-semibold mt-0.5"
@@ -131,7 +131,7 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
                 </a>
               </div>
               <div>
-                <span className="text-xs text-gelap/75 block">Nomor WhatsApp:</span>
+                <span className="text-xs text-gelap-muted block">Nomor WhatsApp:</span>
                 <a
                   href={`tel:${tenant.owner.phoneNumber}`}
                   className="flex items-center text-primer hover:underline font-semibold mt-0.5"
@@ -146,7 +146,7 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
 
         <div className="lg:col-span-7 p-6 space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap/80 flex items-center">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-gelap-muted flex items-center">
               <FileText className="w-4 h-4 mr-1.5 text-primer" />
               Daftar Berkas Legalitas ({tenant.documents.length})
             </h3>
@@ -154,8 +154,8 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
 
           {tenant.documents.length === 0 ? (
             <div className="p-8 text-center bg-netral-canvas rounded-xl border border-dashed border-netral-border">
-              <FileText className="w-8 h-8 mx-auto text-gelap/40 mb-2" />
-              <p className="text-xs text-gelap/75">Belum ada dokumen legalitas yang diunggah.</p>
+              <FileText className="w-8 h-8 mx-auto text-gelap-muted mb-2" />
+              <p className="text-xs text-gelap-muted">Belum ada dokumen legalitas yang diunggah.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -173,8 +173,8 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
                         <span className="text-sm font-bold text-gelap">Dokumen {doc.documentType}</span>
                         <StatusBadge status={doc.status} />
                       </div>
-                      <p className="text-xs text-gelap/80 font-medium mt-0.5">Nomor: {doc.documentNumber}</p>
-                      <p className="text-[11px] text-gelap/70 mt-0.5 flex items-center gap-1.5">
+                      <p className="text-xs text-gelap-muted font-medium mt-0.5">Nomor: {doc.documentNumber}</p>
+                      <p className="text-[11px] text-gelap-muted mt-0.5 flex items-center gap-1.5">
                         <span>Ukuran: {(doc.fileSizeBytes / (1024 * 1024)).toFixed(2)} MB</span>
                         <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
                         <span>Format: {doc.fileMimeType}</span>
@@ -182,7 +182,7 @@ export function KybAuditPanel({ tenant, onBack, onOpenReviewModal, isLoading }: 
                     </div>
                   </div>
                   <div className="sm:self-center">
-                    <span className="inline-block px-2.5 py-1 text-xs font-bold rounded-lg bg-netral-canvas text-gelap/90 border border-netral-border">
+                    <span className="inline-block px-2.5 py-1 text-xs font-bold rounded-lg bg-netral-canvas text-gelap-muted border border-netral-border">
                       Tersimpan di S3 MinIO
                     </span>
                   </div>

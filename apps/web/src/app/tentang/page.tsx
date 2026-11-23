@@ -28,11 +28,11 @@ export default function TentangPage() {
       <main className="flex-1">
         <div className="bg-transparent pt-6 pb-2 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <nav className="flex items-center text-xs text-gelap/60 mb-2" aria-label="Breadcrumb">
+            <nav className="flex items-center text-xs text-gelap-muted mb-2" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primer transition-colors">
                 Beranda
               </Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-gelap/40" />
+              <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-gelap-muted" />
               <span className="font-semibold text-primer">Tentang Kami</span>
             </nav>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -40,7 +40,7 @@ export default function TentangPage() {
                 <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-gelap tracking-tight">
                   Kisah, Visi & Komitmen Kemitraan DIY
                 </h1>
-                <p className="text-xs sm:text-sm text-gelap/70 mt-1 max-w-2xl">
+                <p className="text-xs sm:text-sm text-gelap-muted mt-1 max-w-2xl">
                   Membangun ketahanan pangan lokal dengan memastikan supplier dan produsen mendapat kepastian pasar dan dapur kuliner menerima pasokan konsisten.
                 </p>
               </div>

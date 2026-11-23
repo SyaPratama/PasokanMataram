@@ -16,7 +16,7 @@ export default function SupplierHelpPage() {
         <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-gelap tracking-tight">
           Pusat Bantuan Gapoktan & Sentra Hub
         </h1>
-        <p className="text-xs sm:text-sm text-gelap/70 mt-1">
+        <p className="text-xs sm:text-sm text-gelap-muted mt-1">
           Bantuan lapangan dan koordinasi serah terima hasil panen di Sentra Hub Kulon Progo (Sentolo).
         </p>
       </div>
@@ -29,7 +29,7 @@ export default function SupplierHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Posko Penerimaan Hub Sentolo
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Aktif pukul 16.00 - 22.00 WIB setiap hari untuk penjemputan bak pikap dan konfirmasi antrean timbang.
           </p>
           <div className="font-mono text-sm font-bold text-sekunder">
@@ -44,7 +44,7 @@ export default function SupplierHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Pendamping Lapangan Gapoktan
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Bantuan verifikasi legalitas gapoktan, pembukaan rekening kelompok, dan pencairan dana escrow.
           </p>
           <div className="font-mono text-sm font-bold text-primer">
@@ -59,7 +59,7 @@ export default function SupplierHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Buku Saku Standar Grade Panen
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Panduan sortasi awal di kebun agar panen lolos 100% pada uji petik Hub Sentolo.
           </p>
           <a

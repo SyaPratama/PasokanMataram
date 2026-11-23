@@ -237,10 +237,10 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gelap/85" aria-label="Navigasi Utama">
+          <nav className="hidden lg:flex items-center space-x-2 text-xs sm:text-sm font-semibold text-gelap-muted" aria-label="Navigasi Utama">
             <Link
               href="/"
-              className="hover:text-primer transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 text-gelap/80 hover:bg-primer-light/40"
+              className="hover:text-primer transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 text-gelap-muted hover:bg-primer-light/40 min-h-[44px] inline-flex items-center"
             >
               Beranda
             </Link>
@@ -256,13 +256,13 @@ export function Navbar() {
                     className={`inline-flex items-center gap-1.5 py-2 px-3.5 rounded-full text-xs sm:text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-primer min-h-[44px] ${
                       isOpen
                         ? 'text-primer bg-primer-light/70 font-bold shadow-2xs'
-                        : 'text-gelap/80 hover:text-primer hover:bg-primer-light/40'
+                        : 'text-gelap-muted hover:text-primer hover:bg-primer-light/40'
                     }`}
                   >
                     <span>{group.title}</span>
                     <ChevronDown
                       className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-primer' : 'text-gelap/50'
+                        isOpen ? 'rotate-180 text-primer' : 'text-gelap-muted'
                       }`}
                     />
                   </button>
@@ -296,7 +296,7 @@ export function Navbar() {
                                 <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity text-primer" />
                               </div>
                               {item.desc && (
-                                <p className="text-[11px] text-gelap/65 leading-snug mt-0.5 font-normal">
+                                <p className="text-[11px] text-gelap-muted leading-snug mt-0.5 font-normal">
                                   {item.desc}
                                 </p>
                               )}
@@ -314,7 +314,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center space-x-3">
             <Link
               href="/login"
-              className="text-xs sm:text-sm font-semibold text-gelap/85 hover:text-primer hover:bg-netral-canvas transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 min-h-[44px] flex items-center"
+              className="text-xs sm:text-sm font-semibold text-gelap-muted hover:text-primer hover:bg-netral-canvas transition-colors focus-visible:ring-2 focus-visible:ring-primer rounded-full py-2 px-3.5 min-h-[44px] flex items-center"
             >
               Masuk Portal
             </Link>
@@ -382,7 +382,7 @@ export function Navbar() {
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Tutup menu navigasi"
-                  className="p-2 rounded-full text-gelap/60 hover:text-gelap hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-2 rounded-full text-gelap-muted hover:text-gelap hover:bg-netral-canvas min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -411,7 +411,7 @@ export function Navbar() {
                       >
                         <span>{group.title}</span>
                         <ChevronDown
-                          className={`w-4 h-4 text-gelap/50 transition-transform ${
+                          className={`w-4 h-4 text-gelap-muted transition-transform ${
                             isExpanded ? 'rotate-180 text-primer' : ''
                           }`}
                         />
@@ -426,7 +426,7 @@ export function Navbar() {
                                 key={item.label}
                                 href={item.href}
                                 onClick={(e) => handleScrollToSection(e, item.sectionId, item.href)}
-                                className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white text-xs text-gelap/90 transition-colors min-h-[44px]"
+                                className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white text-xs text-gelap-muted transition-colors min-h-[44px]"
                               >
                                 <div className="w-7 h-7 rounded-lg bg-primer-light text-primer flex items-center justify-center shrink-0">
                                   <IconComponent className="w-3.5 h-3.5" />
@@ -434,7 +434,7 @@ export function Navbar() {
                                 <div className="flex-1 min-w-0">
                                   <div className="font-semibold text-xs text-gelap truncate">{item.label}</div>
                                   {item.desc && (
-                                    <div className="text-[10px] text-gelap/60 truncate">{item.desc}</div>
+                                    <div className="text-[10px] text-gelap-muted truncate">{item.desc}</div>
                                   )}
                                 </div>
                               </Link>

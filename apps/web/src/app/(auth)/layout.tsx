@@ -66,7 +66,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="min-w-0">
               <div className="text-xs font-bold font-heading text-gelap">100% Proteksi Escrow</div>
-              <p className="text-[11px] text-gelap/75 leading-snug font-body mt-0.5">
+              <p className="text-[11px] text-gelap-muted leading-snug font-body mt-0.5">
                 Dana belanja aman di rekening bersama s/d koki konfirmasi QC di gerai.
               </p>
             </div>
@@ -78,7 +78,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="min-w-0">
               <div className="text-xs font-bold font-heading text-gelap">Rantai Dingin 24 Jam</div>
-              <p className="text-[11px] text-gelap/75 leading-snug font-body mt-0.5">
+              <p className="text-[11px] text-gelap-muted leading-snug font-body mt-0.5">
                 4 jendela distribusi terjadwal dari Hub Transit Bantul se-DIY.
               </p>
             </div>
@@ -90,21 +90,21 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="min-w-0">
               <div className="text-xs font-bold font-heading text-gelap">Gapoktan Sah DIY</div>
-              <p className="text-[11px] text-gelap/75 leading-snug font-body mt-0.5">
+              <p className="text-[11px] text-gelap-muted leading-snug font-body mt-0.5">
                 Sourcing langsung ke kelompok tani binaan Kulon Progo, Bantul, dan Sleman.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="w-full mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] text-gelap/70 font-body">
+        <div className="w-full mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] text-gelap-muted font-body">
           <span>Terhubung di 5 Kabupaten/Kota D.I. Yogyakarta</span>
           <span className="w-1 h-1 rounded-full bg-gelap/30 inline-block" aria-hidden="true" />
           <span>Isolasi &amp; Privasi Data Bisnis Terproteksi</span>
         </div>
       </main>
 
-      <footer className="relative z-10 mt-4 pb-1 text-center text-xs text-gelap/60 font-body">
+      <footer className="relative z-10 mt-4 pb-1 text-center text-xs text-gelap-muted font-body">
         <p>Rekening Bersama Escrow Terproteksi Bank Indonesia &amp; Pengawasan Mutu QC Pangan DIY</p>
       </footer>
     </div>

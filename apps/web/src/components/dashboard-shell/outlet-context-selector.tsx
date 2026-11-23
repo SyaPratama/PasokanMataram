@@ -48,7 +48,7 @@ export function OutletContextSelector({
     <div className="relative space-y-1.5" ref={dropdownRef}>
       <label
         htmlFor="outlet-selector-btn"
-        className="block text-[11px] font-semibold text-gelap/85 uppercase tracking-wider px-1"
+        className="block text-[11px] font-semibold text-gelap-muted uppercase tracking-wider px-1"
       >
         Gerai Operasional:
       </label>
@@ -65,12 +65,12 @@ export function OutletContextSelector({
             <Building2 className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0" aria-hidden="true" />
             <span className="truncate">{activeOutlet?.name || 'Belum Ada Gerai'}</span>
           </div>
-          <div className="text-[10px] text-gelap/85 truncate pl-5">
+          <div className="text-[10px] text-gelap-muted truncate pl-5">
             {activeOutlet?.regency ? activeOutlet.regency.replace('_', ' ') : 'D.I. Yogyakarta'}
           </div>
         </div>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-gelap/60 flex-shrink-0 transition-transform duration-200 ${
+          className={`w-3.5 h-3.5 text-gelap-muted flex-shrink-0 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
           aria-hidden="true"
@@ -84,7 +84,7 @@ export function OutletContextSelector({
           className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-netral-border rounded-xl shadow-lg z-30 py-1 max-h-48 overflow-y-auto custom-scrollbar"
         >
           {outlets.length === 0 ? (
-            <div className="p-3 text-xs text-gelap/60 text-center">Belum ada gerai terdaftar</div>
+            <div className="p-3 text-xs text-gelap-muted text-center">Belum ada gerai terdaftar</div>
           ) : (
             outlets.map((outlet) => {
               const isSelected = outlet.id === activeOutletId;
@@ -103,7 +103,7 @@ export function OutletContextSelector({
                   }`}
                 >
                   <span className="truncate">{outlet.name}</span>
-                  <span className="text-[10px] text-gelap/85 flex items-center gap-1">
+                  <span className="text-[10px] text-gelap-muted flex items-center gap-1">
                     <span>{outlet.isMain ? 'Pusat' : 'Cabang'}</span>
                     <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
                     <span>{outlet.regency ? outlet.regency.replace('_', ' ') : 'D.I. Yogyakarta'}</span>

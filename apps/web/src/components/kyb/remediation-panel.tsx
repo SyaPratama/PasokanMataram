@@ -77,7 +77,7 @@ export function RemediationPanel({
         <h3 className="text-base sm:text-lg font-bold text-gelap font-heading">
           Berkas Perbaikan Berhasil Dikirimkan
         </h3>
-        <p className="text-xs sm:text-sm text-gelap/90 max-w-md mx-auto leading-relaxed font-body">
+        <p className="text-xs sm:text-sm text-gelap-muted max-w-md mx-auto leading-relaxed font-body">
           Status kepatuhan entitas usaha Anda telah beralih kembali ke <strong className="text-gelap font-bold">PENDING_VERIFICATION</strong>. Dokumen telah masuk kembali ke antrean teratas meja kerja audit tim PasokMataram.
         </p>
         <div className="pt-2">
@@ -99,7 +99,7 @@ export function RemediationPanel({
           <h3 className="font-bold text-sm sm:text-base text-sekunder-dark font-heading">
             Permohonan Verifikasi Membutuhkan Perbaikan
           </h3>
-          <p className="text-gelap/90 leading-relaxed font-body">
+          <p className="text-gelap-muted leading-relaxed font-body">
             Tim kepatuhan PasokMataram menandai dokumen <strong className="text-gelap font-bold">{rejectedDocumentType}</strong> memerlukan perbaikan dengan catatan resmi sebagai berikut:
           </p>
           <div className="bg-white p-3.5 rounded-xl border border-sekunder/30 text-gelap font-medium mt-2 italic text-xs leading-relaxed shadow-2xs">
@@ -146,16 +146,16 @@ export function RemediationPanel({
                     <FileText className="w-4 h-4 text-primer shrink-0" aria-hidden="true" />
                     {selectedFile.name}
                   </span>
-                  <span className="text-xs text-gelap/75 flex items-center justify-center gap-1.5 mt-1 font-body">
+                  <span className="text-xs text-gelap-muted flex items-center justify-center gap-1.5 mt-1 font-body">
                     <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
                     <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
                     <span>Klik untuk mengganti berkas</span>
                   </span>
                 </div>
               ) : (
-                <div className="text-xs text-gelap/80 space-y-1 font-body">
+                <div className="text-xs text-gelap-muted space-y-1 font-body">
                   <span className="font-bold text-primer text-sm block">Klik untuk memilih berkas pengganti</span>
-                  <p className="text-xs text-gelap/75">
+                  <p className="text-xs text-gelap-muted">
                     Pastikan lembar tanda tangan dan stempel instansi terlihat utuh serta tidak buram (Format: PDF/WebP maks. 5 MB)
                   </p>
                 </div>
@@ -185,7 +185,7 @@ export function RemediationPanel({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Tuliskan keterangan jika ada halaman tambahan atau konfirmasi nomor surat pengesahan…"
-            className="w-full text-xs sm:text-sm p-3 rounded-xl border border-netral-border focus-visible:ring-2 focus-visible:ring-primer focus-visible:outline-none bg-white text-gelap placeholder:text-gelap/50"
+            className="w-full text-xs sm:text-sm p-3 rounded-xl border border-netral-border focus-visible:ring-2 focus-visible:ring-primer focus-visible:outline-none bg-white text-gelap placeholder:text-gelap-muted"
           />
         </div>
 

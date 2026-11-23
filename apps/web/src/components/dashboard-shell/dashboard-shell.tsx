@@ -88,7 +88,7 @@ export function DashboardShell({
         <nav className="p-3.5 space-y-6 flex-1 overflow-y-auto min-h-0 custom-scrollbar">
           {navGroups.map((group) => (
             <div key={group.title}>
-              <div className="text-[10px] font-bold text-gelap/80 uppercase tracking-wider px-3.5 mb-2">
+              <div className="text-[10px] font-bold text-gelap-muted uppercase tracking-wider px-3.5 mb-2">
                 {group.title}
               </div>
               <div className="space-y-1">
@@ -154,7 +154,7 @@ export function DashboardShell({
               >
                 {tenantProfile.userName}
               </div>
-              <div className="text-[10px] text-gelap/85 font-mono font-medium truncate">
+              <div className="text-[10px] text-gelap-muted font-mono font-medium truncate">
                 {tenantProfile.roleTitle}
               </div>
             </div>
@@ -172,7 +172,7 @@ export function DashboardShell({
 
       <div className="flex-1 flex flex-col min-w-0 md:h-screen md:overflow-hidden">
         <header className="hidden md:flex bg-white border-b border-netral-border/80 px-6 py-3 items-center justify-between sticky top-0 z-20 shadow-2xs flex-shrink-0 min-h-[56px]">
-          <div className="text-xs text-gelap/85 flex items-center gap-2 min-w-0">
+          <div className="text-xs text-gelap-muted flex items-center gap-2 min-w-0">
             {topBarMeta.titleMeta}
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
@@ -258,7 +258,7 @@ export function DashboardShell({
               <nav className="p-3.5 space-y-6 flex-1 overflow-y-auto min-h-0 custom-scrollbar">
                 {navGroups.map((group) => (
                   <div key={group.title}>
-                    <div className="text-[10px] font-bold text-gelap/80 uppercase tracking-wider px-3.5 mb-2">
+                    <div className="text-[10px] font-bold text-gelap-muted uppercase tracking-wider px-3.5 mb-2">
                       {group.title}
                     </div>
                     <div className="space-y-1">
@@ -306,7 +306,7 @@ export function DashboardShell({
                   >
                     {tenantProfile.tenantName}
                   </div>
-                  <div className="text-[10px] text-gelap/85 font-mono font-medium truncate flex items-center gap-1">
+                  <div className="text-[10px] text-gelap-muted font-mono font-medium truncate flex items-center gap-1">
                     <span>{tenantProfile.userName}</span>
                     <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
                     <span>{tenantProfile.roleTitle}</span>
@@ -343,12 +343,12 @@ export function DashboardShell({
                   className={`flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                     item.active
                       ? 'text-primer font-bold'
-                      : 'text-gelap/60 hover:text-primer'
+                      : 'text-gelap-muted hover:text-primer'
                   }`}
                 >
                   <Icon
                     className={`w-5 h-5 mb-1 shrink-0 ${
-                      item.active ? 'text-primer' : 'text-gelap/60'
+                      item.active ? 'text-primer' : 'text-gelap-muted'
                     }`}
                     aria-hidden="true"
                   />
@@ -365,14 +365,14 @@ export function DashboardShell({
               className={`flex flex-col items-center justify-center h-full min-h-[48px] py-1 px-0.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer ${
                 mobileMenuOpen || isOtherActive
                   ? 'text-primer font-bold'
-                  : 'text-gelap/60 hover:text-primer'
+                  : 'text-gelap-muted hover:text-primer'
               }`}
               aria-label="Buka Menu Lainnya"
               aria-expanded={mobileMenuOpen}
             >
               <MoreHorizontal
                 className={`w-5 h-5 mb-1 shrink-0 ${
-                  mobileMenuOpen || isOtherActive ? 'text-primer' : 'text-gelap/60'
+                  mobileMenuOpen || isOtherActive ? 'text-primer' : 'text-gelap-muted'
                 }`}
                 aria-hidden="true"
               />

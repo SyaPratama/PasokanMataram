@@ -152,7 +152,7 @@ export function PublicForecastSimulator() {
             <h3 className="text-sm font-bold text-gelap font-heading">
               Filter &amp; Pencarian Komoditas Pasok
             </h3>
-            <p className="text-xs text-gelap/60 mt-0.5">
+            <p className="text-xs text-gelap-muted mt-0.5">
               Data terintegrasi API harga pangan real-time dan prakiraan cerdas per daerah D.I. Yogyakarta
             </p>
           </div>
@@ -164,7 +164,7 @@ export function PublicForecastSimulator() {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           <div className="md:col-span-5 relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap/50">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gelap-muted">
               <Search className="w-4 h-4 text-primer" aria-hidden="true" />
             </div>
             <input
@@ -175,14 +175,14 @@ export function PublicForecastSimulator() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari komoditas (misal: Bawang, Cabai, Sleman)..."
               aria-label="Cari nama komoditas atau daerah sentra"
-              className="w-full pl-10 pr-9 py-2.5 text-xs text-gelap bg-netral-canvas/40 border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] placeholder:text-gelap/45 transition-colors"
+              className="w-full pl-10 pr-9 py-2.5 text-xs text-gelap bg-netral-canvas/40 border border-netral-border/80 rounded-xl shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primer min-h-[48px] placeholder:text-gelap-muted transition-colors"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label="Hapus kata kunci pencarian"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gelap/50 hover:text-gelap min-h-[48px] min-w-[48px] justify-center"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gelap-muted hover:text-gelap min-h-[48px] min-w-[48px] justify-center"
               >
                 <X className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -190,7 +190,7 @@ export function PublicForecastSimulator() {
           </div>
 
           <div className="md:col-span-4 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gelap/50">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gelap-muted">
               <MapPin className="w-4 h-4 text-sekunder" aria-hidden="true" />
             </div>
             <select
@@ -208,13 +208,13 @@ export function PublicForecastSimulator() {
               <option value="GUNUNGKIDUL">Gunungkidul</option>
               <option value="YOGYAKARTA">Kota Yogyakarta</option>
             </select>
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gelap/50">
-              <ChevronDown className="w-4 h-4 text-gelap/50" aria-hidden="true" />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gelap-muted">
+              <ChevronDown className="w-4 h-4 text-gelap-muted" aria-hidden="true" />
             </div>
           </div>
 
           <div className="md:col-span-3 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gelap/50">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gelap-muted">
               <ArrowUpDown className="w-4 h-4 text-primer" aria-hidden="true" />
             </div>
             <select
@@ -229,15 +229,15 @@ export function PublicForecastSimulator() {
               <option value="price_asc">Harga: Termurah (Asc)</option>
               <option value="price_desc">Harga: Termahal (Desc)</option>
             </select>
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gelap/50">
-              <ChevronDown className="w-4 h-4 text-gelap/50" aria-hidden="true" />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gelap-muted">
+              <ChevronDown className="w-4 h-4 text-gelap-muted" aria-hidden="true" />
             </div>
           </div>
         </div>
 
         {commodities.length > 0 ? (
           <div className="pt-2 border-t border-netral-border/50">
-            <div className="text-xs font-semibold text-gelap/80 mb-2">
+            <div className="text-xs font-semibold text-gelap-muted mb-2">
               Pilih komoditas untuk menampilkan simulasi kurva &amp; wawasan:
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -259,7 +259,7 @@ export function PublicForecastSimulator() {
                       className={`text-[11px] font-mono px-2 py-0.5 rounded whitespace-nowrap ${
                         isSelected
                           ? 'bg-white/20 text-white font-bold'
-                          : 'bg-netral-canvas text-gelap/70'
+                          : 'bg-netral-canvas text-gelap-muted'
                       }`}
                     >
                       Rp&nbsp;{(item.currentPrice / 1000).toFixed(0)}k
@@ -270,7 +270,7 @@ export function PublicForecastSimulator() {
             </div>
           </div>
         ) : (
-          <div className="pt-4 pb-2 text-center text-xs text-gelap/70">
+          <div className="pt-4 pb-2 text-center text-xs text-gelap-muted">
             <p>Tidak ada komoditas yang cocok dengan filter atau kata kunci pencarian.</p>
             <button
               type="button"
@@ -295,7 +295,7 @@ export function PublicForecastSimulator() {
                   <h4 className="text-sm sm:text-base font-bold text-gelap font-heading">
                     Simulasi Skenario Agroklimat &amp; Logistik ML
                   </h4>
-                  <p className="text-xs text-gelap/60">
+                  <p className="text-xs text-gelap-muted">
                     Eksplorasi sensitivitas harga pangan DIY terhadap cuaca BMKG dan tarif transportasi
                   </p>
                 </div>
@@ -308,7 +308,7 @@ export function PublicForecastSimulator() {
                     <span>{simulationSource}</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-netral-canvas text-gelap/70 border border-netral-border">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-netral-canvas text-gelap-muted border border-netral-border">
                     <span>Baseline Model</span>
                   </span>
                 )}
@@ -351,7 +351,7 @@ export function PublicForecastSimulator() {
                       className={`text-[11px] px-2.5 py-1.5 rounded-lg border font-medium whitespace-nowrap min-h-[48px] flex items-center ${
                         rainfallAnomaly === p.val
                           ? 'bg-sekunder text-white border-sekunder'
-                          : 'bg-white border-netral-border text-gelap/80 hover:bg-netral-canvas'
+                          : 'bg-white border-netral-border text-gelap-muted hover:bg-netral-canvas'
                       }`}
                     >
                       {p.label}
@@ -394,7 +394,7 @@ export function PublicForecastSimulator() {
                       className={`text-[11px] px-2.5 py-1.5 rounded-lg border font-medium whitespace-nowrap min-h-[48px] flex items-center ${
                         fuelPriceHike === p.val
                           ? 'bg-primer text-white border-primer'
-                          : 'bg-white border-netral-border text-gelap/80 hover:bg-netral-canvas'
+                          : 'bg-white border-netral-border text-gelap-muted hover:bg-netral-canvas'
                       }`}
                     >
                       {p.label}
@@ -409,9 +409,9 @@ export function PublicForecastSimulator() {
                 <button
                   type="button"
                   onClick={handleResetSimulation}
-                  className="px-4 py-2.5 text-xs font-semibold text-gelap/80 bg-white border border-netral-border rounded-xl hover:bg-netral-canvas min-h-[48px] inline-flex items-center gap-2"
+                  className="px-4 py-2.5 text-xs font-semibold text-gelap-muted bg-white border border-netral-border rounded-xl hover:bg-netral-canvas min-h-[48px] inline-flex items-center gap-2"
                 >
-                  <RotateCcw className="w-4 h-4 text-gelap/60" />
+                  <RotateCcw className="w-4 h-4 text-gelap-muted" />
                   <span>Kembalikan ke Baseline</span>
                 </button>
               )}
@@ -429,27 +429,27 @@ export function PublicForecastSimulator() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-              <div className="text-xs font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap">
+              <div className="text-xs font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap">
                 Harga Rata-Rata Terkini
               </div>
               <div className="text-xl sm:text-2xl font-heading font-black text-gelap mt-1 font-mono tabular-nums whitespace-nowrap">
                 Rp&nbsp;{activeCommodity.currentPrice.toLocaleString('id-ID')}
-                <span className="text-xs font-normal text-gelap/60"> / kg</span>
+                <span className="text-xs font-normal text-gelap-muted"> / kg</span>
               </div>
-              <div className="text-xs text-gelap/60 mt-1 flex items-center gap-1">
+              <div className="text-xs text-gelap-muted mt-1 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-sekunder shrink-0" />
                 <span className="truncate">{activeCommodity.originRegion}</span>
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-              <div className="text-xs font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap">
+              <div className="text-xs font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap">
                 Proyeksi 7 Hari
               </div>
               <div className="text-xl sm:text-2xl font-heading font-black text-primer mt-1 font-mono tabular-nums whitespace-nowrap">
                 Rp&nbsp;{activeCommodity.predictedPrice7d.toLocaleString('id-ID')}
               </div>
-              <div className="text-xs text-gelap/60 mt-1 whitespace-nowrap truncate">
+              <div className="text-xs text-gelap-muted mt-1 whitespace-nowrap truncate">
                 {activeCommodity.predictedPrice7d < activeCommodity.currentPrice
                   ? 'Koreksi turun'
                   : 'Kenaikan bertahap'}
@@ -457,7 +457,7 @@ export function PublicForecastSimulator() {
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-              <div className="text-xs font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap">
+              <div className="text-xs font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap">
                 Proyeksi 30 Hari
               </div>
               <div className="text-xl sm:text-2xl font-heading font-black text-primer mt-1 font-mono tabular-nums whitespace-nowrap">
@@ -471,13 +471,13 @@ export function PublicForecastSimulator() {
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-netral-border/80 shadow-xs">
-              <div className="text-xs font-semibold text-gelap/60 uppercase tracking-wider whitespace-nowrap">
+              <div className="text-xs font-semibold text-gelap-muted uppercase tracking-wider whitespace-nowrap">
                 Akurasi Model ML
               </div>
               <div className="text-xl sm:text-2xl font-heading font-black text-primer mt-1 font-mono tabular-nums whitespace-nowrap">
                 {activeCommodity.confidenceScore}%
               </div>
-              <div className="text-xs text-gelap/60 mt-1 whitespace-nowrap truncate">
+              <div className="text-xs text-gelap-muted mt-1 whitespace-nowrap truncate">
                 Mean Absolute Percentage Error
               </div>
             </div>
@@ -494,7 +494,7 @@ export function PublicForecastSimulator() {
       ) : (
         <div className="p-12 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
           <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
-          <p className="text-xs text-gelap/60">Tidak ada data komoditas yang dipilih atau tersedia.</p>
+          <p className="text-xs text-gelap-muted">Tidak ada data komoditas yang dipilih atau tersedia.</p>
         </div>
       )}
     </div>

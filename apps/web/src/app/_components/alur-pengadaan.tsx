@@ -75,7 +75,7 @@ export function AlurPengadaan({ hideHeader = false }: AlurPengadaanProps = {}) {
             <h2 className="text-2xl sm:text-4xl font-extrabold text-gelap font-heading tracking-tight">
               Bagaimana PasokMataram Mengamankan Dapur Anda
             </h2>
-            <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body">
+            <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
               Empat langkah terintegrasi menghubungkan pesanan dapur HoReKa langsung ke ekosistem supplier pangan lokal D.I. Yogyakarta.
             </p>
           </div>
@@ -102,11 +102,11 @@ export function AlurPengadaan({ hideHeader = false }: AlurPengadaanProps = {}) {
                     {item.title}
                   </h3>
 
-                  <p className="mt-2 text-xs text-gelap/80 leading-relaxed font-body">
+                  <p className="mt-2 text-xs text-gelap-muted leading-relaxed font-body">
                     {item.summary}
                   </p>
 
-                  <ul className="mt-4 space-y-1.5 text-[11px] text-gelap/75 font-body">
+                  <ul className="mt-4 space-y-1.5 text-[11px] text-gelap-muted font-body">
                     {item.points.map((pt, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-primer shrink-0 mt-1" />
@@ -118,7 +118,7 @@ export function AlurPengadaan({ hideHeader = false }: AlurPengadaanProps = {}) {
 
                 <div className="mt-6 pt-3 text-[11px] font-bold text-primer flex items-center justify-between">
                   <span>Tahap {item.step}</span>
-                  <span className="text-gelap/40 font-normal">Selesai Terverifikasi</span>
+                  <span className="text-gelap-muted font-normal">Selesai Terverifikasi</span>
                 </div>
               </div>
             );

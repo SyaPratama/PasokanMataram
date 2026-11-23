@@ -88,7 +88,7 @@ export default function SupplierDashboardPage() {
           <h1 className="text-xl font-bold font-heading text-gelap">
             Meja Kerja Suplai Bahan Pangan &amp; Etalase
           </h1>
-          <p className="text-xs text-gelap/60 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Pantau pasokan harian, alokasi kuota dapur HoReKa, dan jaminan dana escrow supplier.
           </p>
         </div>
@@ -112,37 +112,37 @@ export default function SupplierDashboardPage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/60">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Total Pasokan Siap Kirim</span>
             <div className="p-2 bg-primer-light rounded-lg text-primer">
               <PackageCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-gelap font-heading">
-            4.15 <span className="text-xs font-normal text-gelap/60">Ton</span>
+            4.15 <span className="text-xs font-normal text-gelap-muted">Ton</span>
           </div>
-          <div className="text-[11px] text-gelap/70">
+          <div className="text-[11px] text-gelap-muted">
             Unggas, Daging, Susu, Bumbu &amp; Sayur DIY
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/60">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Terkunci Kontrak HoReKa</span>
             <div className="p-2 bg-sekunder-light rounded-lg text-sekunder">
               <Lock className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-sekunder font-heading">
-            2.50 <span className="text-xs font-normal text-gelap/60">Ton (60.2%)</span>
+            2.50 <span className="text-xs font-normal text-gelap-muted">Ton (60.2%)</span>
           </div>
-          <div className="text-[11px] text-gelap/70">
+          <div className="text-[11px] text-gelap-muted">
             Terikat PO Restoran & Hotel DIY
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/60">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Jadwal Drop Terdekat</span>
             <div className="p-2 bg-netral-canvas rounded-lg text-primer border border-netral-border">
               <Calendar className="w-4 h-4" />
@@ -151,13 +151,13 @@ export default function SupplierDashboardPage() {
           <div className="text-xl font-bold text-gelap font-heading">
             12 Okt 2026
           </div>
-          <div className="text-[11px] text-gelap/70">
+          <div className="text-[11px] text-gelap-muted">
             Sentra Hub Sentolo (1.2 Ton Bawang)
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/60">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Dana Escrow Tertampung</span>
             <div className="p-2 bg-primer-light rounded-lg text-primer">
               <Wallet className="w-4 h-4" />
@@ -166,7 +166,7 @@ export default function SupplierDashboardPage() {
           <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight tabular-nums">
             Rp 65.000.000
           </div>
-          <div className="text-[11px] text-gelap/70">
+          <div className="text-[11px] text-gelap-muted">
             Pencairan Otomatis Pasca QC Digital
           </div>
         </div>
@@ -181,7 +181,7 @@ export default function SupplierDashboardPage() {
               One-Stop Supplier
             </span>
           </div>
-          <p className="text-xs text-gelap/80">
+          <p className="text-xs text-gelap-muted">
             Pajang produk unggas, daging sapi, susu, bumbu, atau hasil panen Anda di etalase katalog HoReKa, dan pantau ulasan kualitas dari para kepala dapur.
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function SupplierDashboardPage() {
             </span>
             <StatusBadge status="VERIFIED" />
           </div>
-          <p className="text-xs text-gelap/70 flex flex-wrap items-center gap-1.5">
+          <p className="text-xs text-gelap-muted flex flex-wrap items-center gap-1.5">
             <span>SK Pengukuhan: <strong>520/SK-DISTAN/KP/2024</strong></span>
             <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
             <span>Diterbitkan oleh: Dinas Pertanian &amp; Ketahanan Pangan Kab. Kulon Progo.</span>
@@ -219,7 +219,7 @@ export default function SupplierDashboardPage() {
             <h2 className="text-sm font-bold text-gelap font-heading">
               Komitmen Jadwal Panen & Alokasi Pasok Sentra Hub
             </h2>
-            <p className="text-xs text-gelap/60 mt-0.5">
+            <p className="text-xs text-gelap-muted mt-0.5">
               Daftar komoditas siap panen yang telah dipesan oleh konsorsium dapur HoReKa PasokMataram.
             </p>
           </div>
@@ -227,7 +227,7 @@ export default function SupplierDashboardPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-netral-canvas text-gelap/70 font-semibold border-b border-netral-border uppercase text-[10px] tracking-wider">
+            <thead className="bg-netral-canvas text-gelap-muted font-semibold border-b border-netral-border uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="py-3 px-4">Kode Panen</th>
                 <th className="py-3 px-4">Komoditas & Varietas</th>
@@ -252,7 +252,7 @@ export default function SupplierDashboardPage() {
                 ))
               ) : commitments.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 px-4 text-center text-gelap/60 text-xs">
+                  <td colSpan={7} className="py-8 px-4 text-center text-gelap-muted text-xs">
                     Tidak Ada
                   </td>
                 </tr>
@@ -264,18 +264,18 @@ export default function SupplierDashboardPage() {
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-gelap">{item.commodityName}</div>
-                      <div className="text-[11px] text-gelap/60">{item.variety || 'Hasil Tani'}</div>
+                      <div className="text-[11px] text-gelap-muted">{item.variety || 'Hasil Tani'}</div>
                     </td>
-                    <td className="py-3.5 px-4 text-gelap/80 font-medium">
+                    <td className="py-3.5 px-4 text-gelap-muted font-medium">
                       {item.estimatedHarvestDate || '-'}
                     </td>
-                    <td className="py-3.5 px-4 text-right font-medium text-gelap/70">
+                    <td className="py-3.5 px-4 text-right font-medium text-gelap-muted">
                       {(item.totalYieldKg || 0).toLocaleString('id-ID')} kg
                     </td>
                     <td className="py-3.5 px-4 text-right font-bold text-primer">
                       {(item.allocatedQuotaKg || 0).toLocaleString('id-ID')} kg
                     </td>
-                    <td className="py-3.5 px-4 text-gelap/70">
+                    <td className="py-3.5 px-4 text-gelap-muted">
                       <div className="flex items-center">
                         <MapPin className="w-3 h-3 mr-1 text-sekunder flex-shrink-0" />
                         <span>{item.dropPointHub || 'Sentra Hub'}</span>
@@ -288,7 +288,7 @@ export default function SupplierDashboardPage() {
                             ? 'bg-sekunder-light text-sekunder border border-sekunder/20'
                             : item.status === 'SIAP_SERAH'
                             ? 'bg-primer-light text-primer border border-primer/20'
-                            : 'bg-netral-canvas text-gelap/70 border border-netral-border'
+                            : 'bg-netral-canvas text-gelap-muted border border-netral-border'
                         }`}
                       >
                         {(item.status || 'PENDING').replace('_', ' ')}
@@ -307,22 +307,22 @@ export default function SupplierDashboardPage() {
           <ClipboardCheck className="w-4 h-4 mr-1.5" />
           Prosedur Serah Terima Tanpa Perantara di Sentra Hub Pengumpulan
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gelap/80">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gelap-muted">
           <div className="bg-white p-3.5 rounded-lg border border-netral-border/50 space-y-1">
             <div className="font-bold text-gelap">1. Drop Subuh di Sentra Hub</div>
-            <p className="text-[11px] text-gelap/60">
+            <p className="text-[11px] text-gelap-muted">
               Petani membawa hasil panen ke sentra hub terdekat (Sentolo, Srandakan, atau Prambanan) maksimal jam 20:00 WIB setelah panen sore.
             </p>
           </div>
           <div className="bg-white p-3.5 rounded-lg border border-netral-border/50 space-y-1">
             <div className="font-bold text-gelap">2. Validasi Timbangan Digital</div>
-            <p className="text-[11px] text-gelap/60">
+            <p className="text-[11px] text-gelap-muted">
               Petugas hub bersama perwakilan kelompok tani menimbang bobot bersih dan mengisi formulir digital QC langsung pada tablet hub.
             </p>
           </div>
           <div className="bg-white p-3.5 rounded-lg border border-netral-border/50 space-y-1">
             <div className="font-bold text-gelap">3. Pencairan Escrow Otomatis</div>
-            <p className="text-[11px] text-gelap/60">
+            <p className="text-[11px] text-gelap-muted">
               Begitu tanda terima digital disetujui, dana escrow yang ditahan oleh pembeli otomatis dilepas ke rekening kas kelompok tani.
             </p>
           </div>

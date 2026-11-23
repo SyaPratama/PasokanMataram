@@ -61,7 +61,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
           <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-primer-light text-primer">
             {facility.badge}
           </span>
-          <span className="text-xs text-gelap/60 font-medium">Standar Operasional Prosedur</span>
+          <span className="text-xs text-gelap-muted font-medium">Standar Operasional Prosedur</span>
         </div>
 
         <h2
@@ -81,7 +81,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
           />
         </div>
 
-        <p className="text-xs sm:text-sm text-gelap/85 font-body leading-relaxed mb-6">
+        <p className="text-xs sm:text-sm text-gelap-muted font-body leading-relaxed mb-6">
           {facility.summary}
         </p>
 
@@ -93,7 +93,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
             {facility.sopSteps.map((step, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl bg-netral-canvas border border-netral-border/70 flex items-start gap-2.5 text-xs text-gelap/90 leading-relaxed font-body"
+                className="p-3 rounded-xl bg-netral-canvas border border-netral-border/70 flex items-start gap-2.5 text-xs text-gelap-muted leading-relaxed font-body"
               >
                 <CheckCircle2 className="w-4 h-4 text-primer shrink-0 mt-0.5" aria-hidden="true" />
                 <span>{step}</span>
@@ -112,7 +112,7 @@ export function FacilityDetailModal({ facility, onClose }: FacilityDetailModalPr
                 key={idx}
                 className="p-3 rounded-xl bg-white border border-netral-border text-center"
               >
-                <div className="text-[10px] text-gelap/60 font-bold uppercase tracking-wider">
+                <div className="text-[10px] text-gelap-muted font-bold uppercase tracking-wider">
                   {spec.label}
                 </div>
                 <div className="text-xs font-extrabold text-primer mt-1 font-heading">

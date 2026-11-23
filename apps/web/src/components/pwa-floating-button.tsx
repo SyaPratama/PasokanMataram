@@ -132,14 +132,14 @@ export function PwaFloatingButton() {
                   type="button"
                   onClick={() => setModalOpen(false)}
                   aria-label="Tutup dialog"
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-gelap/60 hover:text-gelap hover:bg-netral-canvas transition-colors"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-gelap-muted hover:text-gelap hover:bg-netral-canvas transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="py-4 space-y-3.5">
-                <p className="text-xs sm:text-sm text-gelap/80 leading-relaxed font-body">
+                <p className="text-xs sm:text-sm text-gelap-muted leading-relaxed font-body">
                   Pasang PasokMataram langsung ke layar utama tablet koki atau smartphone manajer tanpa perlu mengunduh berkas besar dari App Store atau Play Store.
                 </p>
 
@@ -177,7 +177,7 @@ export function PwaFloatingButton() {
                 {showManualGuide && !isIos && (
                   <div className="bg-primer-light/70 border border-primer/20 rounded-2xl p-4 text-xs space-y-1.5 text-gelap">
                     <span className="font-bold text-primer block">Panduan Pemasangan Cepat Browser:</span>
-                    <p className="text-gelap/85 leading-relaxed">
+                    <p className="text-gelap-muted leading-relaxed">
                       Klik ikon <strong>Instal Aplikasi</strong> di bilah alamat browser atau buka menu browser (tiga titik) lalu pilih <strong>&quot;Pasang PasokMataram&quot;</strong> atau <strong>&quot;Install App&quot;</strong>.
                     </p>
                   </div>
@@ -204,7 +204,7 @@ export function PwaFloatingButton() {
                 )}
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="px-5 py-3 rounded-full text-xs font-semibold text-gelap/70 hover:text-gelap hover:bg-netral-canvas transition-colors min-h-[44px]"
+                  className="px-5 py-3 rounded-full text-xs font-semibold text-gelap-muted hover:text-gelap hover:bg-netral-canvas transition-colors min-h-[44px]"
                 >
                   Tutup
                 </button>

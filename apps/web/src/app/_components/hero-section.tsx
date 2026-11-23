@@ -164,12 +164,12 @@ export function HeroSection() {
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-sm font-bold font-heading rounded-full bg-white hover:bg-netral-canvas text-gelap hover:text-primer border border-netral-border/80 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] min-h-[48px]"
             >
               <span>Lihat Komoditas Pangan</span>
-              <ArrowRight className="w-4 h-4 ml-2 text-gelap/60" aria-hidden="true" />
+              <ArrowRight className="w-4 h-4 ml-2 text-gelap-muted" aria-hidden="true" />
             </Link>
           </div>
 
           <div className="mt-12 sm:mt-16 pt-6 max-w-3xl mx-auto">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gelap/70 mb-4 font-heading">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gelap-muted mb-4 font-heading">
               Didukung Sinergi Ekosistem Sourcing &amp; Perbankan D.I. Yogyakarta
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-semibold text-gelap">

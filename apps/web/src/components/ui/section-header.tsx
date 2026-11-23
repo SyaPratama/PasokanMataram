@@ -90,7 +90,7 @@ export function SectionHeader({
       </h2>
 
       {description && (
-        <p className="mt-3.5 text-sm sm:text-base text-gelap/80 font-body leading-relaxed">
+        <p className="mt-3.5 text-sm sm:text-base text-gelap-muted font-body leading-relaxed">
           {description}
         </p>
       )}

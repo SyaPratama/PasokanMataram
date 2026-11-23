@@ -30,19 +30,19 @@ export function SupplierContextCard({
 
   return (
     <div className="space-y-2.5">
-      <div className="text-[11px] font-semibold text-gelap/85 uppercase tracking-wider px-1">
+      <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider px-1">
         Mitra Pemasok Pangan:
       </div>
       <div className="bg-white p-3 rounded-xl border border-netral-border/80 shadow-2xs space-y-1.5">
         <div className="text-xs font-bold text-gelap leading-snug font-heading truncate" title={displayName}>
           {displayName}
         </div>
-        <div className="text-[11px] text-gelap/85 flex items-center font-medium">
+        <div className="text-[11px] text-gelap-muted flex items-center font-medium">
           <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder flex-shrink-0" aria-hidden="true" />
           <span className="truncate">{location}</span>
         </div>
         <div className="pt-1.5 border-t border-netral-border/60 flex items-center justify-between gap-2">
-          <span className="text-[10px] text-gelap/85 font-medium">Status Legalitas:</span>
+          <span className="text-[10px] text-gelap-muted font-medium">Status Legalitas:</span>
           <StatusBadge status={status} />
         </div>
       </div>

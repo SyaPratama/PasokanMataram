@@ -27,7 +27,7 @@ export function HubContextCard({
 }: HubContextCardProps) {
   return (
     <div className="space-y-2.5">
-      <div className="text-[11px] font-semibold text-gelap/85 uppercase tracking-wider px-1">
+      <div className="text-[11px] font-semibold text-gelap-muted uppercase tracking-wider px-1">
         Fasilitas Logistik Aktif:
       </div>
       <div className="bg-white p-3 rounded-xl border border-netral-border/80 shadow-2xs space-y-1.5">
@@ -39,12 +39,12 @@ export function HubContextCard({
             {facilityCode}
           </span>
         </div>
-        <div className="text-[11px] text-gelap/85 flex items-center font-medium">
+        <div className="text-[11px] text-gelap-muted flex items-center font-medium">
           <MapPin className="w-3.5 h-3.5 mr-1 text-sekunder flex-shrink-0" aria-hidden="true" />
           <span className="truncate">{location}</span>
         </div>
         <div className="pt-1.5 border-t border-netral-border/60 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 text-[10px] text-gelap/85 font-medium">
+          <div className="flex items-center gap-1 text-[10px] text-gelap-muted font-medium">
             <Scale className="w-3 h-3 text-sekunder" aria-hidden="true" />
             <span>Timbangan Tera</span>
           </div>

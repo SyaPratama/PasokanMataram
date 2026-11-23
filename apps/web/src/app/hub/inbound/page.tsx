@@ -48,7 +48,7 @@ export default function HubInboundPage() {
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Inbound Muatan Truk Masuk & Uji Mutu QC
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Validasi manifes surat jalan, penimbangan digital, dan uji kadar air panen sebelum distribusi subuh.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function HubInboundPage() {
           <div className="p-6 rounded-2xl bg-netral-canvas/60 border-2 border-dashed border-netral-border text-center space-y-2">
             <Truck className="w-8 h-8 text-primer mx-auto" />
             <div className="text-xs font-bold text-gelap">Truk AB-8120-QZ Tiba</div>
-            <p className="text-[10px] text-gelap/60 flex items-center justify-center gap-1.5">
+            <p className="text-[10px] text-gelap-muted flex items-center justify-center gap-1.5">
               <span>Supir: Pak Tejo</span>
               <span className="w-1 h-1 rounded-full bg-netral-border inline-block" aria-hidden="true" />
               <span>Tiba: 03:45 WIB</span>
@@ -78,15 +78,15 @@ export default function HubInboundPage() {
 
           <div className="space-y-2 text-xs divide-y divide-netral-border/60">
             <div className="pt-2 flex justify-between">
-              <span className="text-gelap/60">Pemasok Sentra:</span>
+              <span className="text-gelap-muted">Pemasok Sentra:</span>
               <strong className="text-gelap">{supplierName}</strong>
             </div>
             <div className="pt-2 flex justify-between">
-              <span className="text-gelap/60">Komoditas:</span>
+              <span className="text-gelap-muted">Komoditas:</span>
               <strong className="text-primer">{commodity}</strong>
             </div>
             <div className="pt-2 flex justify-between">
-              <span className="text-gelap/60">Estimasi Manifes:</span>
+              <span className="text-gelap-muted">Estimasi Manifes:</span>
               <strong className="text-gelap">{manifestWeight} kg</strong>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function HubInboundPage() {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setActualWeight(Number(e.target.value))}
                 className="w-full text-base font-bold font-mono h-11"
               />
-              <p className="text-[11px] text-gelap/65 mt-1">
+              <p className="text-[11px] text-gelap-muted mt-1">
                 Selisih: <strong className={varianceKg < 0 ? 'text-amber-700' : 'text-green-700'}>
                   {varianceKg} kg ({variancePercent}%)
                 </strong>
@@ -138,7 +138,7 @@ export default function HubInboundPage() {
                 />
                 <Droplets className="w-4 h-4 text-primer absolute right-3 top-1/2 -translate-y-1/2" />
               </div>
-              <p className="text-[11px] text-gelap/65 mt-1">
+              <p className="text-[11px] text-gelap-muted mt-1">
                 Batas maksimal mutu Grade A: &le; 14.0%
               </p>
             </div>

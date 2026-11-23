@@ -28,12 +28,12 @@ export default function HubOverviewPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Stasiun Aktif 24 Jam</Badge>
-            <span className="text-xs text-gelap/60">Wilayah D.I. Yogyakarta</span>
+            <span className="text-xs text-gelap-muted">Wilayah D.I. Yogyakarta</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Meja Kerja Operasional Cross-Dock Hub Transit
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Sentra sortir fisik, timbangan digital tera, dan staging rantai dingin terpadu untuk hasil panen dan supplier pangan DIY.
           </p>
         </div>
@@ -50,46 +50,46 @@ export default function HubOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Inbound Truk Masuk</span>
+            <span className="text-xs font-semibold text-gelap-muted">Inbound Truk Masuk</span>
             <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <Truck className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">12 Truk</div>
-          <p className="text-[11px] text-gelap/60 mt-1">8 terverifikasi, 4 dalam antrean</p>
+          <p className="text-[11px] text-gelap-muted mt-1">8 terverifikasi, 4 dalam antrean</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Tonase Diterima Hari Ini</span>
+            <span className="text-xs font-semibold text-gelap-muted">Tonase Diterima Hari Ini</span>
             <div className="w-8 h-8 rounded-lg bg-aksen-light flex items-center justify-center text-aksen-dark">
               <Scale className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-bold font-heading text-gelap mt-2 whitespace-nowrap tracking-tight tabular-nums">8.450 kg</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Deviasi rata-rata: -0.8% (Aman)</p>
+          <p className="text-[11px] text-gelap-muted mt-1">Deviasi rata-rata: -0.8% (Aman)</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Lolos QC Grade A</span>
+            <span className="text-xs font-semibold text-gelap-muted">Lolos QC Grade A</span>
             <div className="w-8 h-8 rounded-lg bg-primer-light flex items-center justify-center text-primer">
               <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-primer mt-2">98.4%</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Kadar air rata-rata: 13.1%</p>
+          <p className="text-[11px] text-gelap-muted mt-1">Kadar air rata-rata: 13.1%</p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/80 shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gelap/70">Karantina Deviasi</span>
+            <span className="text-xs font-semibold text-gelap-muted">Karantina Deviasi</span>
             <div className="w-8 h-8 rounded-lg bg-status-danger-light flex items-center justify-center text-status-danger">
               <ShieldAlert className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="text-2xl font-bold font-heading text-status-danger mt-2">1 Batch</div>
-          <p className="text-[11px] text-gelap/60 mt-1">Remediasi sortasi ulang</p>
+          <p className="text-[11px] text-gelap-muted mt-1">Remediasi sortasi ulang</p>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Inbound &amp; QC Sortasi
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Pemindaian QR surat jalan dan uji kadar air digital</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Pemindaian QR surat jalan dan uji kadar air digital</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -127,7 +127,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Stasiun Timbangan Tera
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Sertifikasi timbangan digital Metrologi Legal DIY</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Sertifikasi timbangan digital Metrologi Legal DIY</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -148,7 +148,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Jadwal Antar Subuh
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Manajemen armada cold-chain hasil panen dan supplier menuju gerai HoReKa</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Manajemen armada cold-chain hasil panen dan supplier menuju gerai HoReKa</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer whitespace-nowrap">
@@ -169,7 +169,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Karantina Deviasi Mutu
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Pemisahan komoditas tidak sesuai toleransi &plusmn;5%</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Pemisahan komoditas tidak sesuai toleransi &plusmn;5%</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -190,7 +190,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 SOP Standar Fasilitas
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Panduan penanganan suhu dingin dan uji kadar air pangan</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Panduan penanganan suhu dingin dan uji kadar air pangan</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">
@@ -211,7 +211,7 @@ export default function HubOverviewPage() {
               <h2 className="text-sm font-bold text-gelap font-heading group-hover:text-primer transition-colors">
                 Pusat Bantuan Stasiun
               </h2>
-              <p className="text-xs text-gelap/65 mt-0.5">Kontak darurat kendala timbangan dan radio logistik</p>
+              <p className="text-xs text-gelap-muted mt-0.5">Kontak darurat kendala timbangan dan radio logistik</p>
             </div>
           </div>
           <div className="mt-4 flex items-center text-xs font-semibold text-primer">

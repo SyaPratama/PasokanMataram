@@ -15,7 +15,7 @@ export function MekanismePoolingSection() {
           <h2 className="mt-2 text-2xl md:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Mekanisme Pooling: Harga Grosir untuk Dapur Mandiri
           </h2>
-          <p className="mt-3 text-sm md:text-base text-gelap/85 font-body">
+          <p className="mt-3 text-sm md:text-base text-gelap-muted font-body">
             Kafe dan resto independen sering membayar premi 35% lebih mahal di pasar eceran karena volume harian di bawah muatan truk. PasokMataram menggabungkan alokasi dapur Anda dalam satu kontrak panen kolektif.
           </p>
         </div>
@@ -27,7 +27,7 @@ export function MekanismePoolingSection() {
                 1
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Buka Kuota Pasokan</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Supplier pangan dan Gapoktan mitra mengumumkan ketersediaan pasokan dengan batas minimum tonase muatan truk (25 kg hingga 2 ton).
               </p>
             </div>
@@ -43,7 +43,7 @@ export function MekanismePoolingSection() {
                 2
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Kunci Alokasi & Escrow</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Dapur memesan porsi (25 sampai 100 kg). Saldo pesanan dikunci dengan aman di rekening penampung escrow terproteksi.
               </p>
             </div>
@@ -59,7 +59,7 @@ export function MekanismePoolingSection() {
                 3
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">QC Hub Transit Bantul</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Panen tiba sore hari di Hub Transit untuk kalibrasi timbangan digital presisi dan penyortiran fisik grade A.
               </p>
             </div>
@@ -75,7 +75,7 @@ export function MekanismePoolingSection() {
                 4
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Drop Subuh & Rilis Dana</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Armada mengantar komoditas pukul 04:30 WIB. Koki memvalidasi kualitas via QC digital sebelum dana escrow dilepas ke supplier.
               </p>
             </div>
@@ -98,7 +98,7 @@ export function MekanismePoolingSection() {
               </h3>
             </div>
             <div className="text-left sm:text-right">
-              <span className="text-xs text-gelap/85 font-medium block">Target Tonase Batch</span>
+              <span className="text-xs text-gelap-muted font-medium block">Target Tonase Batch</span>
               <span className="text-base font-extrabold text-primer font-mono tabular-nums">850 kg / 1.000 kg (85%)</span>
             </div>
           </div>
@@ -115,7 +115,7 @@ export function MekanismePoolingSection() {
                 aria-label="Progress kuota pooling bawang merah"
               />
             </div>
-            <div className="flex justify-between items-center text-xs text-gelap/85 mt-2 font-body">
+            <div className="flex justify-between items-center text-xs text-gelap-muted mt-2 font-body">
               <span>Sisa kuota: 150 kg (Tutup pemesanan hari ini 16:00 WIB)</span>
               <span className="font-bold text-sekunder-dark">Harga Langsung Produsen: Rp 24.500/kg</span>
             </div>
@@ -126,7 +126,7 @@ export function MekanismePoolingSection() {
               <CheckCircle2 className="w-4 h-4 text-primer mt-0.5 flex-shrink-0" />
               <div className="text-xs">
                 <span className="font-bold text-gelap block">Garansi Bebas Risiko Retur</span>
-                <span className="text-gelap/85 font-medium">Jika komoditas rusak saat pengiriman, dana escrow dikembalikan secara otomatis.</span>
+                <span className="text-gelap-muted font-medium">Jika komoditas rusak saat pengiriman, dana escrow dikembalikan secara otomatis.</span>
               </div>
             </div>
 
@@ -134,7 +134,7 @@ export function MekanismePoolingSection() {
               <ShieldCheck className="w-4 h-4 text-sekunder mt-0.5 flex-shrink-0" />
               <div className="text-xs">
                 <span className="font-bold text-gelap block">Standar Timbangan Akurat</span>
-                <span className="text-gelap/85 font-medium">Kompensasi 100% jika timbangan fisik dapur berbeda dari timbangan digital hub.</span>
+                <span className="text-gelap-muted font-medium">Kompensasi 100% jika timbangan fisik dapur berbeda dari timbangan digital hub.</span>
               </div>
             </div>
           </div>

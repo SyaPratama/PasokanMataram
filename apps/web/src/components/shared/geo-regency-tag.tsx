@@ -18,7 +18,7 @@ const REGENCY_LABELS: Record<DIYRegency, string> = {
 export function GeoRegencyTag({ regency, className = '' }: GeoRegencyTagProps) {
   return (
     <span
-      className={`inline-flex items-center text-xs font-medium text-gelap/80 bg-netral/30 px-2 py-0.5 rounded border border-netral-border/50 ${className}`}
+      className={`inline-flex items-center text-xs font-medium text-gelap-muted bg-netral/30 px-2 py-0.5 rounded border border-netral-border/50 ${className}`}
     >
       <MapPin className="w-3 h-3 mr-1 text-sekunder" aria-hidden="true" />
       {REGENCY_LABELS[regency] || regency}

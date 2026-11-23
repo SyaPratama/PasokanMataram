@@ -242,7 +242,7 @@ export default function BuyerPoolingPage() {
         ) : pools.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-2xl border-2 border-netral-border/80 shadow-xs">
             <h3 className="text-base font-bold text-gelap font-heading mb-1">Tidak Ada</h3>
-            <p className="text-xs text-gelap/60">Tidak ada kuota pooling panen yang aktif saat ini.</p>
+            <p className="text-xs text-gelap-muted">Tidak ada kuota pooling panen yang aktif saat ini.</p>
           </div>
         ) : (
           pools.map((pool) => {

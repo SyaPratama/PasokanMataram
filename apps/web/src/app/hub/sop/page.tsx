@@ -65,12 +65,12 @@ export default function HubSopPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Standar Operasional Prosedur Resmi</Badge>
-            <span className="text-xs text-gelap/60">Versi 2.4 - Standar Mutu Pangan DIY</span>
+            <span className="text-xs text-gelap-muted">Versi 2.4 - Standar Mutu Pangan DIY</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             SOP Standar Fasilitas Hub Transit
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Pedoman baku penanganan komoditas segar, kalibrasi timbangan, dan rantai dingin subuh se-DIY.
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function HubSopPage() {
                 </div>
               </div>
 
-              <ul className="space-y-2 text-xs text-gelap/85 leading-relaxed">
+              <ul className="space-y-2 text-xs text-gelap-muted leading-relaxed">
                 {sop.points.map((pt, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-primer mt-1.5 shrink-0" aria-hidden="true" />

@@ -141,7 +141,7 @@ export default function SupplierMarketPage() {
               Mitra Pemasok DIY
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-gelap/70 mt-1">
+          <p className="text-xs sm:text-sm text-gelap-muted mt-1">
             Kelola dagangan etalase Anda yang dilihat langsung oleh kepala dapur HoReKa, pantau ulasan kualitas barang, dan lihat reputasi bisnis calon pembeli.
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function SupplierMarketPage() {
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] flex items-center gap-1.5 ${
             activeTab === 'etalase'
               ? 'bg-primer text-white shadow-xs'
-              : 'bg-white border border-netral-border text-gelap/75 hover:bg-netral-canvas'
+              : 'bg-white border border-netral-border text-gelap-muted hover:bg-netral-canvas'
           }`}
         >
           <Store className="w-4 h-4" />
@@ -185,7 +185,7 @@ export default function SupplierMarketPage() {
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] flex items-center gap-1.5 ${
             activeTab === 'ulasan_saya'
               ? 'bg-primer text-white shadow-xs'
-              : 'bg-white border border-netral-border text-gelap/75 hover:bg-netral-canvas'
+              : 'bg-white border border-netral-border text-gelap-muted hover:bg-netral-canvas'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -198,7 +198,7 @@ export default function SupplierMarketPage() {
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] flex items-center gap-1.5 ${
             activeTab === 'profil_pembeli'
               ? 'bg-primer text-white shadow-xs'
-              : 'bg-white border border-netral-border text-gelap/75 hover:bg-netral-canvas'
+              : 'bg-white border border-netral-border text-gelap-muted hover:bg-netral-canvas'
           }`}
         >
           <Building2 className="w-4 h-4" />
@@ -217,7 +217,7 @@ export default function SupplierMarketPage() {
               <h3 className="text-base font-bold text-gelap font-heading mb-1">
                 {loadError ? 'Katalog Tidak Tersedia' : 'Belum Ada Produk'}
               </h3>
-              <p className="text-xs text-gelap/60">
+              <p className="text-xs text-gelap-muted">
                 {loadError || 'Belum ada dagangan aktif yang terdaftar di etalase Anda.'}
               </p>
             </div>
@@ -235,16 +235,16 @@ export default function SupplierMarketPage() {
                     </span>
                   </div>
                   <h2 className="text-base font-heading font-bold text-gelap">{item.name}</h2>
-                  <p className="text-xs text-gelap/70 mt-1 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-gelap-muted mt-1 leading-relaxed line-clamp-2">
                     Supplier: {item.supplierName}
                   </p>
-                  <div className="mt-3 text-xs text-gelap/60">
+                  <div className="mt-3 text-xs text-gelap-muted">
                     <span className="font-mono">Stok: <strong>{item.stockAvailable} kg</strong></span>
                   </div>
                 </div>
                 <div className="mt-5 pt-3 border-t border-netral-border/60 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] text-gelap/60 uppercase">Harga per kg:</div>
+                    <div className="text-[10px] text-gelap-muted uppercase">Harga per kg:</div>
                     <div className="text-lg font-heading font-extrabold text-primer font-mono tabular-nums">
                       Rp {item.price.toLocaleString('id-ID')}
                     </div>
@@ -263,14 +263,14 @@ export default function SupplierMarketPage() {
       {activeTab === 'ulasan_saya' && (
         <div className="p-8 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
           <h3 className="text-sm font-bold text-gelap font-heading mb-1">Belum Ada Data Ulasan</h3>
-          <p className="text-xs text-gelap/60">Ulasan mitra tampil setelah transaksi tersimpan.</p>
+          <p className="text-xs text-gelap-muted">Ulasan mitra tampil setelah transaksi tersimpan.</p>
         </div>
       )}
 
       {activeTab === 'profil_pembeli' && (
         <div className="p-8 text-center bg-white rounded-2xl border border-netral-border/80 shadow-xs">
           <h3 className="text-sm font-bold text-gelap font-heading mb-1">Belum Ada Data Pembeli</h3>
-          <p className="text-xs text-gelap/60">Profil pembeli tampil setelah data reputasi tersedia.</p>
+          <p className="text-xs text-gelap-muted">Profil pembeli tampil setelah data reputasi tersedia.</p>
         </div>
       )}
       {isAddModalOpen && (
@@ -287,7 +287,7 @@ export default function SupplierMarketPage() {
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1 rounded-lg text-gelap/60 hover:text-gelap"
+                className="p-1 rounded-lg text-gelap-muted hover:text-gelap"
               >
                 <X className="w-5 h-5" />
               </button>

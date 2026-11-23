@@ -128,7 +128,7 @@ export default function BuyerDashboardPage() {
                 {currentRole}
               </span>
             </div>
-            <p className="text-[11px] text-gelap/85 mt-0.5">
+            <p className="text-[11px] text-gelap-muted mt-0.5">
               {hasFinancialAccess
                 ? 'Akses penuh saldo pembayaran, mutasi perbankan, dan pengadaan multi-outlet aktif.'
                 : 'Metrik saldo & transaksi keuangan disembunyikan total demi privasi bisnis.'}
@@ -160,7 +160,7 @@ export default function BuyerDashboardPage() {
           <h1 className="text-xl font-bold font-heading text-gelap">
             {hasFinancialAccess ? 'Ringkasan Pengadaan & Finansial' : 'Meja Kerja Operasional Dapur'}
           </h1>
-          <p className="text-xs text-gelap/85 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             {hasFinancialAccess
               ? 'Pantau perputaran dana komoditas, standing orders gerai, dan status pembayaran.'
               : 'Pantau ketersediaan stok bahan segar dan alokasi pool kuota.'}
@@ -188,7 +188,7 @@ export default function BuyerDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {hasFinancialAccess ? (
           <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-gelap/80">
+            <div className="flex items-center justify-between text-gelap-muted">
               <span className="text-xs font-semibold uppercase tracking-wider">Saldo Tersedia</span>
               <div className="p-2 bg-primer-light rounded-xl text-primer">
                 <Wallet className="w-4 h-4" />
@@ -197,13 +197,13 @@ export default function BuyerDashboardPage() {
             <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight tabular-nums">
               {orders.length > 0 ? `Rp ${orders.reduce((sum, o) => sum + (o.totalRp || 0), 0).toLocaleString('id-ID')}` : 'Tidak Ada'}
             </div>
-            <div className="text-[11px] text-gelap/85 font-medium">
+            <div className="text-[11px] text-gelap-muted font-medium">
               Data rekening belum tersedia
             </div>
           </div>
         ) : (
           <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-gelap/80">
+            <div className="flex items-center justify-between text-gelap-muted">
               <span className="text-xs font-semibold uppercase tracking-wider">Stok Bahan Siap Pakai</span>
               <div className="p-2 bg-primer-light rounded-xl text-primer">
                 <CookingPot className="w-4 h-4" />
@@ -212,7 +212,7 @@ export default function BuyerDashboardPage() {
             <div className="text-xl sm:text-2xl font-bold text-primer font-heading whitespace-nowrap tracking-tight">
               {orders.length > 0 ? `${orders.reduce((sum, o) => sum + (o.quantityKg || 0), 0)} Kilogram` : 'Tidak Ada'}
             </div>
-            <div className="text-[11px] text-gelap/85 font-medium">
+            <div className="text-[11px] text-gelap-muted font-medium">
               {orders.length > 0 ? 'Stok Dapur Terjadwal' : 'Tidak Ada'}
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function BuyerDashboardPage() {
 
         {hasFinancialAccess ? (
           <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-gelap/80">
+            <div className="flex items-center justify-between text-gelap-muted">
               <span className="text-xs font-semibold uppercase tracking-wider">Hemat Pooling Bulan Ini</span>
               <div className="p-2 bg-sekunder-light rounded-xl text-sekunder">
                 <TrendingDown className="w-4 h-4" />
@@ -229,13 +229,13 @@ export default function BuyerDashboardPage() {
             <div className="text-xl sm:text-2xl font-bold text-sekunder font-heading whitespace-nowrap tracking-tight tabular-nums">
               Tidak tersedia
             </div>
-            <div className="text-[11px] text-gelap/85 flex items-center font-medium">
+            <div className="text-[11px] text-gelap-muted flex items-center font-medium">
               Belum ada data pembanding harga
             </div>
           </div>
         ) : (
           <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between text-gelap/80">
+            <div className="flex items-center justify-between text-gelap-muted">
               <span className="text-xs font-semibold uppercase tracking-wider">Kalkulator Resep COGS</span>
               <div className="p-2 bg-aksen/15 rounded-xl text-aksen-dark">
                 <Sparkles className="w-4 h-4" />
@@ -244,14 +244,14 @@ export default function BuyerDashboardPage() {
             <div className="text-xl sm:text-2xl font-bold text-gelap font-heading whitespace-nowrap tracking-tight">
               Tidak tersedia
             </div>
-            <div className="text-[11px] text-gelap/85 font-medium">
+            <div className="text-[11px] text-gelap-muted font-medium">
               Data resep COGS belum tersedia
             </div>
           </div>
         )}
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/80">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Jadwal Drop Terdekat</span>
             <div className="p-2 bg-netral-canvas rounded-xl text-primer border border-netral-border">
               <Clock className="w-4 h-4" />
@@ -260,13 +260,13 @@ export default function BuyerDashboardPage() {
           <div className="text-xl font-bold text-gelap font-heading">
             {orders.length > 0 ? 'Belum ada jadwal pengiriman' : 'Tidak Ada'}
           </div>
-          <div className="text-[11px] text-gelap/85 font-medium flex items-center gap-1.5">
+          <div className="text-[11px] text-gelap-muted font-medium flex items-center gap-1.5">
             Waktu pengiriman belum tercatat
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-netral-border/70 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-gelap/80">
+          <div className="flex items-center justify-between text-gelap-muted">
             <span className="text-xs font-semibold uppercase tracking-wider">Jaminan Mutu QC Hub</span>
             <div className="p-2 bg-primer-light rounded-xl text-primer">
               <ShieldCheck className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function BuyerDashboardPage() {
           <div className="text-xl font-bold text-primer font-heading flex items-center">
             Grade A Prima
           </div>
-          <div className="text-[11px] text-gelap/85 font-medium">
+          <div className="text-[11px] text-gelap-muted font-medium">
             Lolos uji kadar air &lt; 14%
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function BuyerDashboardPage() {
             <h2 className="text-sm font-bold text-gelap font-heading">
               Daftar Pesanan &amp; Reservasi Berjalan
             </h2>
-            <p className="text-[11px] text-gelap/85 mt-0.5">
+            <p className="text-[11px] text-gelap-muted mt-0.5">
               Daftar reservasi dan pesanan komoditas pangan dari supplier terdaftar.
             </p>
           </div>
@@ -298,7 +298,7 @@ export default function BuyerDashboardPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-netral-canvas/60 text-gelap/85 font-semibold border-b border-netral-border">
+            <thead className="bg-netral-canvas/60 text-gelap-muted font-semibold border-b border-netral-border">
               <tr>
                 <th className="p-3.5">ID Pesanan</th>
                 <th className="p-3.5">Komoditas</th>
@@ -322,7 +322,7 @@ export default function BuyerDashboardPage() {
                 ))
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={hasFinancialAccess ? 6 : 5} className="p-8 text-center text-gelap/60 text-xs">
+                  <td colSpan={hasFinancialAccess ? 6 : 5} className="p-8 text-center text-gelap-muted text-xs">
                     Belum ada data pesanan aktif.
                   </td>
                 </tr>
@@ -334,7 +334,7 @@ export default function BuyerDashboardPage() {
                     </td>
                     <td className="p-3.5">
                       <div className="font-semibold">{order.commodityName || 'Tidak Ada'}</div>
-                      <div className="text-[10px] text-gelap/85">{order.deliveryWindow}</div>
+                      <div className="text-[10px] text-gelap-muted">{order.deliveryWindow}</div>
                     </td>
                     <td className="p-3.5">
                       <div>{order.outletName || 'Tidak Ada'}</div>

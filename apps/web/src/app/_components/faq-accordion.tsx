@@ -61,7 +61,7 @@ export function FaqAccordionSection() {
             <h2 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight leading-tight">
               Jawaban Lengkap Operasional Pengadaan & Escrow
             </h2>
-            <p className="mt-4 text-xs sm:text-sm text-gelap/80 font-body leading-relaxed">
+            <p className="mt-4 text-xs sm:text-sm text-gelap-muted font-body leading-relaxed">
               Memahami bagaimana alur proteksi uang muka, toleransi timbangan, dan mekanisme retur bekerja sebelum Anda memulai pengadaan pertama.
             </p>
 
@@ -74,7 +74,7 @@ export function FaqAccordionSection() {
                   <h3 className="font-heading font-bold text-xs sm:text-sm text-gelap">
                     Proteksi Transaksi 100%
                   </h3>
-                  <p className="text-[11px] text-gelap/70 font-body mt-0.5">
+                  <p className="text-[11px] text-gelap-muted font-body mt-0.5">
                     Dana hanya cair ke supplier setelah koki Anda menyatakan kualitas sesuai.
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export function FaqAccordionSection() {
                   <h3 className="font-heading font-bold text-xs sm:text-sm text-gelap">
                     Bantuan Lapangan Siaga
                   </h3>
-                  <p className="text-[11px] text-gelap/70 font-body mt-0.5">
+                  <p className="text-[11px] text-gelap-muted font-body mt-0.5">
                     Petugas Hub Transit Bantul siap melayani remediasi timbangan setiap hari kerja.
                   </p>
                 </div>
@@ -114,7 +114,7 @@ export function FaqAccordionSection() {
                       className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
                         isOpen
                           ? 'rotate-180 bg-primer text-white'
-                          : 'bg-netral-canvas text-gelap/60'
+                          : 'bg-netral-canvas text-gelap-muted'
                       }`}
                     >
                       <ChevronDown className="w-4 h-4" />
@@ -129,7 +129,7 @@ export function FaqAccordionSection() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
                       >
-                        <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-gelap/80 font-body leading-relaxed border-t border-netral-border/50 pt-4">
+                        <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-gelap-muted font-body leading-relaxed border-t border-netral-border/50 pt-4">
                           {item.jawaban}
                         </div>
                       </motion.div>

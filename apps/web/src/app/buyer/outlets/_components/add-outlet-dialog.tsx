@@ -110,7 +110,7 @@ export function AddOutletDialog({ isOpen, onClose, onSuccess }: AddOutletDialogP
                 <option value="KOTA_YOGYAKARTA">Kota Yogyakarta</option>
               </select>
               <ChevronDown
-                className="w-4 h-4 text-gelap/50 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                className="w-4 h-4 text-gelap-muted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
                 aria-hidden="true"
               />
             </div>

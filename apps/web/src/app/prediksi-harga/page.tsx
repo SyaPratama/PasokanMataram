@@ -33,11 +33,11 @@ export default function PrediksiHargaPage() {
       <main className="flex-1">
         <div className="bg-transparent pt-6 pb-2 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <nav className="flex items-center text-xs text-gelap/60 mb-3" aria-label="Breadcrumb">
+            <nav className="flex items-center text-xs text-gelap-muted mb-3" aria-label="Breadcrumb">
               <Link href="/" className="hover:text-primer transition-colors">
                 Beranda
               </Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-gelap/40" />
+              <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-gelap-muted" />
               <span className="font-semibold text-primer">Prediksi Harga Pasok</span>
             </nav>
 
@@ -50,7 +50,7 @@ export default function PrediksiHargaPage() {
                 <h1 className="text-2xl sm:text-4xl font-heading font-extrabold text-gelap tracking-tight">
                   Prakiraan Tren Harga Pasokan Pangan D.I. Yogyakarta
                 </h1>
-                <p className="text-xs sm:text-base text-gelap/70 mt-2 leading-relaxed">
+                <p className="text-xs sm:text-base text-gelap-muted mt-2 leading-relaxed">
                   Teknologi Machine Learning multi-horizon yang mengombinasikan deret waktu harga pasar tradisional, kalender panen Gapoktan, dan mikroklimat BMKG DIY untuk keputusan pengadaan dapur yang lebih presisi.
                 </p>
               </div>

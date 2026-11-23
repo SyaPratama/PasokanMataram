@@ -49,12 +49,12 @@ export default function AdminDocsPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="success">Dokumentasi Resmi Terpusat</Badge>
-            <span className="text-xs text-gelap/60">Arsitektur Monorepo Turborepo</span>
+            <span className="text-xs text-gelap-muted">Arsitektur Monorepo Turborepo</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold font-heading text-gelap">
             Pusat Dokumentasi Platform &amp; Tata Kelola
           </h1>
-          <p className="text-xs text-gelap/65 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Dokumentasi prinsip konstitusi, spesifikasi antrean asinkron, dan panduan audit kepatuhan KYB DIY.
           </p>
         </div>
@@ -74,10 +74,10 @@ export default function AdminDocsPage() {
               <Badge variant="outline">{doc.docPath.split('/').pop()}</Badge>
             </div>
 
-            <p className="text-xs text-gelap/85 leading-relaxed">{doc.summary}</p>
+            <p className="text-xs text-gelap-muted leading-relaxed">{doc.summary}</p>
 
             <div className="pt-2 border-t border-netral-border/60 flex items-center justify-between text-xs">
-              <span className="font-mono text-[11px] text-gelap/60 truncate max-w-xs">{doc.docPath}</span>
+              <span className="font-mono text-[11px] text-gelap-muted truncate max-w-xs">{doc.docPath}</span>
               <Button
                 variant="outline"
                 size="sm"

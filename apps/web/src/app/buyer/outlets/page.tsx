@@ -95,7 +95,7 @@ export default function OutletsPage() {
               Manajemen Gerai & Cabang Dapur
             </h1>
           </div>
-          <p className="text-xs text-gelap/60 mt-1">
+          <p className="text-xs text-gelap-muted mt-1">
             Kelola titik cabang restoran, alamat pengantaran subuh, dan staf penanggung jawab dapur di wilayah DIY.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function OutletsPage() {
             <label htmlFor="buyer-outlet-search" className="sr-only">
               Cari nama gerai, alamat, atau narahubung
             </label>
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gelap/40" aria-hidden="true" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-gelap-muted" aria-hidden="true" />
             <Input
               id="buyer-outlet-search"
               name="buyer-outlet-search"
@@ -129,7 +129,7 @@ export default function OutletsPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
-            <span className="text-[11px] font-semibold text-gelap/50 uppercase mr-1 hidden lg:inline">
+            <span className="text-[11px] font-semibold text-gelap-muted uppercase mr-1 hidden lg:inline">
               Wilayah:
             </span>
             <button
@@ -138,7 +138,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'ALL'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Semua ({outlets.length})
@@ -149,7 +149,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'SLEMAN'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Sleman
@@ -160,7 +160,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'BANTUL'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Bantul
@@ -171,7 +171,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'KULON_PROGO'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Kulon Progo
@@ -182,7 +182,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'GUNUNGKIDUL'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Gunungkidul
@@ -193,7 +193,7 @@ export default function OutletsPage() {
               className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                 regencyFilter === 'KOTA_YOGYAKARTA'
                   ? 'bg-primer text-white font-semibold'
-                  : 'bg-netral-canvas text-gelap/70 hover:bg-netral/40'
+                  : 'bg-netral-canvas text-gelap-muted hover:bg-netral/40'
               }`}
             >
               Kota Yogya
@@ -218,11 +218,11 @@ export default function OutletsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-netral-border/60 p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-full bg-netral-canvas flex items-center justify-center text-gelap/40 mx-auto">
+          <div className="w-12 h-12 rounded-full bg-netral-canvas flex items-center justify-center text-gelap-muted mx-auto">
             <MapPin className="w-6 h-6" />
           </div>
           <h3 className="text-sm font-bold text-gelap">Tidak Ada Gerai Ditemukan</h3>
-          <p className="text-xs text-gelap/60 max-w-sm mx-auto">
+          <p className="text-xs text-gelap-muted max-w-sm mx-auto">
             Tidak ada gerai cabang yang cocok dengan kata kunci pencarian atau filter wilayah terpilih.
           </p>
           <Button
@@ -239,7 +239,7 @@ export default function OutletsPage() {
         </div>
       )}
 
-      <div className="bg-white p-3.5 rounded-xl border border-netral-border/60 flex items-center justify-between text-xs text-gelap/70">
+      <div className="bg-white p-3.5 rounded-xl border border-netral-border/60 flex items-center justify-between text-xs text-gelap-muted">
         <div>
           Menampilkan <strong>{filteredOutlets.length}</strong> dari <strong>{outlets.length}</strong> gerai terdaftar
         </div>

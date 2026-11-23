@@ -56,7 +56,7 @@ export function PaymentMethodSelector({ selected, onSelect }: PaymentMethodSelec
               </div>
             )}
             <div className="text-sm font-bold text-gelap">{method.label}</div>
-            <div className="text-xs text-gelap/70 mt-1">{method.description}</div>
+            <div className="text-xs text-gelap-muted mt-1">{method.description}</div>
           </button>
         ))}
       </div>

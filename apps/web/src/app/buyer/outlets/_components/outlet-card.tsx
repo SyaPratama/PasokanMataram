@@ -23,7 +23,7 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
       <div>
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2.5 min-w-0">
-            <div className={`p-2 rounded-lg ${outlet.isMain ? 'bg-primer text-white' : 'bg-netral-canvas text-gelap/80 border border-netral-border'}`}>
+            <div className={`p-2 rounded-lg ${outlet.isMain ? 'bg-primer text-white' : 'bg-netral-canvas text-gelap-muted border border-netral-border'}`}>
               <Building2 className="w-4 h-4" aria-hidden="true" />
             </div>
             <div className="min-w-0">
@@ -31,7 +31,7 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
                 {outlet.name}
               </h3>
               <div className="mt-1">
-                {isDIYRegency(outlet.regency) ? <GeoRegencyTag regency={outlet.regency} /> : <span className="text-xs text-gelap/80">{outlet.regency}</span>}
+                {isDIYRegency(outlet.regency) ? <GeoRegencyTag regency={outlet.regency} /> : <span className="text-xs text-gelap-muted">{outlet.regency}</span>}
               </div>
             </div>
           </div>
@@ -42,12 +42,12 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
           )}
         </div>
 
-        <p className="text-xs text-gelap/70 line-clamp-2 pt-1">
+        <p className="text-xs text-gelap-muted line-clamp-2 pt-1">
           {outlet.streetAddress}
         </p>
 
         {(outlet.contactPerson || outlet.phone || (typeof outlet.latitude === 'number' && typeof outlet.longitude === 'number')) ? (
-          <div className="pt-2.5 space-y-1.5 text-xs text-gelap/80 border-t border-netral-border/40">
+          <div className="pt-2.5 space-y-1.5 text-xs text-gelap-muted border-t border-netral-border/40">
             {outlet.contactPerson && (
               <div className="flex items-center text-[11px]">
                 <UserCheck className="w-3.5 h-3.5 mr-1.5 text-sekunder flex-shrink-0" />
@@ -55,26 +55,26 @@ export function OutletCard({ outlet, onSelect }: OutletCardProps) {
               </div>
             )}
             {outlet.phone && (
-              <div className="flex items-center text-[11px] text-gelap/70">
+              <div className="flex items-center text-[11px] text-gelap-muted">
                 <Phone className="w-3.5 h-3.5 mr-1.5 text-primer flex-shrink-0" />
                 <span>{outlet.phone}</span>
               </div>
             )}
             {typeof outlet.latitude === 'number' && typeof outlet.longitude === 'number' && (
-              <div className="text-[10px] text-gelap/50 pt-0.5 font-mono">
+              <div className="text-[10px] text-gelap-muted pt-0.5 font-mono">
                 Koordinat: {outlet.latitude.toFixed(4)}, {outlet.longitude.toFixed(4)}
               </div>
             )}
           </div>
         ) : (
-          <div className="pt-2.5 text-[11px] text-gelap/60 border-t border-netral-border/40">
+          <div className="pt-2.5 text-[11px] text-gelap-muted border-t border-netral-border/40">
             Detail narahubung belum tercatat
           </div>
         )}
       </div>
 
       <div className="pt-3 border-t border-netral-border/60 flex items-center justify-between text-xs">
-        <div className="flex items-center text-[11px] text-gelap/70">
+        <div className="flex items-center text-[11px] text-gelap-muted">
           <Package className="w-3.5 h-3.5 mr-1 text-sekunder" />
           <span>{typeof outlet.activeOrdersCount === 'number' ? `${outlet.activeOrdersCount} PO tercatat` : 'Status PO belum tercatat'}</span>
         </div>

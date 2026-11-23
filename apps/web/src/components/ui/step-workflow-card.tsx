@@ -47,12 +47,12 @@ export function StepWorkflowCard({
           {title}
         </h3>
 
-        <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+        <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
           {description}
         </p>
 
         {points && points.length > 0 && (
-          <ul className="mt-4 space-y-1.5 text-xs text-gelap/80 font-body">
+          <ul className="mt-4 space-y-1.5 text-xs text-gelap-muted font-body">
             {points.map((pt, idx) => (
               <li key={idx} className="flex items-start gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-primer shrink-0 mt-1.5" />

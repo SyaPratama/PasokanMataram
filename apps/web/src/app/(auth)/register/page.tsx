@@ -133,7 +133,7 @@ export default function RegisterPage() {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
             intent === 'HOREKA'
               ? 'bg-primer text-white shadow-sm'
-              : 'text-gelap/70 hover:text-gelap'
+              : 'text-gelap-muted hover:text-gelap'
           }`}
           aria-pressed={intent === 'HOREKA'}
         >
@@ -146,7 +146,7 @@ export default function RegisterPage() {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-bold transition-all ${
             intent === 'GAPOKTAN'
               ? 'bg-sekunder text-white shadow-sm'
-              : 'text-gelap/70 hover:text-gelap'
+              : 'text-gelap-muted hover:text-gelap'
           }`}
           aria-pressed={intent === 'GAPOKTAN'}
         >
@@ -188,7 +188,7 @@ export default function RegisterPage() {
             Kabupaten / Kota
           </label>
           <div className="relative">
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gelap/50 pointer-events-none" aria-hidden="true" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gelap-muted pointer-events-none" aria-hidden="true" />
             <select
               id="reg-regency"
               name="regency"
@@ -271,7 +271,7 @@ export default function RegisterPage() {
             placeholder="Minimal 8 karakter"
             className="w-full text-sm min-h-[48px] rounded-xl"
           />
-          <p className="mt-1.5 text-[10px] text-gelap/60">
+          <p className="mt-1.5 text-[10px] text-gelap-muted">
             Gunakan kombinasi huruf besar, huruf kecil, dan angka untuk keamanan maksimal.
           </p>
         </div>
@@ -286,7 +286,7 @@ export default function RegisterPage() {
             onChange={(e) => setFormData((prev) => ({ ...prev, acceptedTerms: e.target.checked }))}
             className="mt-1 w-4 h-4 text-primer border-netral-border rounded focus:ring-primer/20"
           />
-          <label htmlFor="acceptedTerms" className="text-xs text-gelap/85 leading-relaxed">
+          <label htmlFor="acceptedTerms" className="text-xs text-gelap-muted leading-relaxed">
             Saya menyetujui{' '}
             <a href="/terms" target="_blank" className="text-primer hover:text-primer-hover font-semibold underline">
               Syarat dan Ketentuan
@@ -318,7 +318,7 @@ export default function RegisterPage() {
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-xs text-gelap/60">
+        <p className="text-xs text-gelap-muted">
           Sudah punya akun?{' '}
           <Link href="/login" className="text-primer font-bold hover:underline">
             Masuk di sini
@@ -331,7 +331,7 @@ export default function RegisterPage() {
           <ShieldCheck className="w-5 h-5 text-primer mt-0.5 flex-shrink-0" aria-hidden="true" />
           <div>
             <h3 className="text-xs font-bold text-gelap mb-1">Keamanan Terjamin</h3>
-            <p className="text-[10px] text-gelap/65 leading-relaxed">
+            <p className="text-[10px] text-gelap-muted leading-relaxed">
               Data usaha Anda dilindungi dengan enkripsi end-to-end dan kebijakan privasi ketat.
               Tidak ada biaya tersembunyi untuk pendaftaran.
             </p>

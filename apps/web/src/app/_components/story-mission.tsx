@@ -52,15 +52,15 @@ export function StoryMissionSection() {
                 Menghubungkan Sentra Panen Langsung ke Meja Dapur Kafe
               </h2>
 
-              <p className="mt-4 text-sm sm:text-base text-gelap/85 font-body leading-relaxed text-justify sm:text-left">
+              <p className="mt-4 text-sm sm:text-base text-gelap-muted font-body leading-relaxed text-justify sm:text-left">
                 Selama ini, bahan pangan segar berpindah tangan hingga 5 titik tengkulak sebelum sampai ke dapur kafe di Sleman atau Yogyakarta. Akibatnya, kualitas menyusut dan harga melonjak hingga 40%.
               </p>
 
-              <p className="mt-3 text-sm sm:text-base text-gelap/85 font-body leading-relaxed text-justify sm:text-left">
+              <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body leading-relaxed text-justify sm:text-left">
                 PasokMataram memfasilitasi pengadaan bahan pangan terpadu langsung dari supplier lokal D.I. Yogyakarta dengan jaminan standar mutu koki, kalibrasi timbangan digital di Hub Transit, serta sistem pembayaran escrow yang adil bagi pemasok dan pelaku usaha kuliner.
               </p>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gelap/85 font-medium">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gelap-muted font-medium">
                 <div className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-netral-border/60">
                   <div className="w-6 h-6 rounded-full bg-primer-light text-primer flex items-center justify-center">
                     <Check className="w-3.5 h-3.5 text-primer" aria-hidden="true" />

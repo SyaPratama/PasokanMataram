@@ -21,47 +21,47 @@ export default function PrivacyPolicyPage() {
         <h1 className="text-3xl font-bold font-heading text-gelap mb-2">
           Kebijakan Privasi
         </h1>
-        <p className="text-sm text-gelap/70 mb-8">Terakhir diperbarui: 3 November 2026</p>
+        <p className="text-sm text-gelap-muted mb-8">Terakhir diperbarui: 3 November 2026</p>
 
         <div className="bg-white rounded-2xl border border-netral-border p-8 space-y-6">
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">1. Pengumpulan Data</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Kami mengumpulkan informasi yang Anda berikan saat registrasi, verifikasi KYB, dan transaksi: nama bisnis, NIB, NPWP, alamat, kontak, dan dokumen legalitas.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">2. Penggunaan Data</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Data digunakan untuk: (a) Verifikasi identitas bisnis, (b) Pemrosesan transaksi dan pembayaran, (c) Penyampaian notifikasi logistik, (d) Audit kepatuhan regulasi pangan.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">3. Keamanan Data</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Data dilindungi dengan enkripsi TLS 1.3, Row-Level Security (RLS) multi-tenant, dan penyimpanan dokumen terenkripsi melalui Appwrite Storage.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">4. Berbagi Data</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Kami tidak menjual data pribadi. Data dibagikan hanya kepada: (a) Solosmartpay untuk pemrosesan pembayaran, (b) Partner logistik untuk pengiriman, (c) Otoritas berwenang jika diwajibkan hukum.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">5. Hak Pengguna</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Anda berhak mengakses, mengubah, dan menghapus data pribadi. Hubungi privacy@pasokmataram.id untuk permintaan terkait data.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold font-heading text-gelap mb-3">6. Cookies</h2>
-            <p className="text-sm text-gelap/85 leading-relaxed">
+            <p className="text-sm text-gelap-muted leading-relaxed">
               Kami menggunakan cookies untuk autentikasi sesi dan preferensi pengguna. Tidak ada cookies pelacakan pihak ketiga.
             </p>
           </section>

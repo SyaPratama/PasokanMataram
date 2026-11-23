@@ -16,7 +16,7 @@ export default function BuyerHelpPage() {
         <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-gelap tracking-tight">
           Pusat Bantuan & Narahubung Operasional
         </h1>
-        <p className="text-xs sm:text-sm text-gelap/70 mt-1">
+        <p className="text-xs sm:text-sm text-gelap-muted mt-1">
           Layanan cepat untuk asistensi jadwal subuh, klaim retur mutu, dan bantuan teknis aplikasi.
         </p>
       </div>
@@ -29,7 +29,7 @@ export default function BuyerHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Hotline Darurat Logistik Subuh
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Aktif pukul 02.30 - 07.00 WIB untuk koordinasi kedatangan armada van pendingin di gerai.
           </p>
           <div className="font-mono text-sm font-bold text-primer">
@@ -44,7 +44,7 @@ export default function BuyerHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Helpdesk Chat WhatsApp
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Konsultasi kontrak standing order, kuota pooling panen, dan onboarding KYB.
           </p>
           <div className="font-mono text-sm font-bold text-sekunder">
@@ -59,7 +59,7 @@ export default function BuyerHelpPage() {
           <h2 className="text-sm font-heading font-bold text-gelap">
             Panduan Standar QC
           </h2>
-          <p className="text-xs text-gelap/70">
+          <p className="text-xs text-gelap-muted">
             Unduh matriks toleransi kadar air dan sertifikasi komoditas sayur segar DIY.
           </p>
           <a

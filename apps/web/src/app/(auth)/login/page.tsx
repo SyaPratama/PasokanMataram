@@ -174,7 +174,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-1 top-1/2 -translate-y-1/2 text-gelap/60 hover:text-gelap min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-gelap-muted hover:text-gelap min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primer"
               aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -202,7 +202,7 @@ function LoginForm() {
       </form>
 
       <div className="bg-netral-canvas/60 px-6 py-3.5 border-t border-netral-border/60 text-center">
-        <p className="text-[11px] text-gelap/85 font-medium flex items-center justify-center gap-1.5 font-body">
+        <p className="text-[11px] text-gelap-muted font-medium flex items-center justify-center gap-1.5 font-body">
           <ShieldCheck className="w-3.5 h-3.5 text-primer" aria-hidden="true" />
           Terproteksi Sistem Enkripsi &amp; Keamanan Data Usaha
         </p>

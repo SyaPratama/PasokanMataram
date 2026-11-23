@@ -38,7 +38,7 @@ export function KybBlockerModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-gelap/50 hover:text-gelap hover:bg-netral-canvas transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full text-gelap-muted hover:text-gelap hover:bg-netral-canvas transition-colors"
           aria-label="Tutup dialog verifikasi legalitas"
         >
           <X className="w-5 h-5" aria-hidden="true" />
@@ -52,7 +52,7 @@ export function KybBlockerModal({
           Verifikasi Legalitas Usaha Diperlukan
         </h2>
 
-        <p className="text-xs text-gelap/85 mt-2 leading-relaxed">
+        <p className="text-xs text-gelap-muted mt-2 leading-relaxed">
           Aktivitas memesan dan membeli pasokan dapur mewajibkan akun usaha terdaftar lengkap dengan identitas resmi (KTP Penanggung Jawab &amp; NIB / Izin Usaha). Verifikasi berkas dapat dilengkapi kapan saja melalui menu <strong>Legalitas &amp; KYB</strong> di dashboard.
         </p>
 
@@ -61,7 +61,7 @@ export function KybBlockerModal({
             <FileText className="w-4 h-4 text-primer" aria-hidden="true" />
             <span>Syarat Memesan &amp; Membeli:</span>
           </div>
-          <p className="text-[11px] text-gelap/75 mt-1 leading-relaxed">
+          <p className="text-[11px] text-gelap-muted mt-1 leading-relaxed">
             Tindakan <span className="font-semibold text-gelap">{actionAttempted}</span>
             {quotaKg ? ` (${quotaKg} kg)` : ''} memerlukan validasi identitas resmi KTP penanggung jawab dan Nomor Induk Berusaha (NIB) sesuai regulasi kliring perbankan escrow pangan.
           </p>

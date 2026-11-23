@@ -20,7 +20,7 @@ export function SolutionsGridSection() {
           <h2 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gelap font-heading tracking-tight">
             Langkah Mudah Kolaborasi Sourcing
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gelap/70 font-body">
+          <p className="mt-3 text-sm sm:text-base text-gelap-muted font-body">
             Empat tahapan terstruktur dari penentuan alokasi panen hingga pengantaran tiba segar di gerai dapur Anda.
           </p>
         </div>
@@ -38,7 +38,7 @@ export function SolutionsGridSection() {
                 01
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Hubungkan Profil Usaha</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Daftarkan profil bisnis restoran (HoReKa) atau supplier bahan pangan Anda secara mandiri.
               </p>
             </div>
@@ -57,7 +57,7 @@ export function SolutionsGridSection() {
                 02
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Kunci Alokasi Kuota</h3>
-              <p className="mt-2 text-xs text-gelap/80 leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted leading-relaxed font-body">
                 Pilih kuota tonase komoditas panen mingguan. Saldo dikunci aman di penampung escrow bersama.
               </p>
             </div>
@@ -80,7 +80,7 @@ export function SolutionsGridSection() {
                 03
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">QC di Hub Transit Bantul</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Uji petik kadar air, sortir fisik grade A, dan kalibrasi timbangan digital sebelum pengiriman.
               </p>
             </div>
@@ -99,7 +99,7 @@ export function SolutionsGridSection() {
                 04
               </div>
               <h3 className="font-heading font-bold text-base text-gelap">Drop Subuh & Rilis Dana</h3>
-              <p className="mt-2 text-xs text-gelap/85 font-medium leading-relaxed font-body">
+              <p className="mt-2 text-xs text-gelap-muted font-medium leading-relaxed font-body">
                 Armada tiba sesuai slot pesanan harian dapur (Pagi, Siang, Sore, Malam, atau Dini Hari).
               </p>
             </div>
@@ -115,7 +115,7 @@ export function SolutionsGridSection() {
             <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-gelap font-heading tracking-tight leading-tight">
               Standar Mutu & Fasilitas Hub Transit Sentral
             </h2>
-            <p className="mt-4 text-xs sm:text-sm text-gelap/85 font-body leading-relaxed">
+            <p className="mt-4 text-xs sm:text-sm text-gelap-muted font-body leading-relaxed">
               Fasilitas Hub Transit fisik di Bantul menjembatani kontrol mutu untuk mengeliminasi sengketa timbangan dan penyusutan kualitas barang.
             </p>
             <p className="mt-2 text-xs text-primer font-medium">

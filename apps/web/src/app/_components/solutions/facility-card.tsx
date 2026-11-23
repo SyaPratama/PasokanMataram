@@ -54,7 +54,7 @@ export function FacilityCard({ facility, index, onSelect }: FacilityCardProps) {
           {facility.title}
         </h3>
 
-        <p className="mt-2 text-xs text-gelap/85 font-body leading-relaxed line-clamp-3">
+        <p className="mt-2 text-xs text-gelap-muted font-body leading-relaxed line-clamp-3">
           {facility.summary}
         </p>
       </div>
