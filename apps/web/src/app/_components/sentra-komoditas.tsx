@@ -310,7 +310,7 @@ export function SentraKomoditasSection() {
                       <span className="text-[11px] text-gelap/85 font-semibold whitespace-nowrap shrink-0">Min. 25 kg</span>
                       <Link
                         href="/register"
-                        className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-xl bg-primer-surface/10 hover:bg-primer hover:text-white text-xs font-bold text-primer-deep group-hover:shadow-xs transition-all min-h-[38px] whitespace-nowrap shrink-0"
+                        className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-xl bg-primer-surface/10 hover:bg-primer hover:text-white text-xs font-bold text-primer-deep group-hover:shadow-xs transition-all min-h-[44px] whitespace-nowrap shrink-0"
                       >
                         <span>Ikut Kuota</span>
                         <ArrowRight className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
@@ -335,7 +335,7 @@ export function SentraKomoditasSection() {
                       aria-selected={activeSlide === idx}
                       aria-label={`Lihat komoditas ${item.nama}`}
                       onClick={() => handleSelectSlide(idx)}
-                      className="p-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primer transition-all"
+                      className="p-2.5 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primer transition-all inline-flex items-center justify-center min-w-[44px] min-h-[44px]"
                     >
                       <span
                         className={`block rounded-full transition-all duration-300 ${

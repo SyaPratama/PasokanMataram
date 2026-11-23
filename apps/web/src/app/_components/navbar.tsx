@@ -220,7 +220,7 @@ export function Navbar() {
           <Link
             href="/"
             onClick={handleScrollToTop}
-            className="flex items-center space-x-2.5 focus-visible:ring-2 focus-visible:ring-primer rounded-full py-1 pr-2 group"
+            className="flex items-center space-x-2.5 focus-visible:ring-2 focus-visible:ring-primer rounded-full py-1 pr-2 group min-h-[44px]"
           >
             <div className="w-8 h-8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image

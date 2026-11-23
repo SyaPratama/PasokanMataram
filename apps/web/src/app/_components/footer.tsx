@@ -40,32 +40,32 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-white/80">
               <li>
-                <Link href="/" className="hover:text-white transition-colors">
+                <Link href="/" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Beranda
                 </Link>
               </li>
               <li>
-                <Link href="/tentang" className="hover:text-white transition-colors">
+                <Link href="/tentang" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Tentang Sourcing
                 </Link>
               </li>
               <li>
-                <Link href="/alur-pengadaan" className="hover:text-white transition-colors">
+                <Link href="/alur-pengadaan" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Alur Pengadaan
                 </Link>
               </li>
               <li>
-                <Link href="/paket-layanan" className="hover:text-white transition-colors">
+                <Link href="/paket-layanan" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Paket Layanan
                 </Link>
               </li>
               <li>
-                <Link href="/komoditas" className="hover:text-white transition-colors">
+                <Link href="/komoditas" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Sentra Komoditas
                 </Link>
               </li>
               <li>
-                <Link href="/prediksi-harga" className="hover:text-white transition-colors">
+                <Link href="/prediksi-harga" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
                   Prediksi Harga Pasok
                 </Link>
               </li>
@@ -116,15 +116,15 @@ export function Footer() {
             Hak Cipta 2026 PasokMataram. Konsorsium AgriTech D.I. Yogyakarta.
           </p>
           <div className="flex items-center space-x-4">
-            <Link href="/register" className="hover:text-white transition-colors">
+            <Link href="/register" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
               Pendaftaran HoReKa
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
-            <Link href="/register" className="hover:text-white transition-colors">
+            <Link href="/register" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
               Pendaftaran Supplier Pangan
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/40 inline-block" aria-hidden="true" />
-            <Link href="/buyer/legalitas" className="hover:text-white transition-colors">
+            <Link href="/buyer/legalitas" className="hover:text-white transition-colors min-h-[44px] inline-flex items-center">
               Legalitas & KYB
             </Link>
           </div>

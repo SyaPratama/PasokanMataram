@@ -270,7 +270,7 @@ export function PaketLayanan() {
                   aria-selected={activeSlide === idx}
                   aria-label={`Lihat paket ${tier.name}`}
                   onClick={() => handleSelectSlide(idx)}
-                  className="p-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primer transition-all"
+                  className="p-2.5 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primer transition-all inline-flex items-center justify-center min-w-[44px] min-h-[44px]"
                 >
                   <span
                     className={`block rounded-full transition-all duration-300 ${
